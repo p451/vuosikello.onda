@@ -47,8 +47,8 @@ const AikajanaKalenteri = () => {
   const [events, setEvents] = useState({
     pyhät: [],
     holidays: [],
-    bakery: [],
-    gym: []
+    pending: [],
+    tablereservation: []
   });
 
   useEffect(() => {
@@ -71,8 +71,8 @@ const AikajanaKalenteri = () => {
       const formattedEvents = {
         pyhät: [],
         holidays: [],
-        bakery: [],
-        gym: []
+        pending: [],
+        tablereservation: []
       };
 
       data.forEach(event => {
@@ -250,9 +250,9 @@ const AikajanaKalenteri = () => {
         return 'bg-red-400';
       case 'general':
         return 'bg-purple-200';
-      case 'bakery':
+      case 'pending':
         return 'bg-yellow-200';
-      case 'gym':
+      case 'tablereservation':
         return 'bg-blue-200';
       default:
         return 'bg-gray-200';
@@ -265,9 +265,9 @@ const AikajanaKalenteri = () => {
         return 'Pyhäpäivät';
       case 'general':
         return 'Yleinen';
-      case 'bakery':
+      case 'pending':
         return 'Leipomo';
-      case 'gym':
+      case 'tablereservation':
         return 'Sali';
       default:
         return type;
@@ -305,7 +305,7 @@ const AikajanaKalenteri = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
   
-    const types = ['pyhät', 'general', 'bakery', 'gym'];
+    const types = ['pyhät', 'general', 'pending', 'tablereservation'];
     const { start, end } = getViewDateRange();
     const viewTitle = {
       day: 'päivän',
@@ -333,8 +333,8 @@ const AikajanaKalenteri = () => {
             }
             .pyhät { background-color: #fc8181 !important; }
             .general { background-color: #d6bcfa !important; }
-            .bakery { background-color: #faf089 !important; }
-            .gym { background-color: #90cdf4 !important; }
+            .pending { background-color: #faf089 !important; }
+            .tablereservation { background-color: #90cdf4 !important; }
             @media print {
               @page { margin: 1cm; }
               .event-item { 
@@ -496,7 +496,7 @@ const AikajanaKalenteri = () => {
                   </div>
                   <div className="space-y-1 flex flex-col mt-1">
                     {/* Other event types */}
-                    {['general', 'bakery', 'gym'].map(type => (
+                    {['general', 'pending', 'tablereservation'].map(type => (
                       <div key={type} className="event-row min-h-[1.5rem]">
                         {renderDayEvents(events[type === 'general' ? 'holidays' : type], day, type)}
                       </div>
@@ -525,7 +525,7 @@ const AikajanaKalenteri = () => {
                   {renderDayEvents(events.pyhät, day, 'pyhät')}
                 </div>
                 {/* Other event types */}
-                {['general', 'bakery', 'gym'].map(type => (
+                {['general', 'pending', 'tablereservation'].map(type => (
                   <div key={type} className="event-row min-h-[1.5rem]">
                     {renderDayEvents(events[type === 'general' ? 'holidays' : type], day, type)}
                   </div>
@@ -545,7 +545,7 @@ const AikajanaKalenteri = () => {
               {renderDayEvents(events.pyhät, currentDate, 'pyhät')}
             </div>
             {/* Other event types */}
-            {['general', 'bakery', 'gym'].map(type => (
+            {['general', 'pending', 'tablereservation'].map(type => (
               <div key={type} className="event-row min-h-[1.5rem]">
                 {renderDayEvents(events[type === 'general' ? 'holidays' : type], currentDate, type)}
               </div>
