@@ -47,8 +47,8 @@ const AikajanaKalenteri = () => {
   const [events, setEvents] = useState({
     pyhät: [],
     holidays: [],
-    pending: [],
-    tablereservation: []
+    pending: [], // Changed from bakery
+    tablereservation: [] // Changed from gym
   });
 
   useEffect(() => {
@@ -71,8 +71,8 @@ const AikajanaKalenteri = () => {
       const formattedEvents = {
         pyhät: [],
         holidays: [],
-        pending: [],
-        tablereservation: []
+        pending: [], // Changed from bakery
+        tablereservation: [] // Changed from gym
       };
 
       data.forEach(event => {
@@ -250,9 +250,9 @@ const AikajanaKalenteri = () => {
         return 'bg-red-400';
       case 'general':
         return 'bg-purple-200';
-      case 'pending':
+      case 'pending': // Changed from bakery
         return 'bg-yellow-200';
-      case 'tablereservation':
+      case 'tablereservation': // Changed from gym
         return 'bg-blue-200';
       default:
         return 'bg-gray-200';
@@ -265,10 +265,10 @@ const AikajanaKalenteri = () => {
         return 'Pyhäpäivät';
       case 'general':
         return 'Yleinen';
-      case 'pending':
-        return 'Leipomo';
-      case 'tablereservation':
-        return 'Sali';
+      case 'pending': // Changed from bakery
+        return 'Pending';
+      case 'tablereservation': // Changed from gym
+        return 'Table Reservation';
       default:
         return type;
     }
@@ -409,11 +409,11 @@ const AikajanaKalenteri = () => {
       </div>
       <div className="legend-item">
         <div className="legend-color w-4 h-4 rounded bg-yellow-200"></div>
-        <span className="ml-2">Leipomo</span>
+        <span className="ml-2">Pending</span>
       </div>
       <div className="legend-item">
         <div className="legend-color w-4 h-4 rounded bg-blue-200"></div>
-        <span className="ml-2">Sali</span>
+        <span className="ml-2">Table Reservation</span>
       </div>
     </div>
   );
@@ -651,19 +651,19 @@ const AikajanaKalenteri = () => {
           </button>
           <button
             className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              selectedLayer === 'bakery' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              selectedLayer === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200'
             }`}
-            onClick={() => setSelectedLayer('bakery')}
+            onClick={() => setSelectedLayer('pending')}
           >
-            Leipomo
+            Pending
           </button>
           <button
             className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              selectedLayer === 'gym' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              selectedLayer === 'tablereservation' ? 'bg-blue-500 text-white' : 'bg-gray-200'
             }`}
-            onClick={() => setSelectedLayer('gym')}
+            onClick={() => setSelectedLayer('tablereservation')}
           >
-            Sali
+            Table Reservation
           </button>
           <button
             className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
@@ -797,8 +797,8 @@ const AikajanaKalenteri = () => {
                   onChange={e => setNewEvent({...newEvent, type: e.target.value})}
                 >
                   <option value="general">Yleinen</option>
-                  <option value="bakery">Leipomo</option>
-                  <option value="gym">Sali</option>
+                  <option value="pending">Pending</option>
+                  <option value="tablereservation">Table Reservation</option>
                   <option value="pyhät">Pyhäpäivä</option>
                 </select>
               </div>
@@ -861,8 +861,8 @@ const AikajanaKalenteri = () => {
                   onChange={e => setEditEvent({...editEvent, type: e.target.value})}
                 >
                   <option value="general">Yleinen</option>
-                  <option value="bakery">Leipomo</option>
-                  <option value="gym">Sali</option>
+                  <option value="pending">Pending</option>
+                  <option value="tablereservation">Table Reservation</option>
                   <option value="pyhät">Pyhäpäivä</option>
                 </select>
               </div>
