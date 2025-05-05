@@ -21,8 +21,8 @@ export default function SignUp() {
 
       if (tenantError) throw tenantError;
 
-      // Then sign up the user with tenant_id in metadata
-      const { error } = await supabase.auth.signUp({
+      // Sign up the user
+      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -32,7 +32,18 @@ export default function SignUp() {
         }
       });
 
-      if (error) throw error;
+      if (signUpError) throw signUpError;
+
+      // Create initial admin role for the user
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert([{
+          user_id: user.id,
+          tenant_id: tenant.id,
+          role: 'admin'  // First user is always admin
+        }]);
+
+      if (roleError) throw roleError;
       
       setMessage('Check your email for the confirmation link.');
     } catch (error) {

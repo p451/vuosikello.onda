@@ -6,6 +6,7 @@ import Auth from './components/Auth';
 import SignUp from './components/SignUp';
 import AikajanaKalenteri from './components/AikajanaKalenteri';
 import { TenantProvider } from './contexts/TenantContext';
+import { RoleProvider } from './contexts/RoleContext';
 import './App.css';
 
 function App() {
@@ -28,22 +29,24 @@ function App() {
   return (
     <Router>
       <TenantProvider>
-        <div className="container">
-          <Routes>
-            <Route 
-              path="/signup" 
-              element={!session ? <SignUp /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/login" 
-              element={!session ? <Auth /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/" 
-              element={session ? <AikajanaKalenteri /> : <Navigate to="/login" />} 
-            />
-          </Routes>
-        </div>
+        <RoleProvider>
+          <div className="container">
+            <Routes>
+              <Route 
+                path="/signup" 
+                element={!session ? <SignUp /> : <Navigate to="/" />} 
+              />
+              <Route 
+                path="/login" 
+                element={!session ? <Auth /> : <Navigate to="/" />} 
+              />
+              <Route 
+                path="/" 
+                element={session ? <AikajanaKalenteri /> : <Navigate to="/login" />} 
+              />
+            </Routes>
+          </div>
+        </RoleProvider>
       </TenantProvider>
     </Router>
   );

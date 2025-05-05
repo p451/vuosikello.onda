@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { useTenant } from '../contexts/TenantContext';
+import { useRole } from '../contexts/RoleContext';
 
 const AikajanaKalenteri = () => {
   const [viewMode, setViewMode] = useState('month');
@@ -8,7 +10,6 @@ const AikajanaKalenteri = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editEvent, setEditEvent] = useState(null);
-  const [tenantId, setTenantId] = useState(null);
   const [newEvent, setNewEvent] = useState({
     name: '',
     startDate: '',
@@ -20,6 +21,9 @@ const AikajanaKalenteri = () => {
   // Add new state for detail view
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const { tenantId } = useTenant();
+  const { can } = useRole();
 
   const defaultHolidays = [
     { id: 1, startDate: '2024-01-01', endDate: '2024-01-01', name: 'Uudenvuodenpäivä', type: 'pyhät' },
@@ -66,7 +70,6 @@ const AikajanaKalenteri = () => {
     const getTenantId = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.user_metadata?.tenant_id) {
-        setTenantId(user.user_metadata.tenant_id);
         setNewEvent(prev => ({ ...prev, tenant_id: user.user_metadata.tenant_id }));
       }
     };
@@ -708,12 +711,14 @@ const AikajanaKalenteri = () => {
           >
             Tulosta agenda
           </button>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 rounded bg-blue-500 text-white"
-          >
-            Lisää tapahtuma
-          </button>
+          {can('create') && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="px-4 py-2 rounded bg-blue-500 text-white"
+            >
+              Lisää tapahtuma
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
@@ -769,12 +774,14 @@ const AikajanaKalenteri = () => {
               >
                 Sulje
               </button>
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={handleEditClick}
-              >
-                Muokkaa
-              </button>
+              {can('update') && (
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                  onClick={handleEditClick}
+                >
+                  Muokkaa
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -844,7 +851,7 @@ const AikajanaKalenteri = () => {
         </div>
       )}
 
-      {showEditModal && editEvent && (
+      {showEditModal && editEvent && can('update') && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
             <h3 className="text-lg font-bold mb-4">Muokkaa tapahtumaa</h3>
@@ -890,15 +897,17 @@ const AikajanaKalenteri = () => {
                 </select>
               </div>
               <div className="flex justify-between">
-                <button
-                  className="px-4 py-2 bg-red-500 text-white rounded"
-                  onClick={() => {
-                    deleteEvent(editEvent);
-                    setShowEditModal(false);
-                  }}
-                >
-                  Poista
-                </button>
+                {can('delete') && (
+                  <button
+                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    onClick={() => {
+                      deleteEvent(editEvent);
+                      setShowEditModal(false);
+                    }}
+                  >
+                    Poista
+                  </button>
+                )}
                 <div className="flex gap-2">
                   <button
                     className="px-4 py-2 bg-gray-200 rounded"
