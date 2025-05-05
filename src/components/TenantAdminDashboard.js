@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, supabaseAdmin } from '../supabaseClient';
+import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 
@@ -50,52 +50,10 @@ export default function TenantAdminDashboard() {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-    
     try {
-      // First check if user exists
-      const { data: existingUser, error: searchError } = await supabaseAdmin.auth.admin.listUsers({
-        filters: {
-          email: inviteEmail
-        }
-      });
-
-      let userId;
-
-      if (existingUser?.users?.length > 0) {
-        // User exists, just add role
-        userId = existingUser.users[0].id;
-      } else {
-        // Create new user
-        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-          email: inviteEmail,
-          email_confirm: true,
-          user_metadata: {
-            tenant_id: tenantId
-          }
-        });
-
-        if (createError) throw createError;
-        userId = newUser.user.id;
-      }
-
-      // Create or update user role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .upsert([{
-          user_id: userId,
-          tenant_id: tenantId,
-          role: selectedRole
-        }], {
-          onConflict: 'user_id,tenant_id'
-        });
-
-      if (roleError) throw roleError;
-
-      setMessage('User access granted successfully');
-      setInviteEmail('');
-      await fetchUsers();
+      // TODO: User creation should be handled in a secure backend/serverless function.
+      setMessage('User invitation is not available from the frontend. Please implement this in a secure backend function.');
     } catch (error) {
-      console.error('Invitation error:', error);
       setMessage(error.message);
     } finally {
       setLoading(false);
