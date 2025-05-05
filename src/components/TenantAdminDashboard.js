@@ -24,7 +24,7 @@ export default function TenantAdminDashboard() {
     try {
       const { data: userData, error: userError } = await supabase
         .from('user_roles')
-        .select('id,role,user_id,tenant_id')
+        .select('id,role,user_id,tenant_id,profiles(email)')
         .eq('tenant_id', tenantId);
 
       if (userError) throw userError;
@@ -150,7 +150,7 @@ export default function TenantAdminDashboard() {
           <table className="min-w-full bg-white">
             <thead>
               <tr>
-                <th className="px-6 py-3 border-b text-left">User ID</th>
+                <th className="px-6 py-3 border-b text-left">Email</th>
                 <th className="px-6 py-3 border-b text-left">Role</th>
                 <th className="px-6 py-3 border-b text-left">Actions</th>
               </tr>
@@ -159,7 +159,7 @@ export default function TenantAdminDashboard() {
               {users.map((user) => (
                 <tr key={user.user_id}>
                   <td className="px-6 py-4 border-b">
-                    {user.user_id}
+                    {user.profiles?.email || user.user_id}
                   </td>
                   <td className="px-6 py-4 border-b">
                     <select
