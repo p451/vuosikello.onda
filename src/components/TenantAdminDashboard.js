@@ -24,15 +24,7 @@ export default function TenantAdminDashboard() {
     try {
       const { data: userData, error: userError } = await supabase
         .from('user_roles')
-        .select(`
-          id,
-          role,
-          user_id,
-          profiles:user_id (
-            email:raw(auth.users.email),
-            created_at:raw(auth.users.created_at)
-          )
-        `)
+        .select('id,role,user_id,tenant_id')
         .eq('tenant_id', tenantId);
 
       if (userError) throw userError;
@@ -148,9 +140,8 @@ export default function TenantAdminDashboard() {
           <table className="min-w-full bg-white">
             <thead>
               <tr>
-                <th className="px-6 py-3 border-b text-left">Email</th>
+                <th className="px-6 py-3 border-b text-left">User ID</th>
                 <th className="px-6 py-3 border-b text-left">Role</th>
-                <th className="px-6 py-3 border-b text-left">Joined</th>
                 <th className="px-6 py-3 border-b text-left">Actions</th>
               </tr>
             </thead>
@@ -158,7 +149,7 @@ export default function TenantAdminDashboard() {
               {users.map((user) => (
                 <tr key={user.user_id}>
                   <td className="px-6 py-4 border-b">
-                    {user.users.email}
+                    {user.user_id}
                   </td>
                   <td className="px-6 py-4 border-b">
                     <select
@@ -170,9 +161,6 @@ export default function TenantAdminDashboard() {
                       <option value="editor">Editor</option>
                       <option value="admin">Admin</option>
                     </select>
-                  </td>
-                  <td className="px-6 py-4 border-b">
-                    {new Date(user.users.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 border-b">
                     <button
