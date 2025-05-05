@@ -77,6 +77,11 @@ const AikajanaKalenteri = () => {
   }, []);
 
   const fetchEvents = async () => {
+    if (!tenantId) {
+      console.log('No tenant ID available');
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('events')
@@ -84,13 +89,21 @@ const AikajanaKalenteri = () => {
         .eq('tenant_id', tenantId)
         .order('start_date', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        return;
+      }
+
+      if (!data) {
+        console.log('No events found');
+        return;
+      }
 
       const formattedEvents = {
         pyhät: [],
         holidays: [],
-        pending: [], // Changed from bakery
-        tablereservation: [] // Changed from gym
+        pending: [],
+        tablereservation: []
       };
 
       data.forEach(event => {
@@ -114,15 +127,25 @@ const AikajanaKalenteri = () => {
   };
 
   const initializeHolidays = async () => {
+    if (!tenantId) {
+      console.log('No tenant ID available');
+      return;
+    }
+
     try {
-      const { data: existingHolidays } = await supabase
+      const { data: existingHolidays, error: checkError } = await supabase
         .from('events')
-        .select('*')
+        .select('id')
         .eq('type', 'pyhät')
         .eq('tenant_id', tenantId);
 
-      if (!existingHolidays?.length && tenantId) {
-        const { error } = await supabase
+      if (checkError) {
+        console.error('Error checking holidays:', checkError);
+        return;
+      }
+
+      if (!existingHolidays?.length) {
+        const { error: insertError } = await supabase
           .from('events')
           .insert(defaultHolidays.map(holiday => ({
             name: holiday.name,
@@ -132,7 +155,11 @@ const AikajanaKalenteri = () => {
             tenant_id: tenantId
           })));
 
-        if (error) throw error;
+        if (insertError) {
+          console.error('Error inserting holidays:', insertError);
+          return;
+        }
+
         await fetchEvents();
       }
     } catch (error) {
