@@ -71,6 +71,11 @@ export default function TenantAdminDashboard() {
   const removeUser = async (userId) => {
     if (!window.confirm('Are you sure you want to remove this user?')) return;
 
+    // Optimistically update UI
+    setUsers(prev => prev.filter(user => user.user_id !== userId));
+    setMessage('');
+    setLoading(true);
+
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -79,10 +84,15 @@ export default function TenantAdminDashboard() {
         .eq('tenant_id', tenantId);
 
       if (error) throw error;
-      await fetchUsers();
       setMessage('User removed successfully');
+      // Optionally refetch users here if you want to be 100% sure
+      // await fetchUsers();
     } catch (error) {
       setMessage(error.message);
+      // Rollback UI if needed
+      await fetchUsers();
+    } finally {
+      setLoading(false);
     }
   };
 
