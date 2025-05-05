@@ -22,29 +22,22 @@ export default function TenantAdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      // First get user roles for the tenant
       const { data: userData, error: userError } = await supabase
         .from('user_roles')
         .select(`
           id,
           role,
           user_id,
-          users:user_id (
-            email,
-            created_at
+          profiles:user_id (
+            email:raw(auth.users.email),
+            created_at:raw(auth.users.created_at)
           )
         `)
         .eq('tenant_id', tenantId);
 
       if (userError) throw userError;
 
-      // Transform the data to match the expected format
-      const transformedUsers = userData.map(user => ({
-        ...user,
-        users: user.users || { email: 'Loading...', created_at: new Date() }
-      }));
-
-      setUsers(transformedUsers);
+      setUsers(userData || []);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -59,29 +52,46 @@ export default function TenantAdminDashboard() {
     setMessage('');
     
     try {
-      // Use supabaseAdmin for user creation
-      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-        email: inviteEmail,
-        email_confirm: true,
-        user_metadata: {
-          tenant_id: tenantId
+      // First check if user exists
+      const { data: existingUser, error: searchError } = await supabaseAdmin.auth.admin.listUsers({
+        filters: {
+          email: inviteEmail
         }
       });
 
-      if (authError) throw authError;
+      let userId;
 
-      // Create user role
-      const { error: roleError } = await supabaseAdmin
+      if (existingUser?.users?.length > 0) {
+        // User exists, just add role
+        userId = existingUser.users[0].id;
+      } else {
+        // Create new user
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email: inviteEmail,
+          email_confirm: true,
+          user_metadata: {
+            tenant_id: tenantId
+          }
+        });
+
+        if (createError) throw createError;
+        userId = newUser.user.id;
+      }
+
+      // Create or update user role
+      const { error: roleError } = await supabase
         .from('user_roles')
-        .insert([{
-          user_id: authData.user.id,
+        .upsert([{
+          user_id: userId,
           tenant_id: tenantId,
           role: selectedRole
-        }]);
+        }], {
+          onConflict: 'user_id,tenant_id'
+        });
 
       if (roleError) throw roleError;
 
-      setMessage('User invited successfully');
+      setMessage('User access granted successfully');
       setInviteEmail('');
       await fetchUsers();
     } catch (error) {
