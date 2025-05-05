@@ -22,12 +22,14 @@ export default function TenantAdminDashboard() {
 
   const fetchUsers = async () => {
     try {
+      // First get user roles for the tenant
       const { data: userData, error: userError } = await supabase
         .from('user_roles')
         .select(`
+          id,
           role,
           user_id,
-          auth.users (
+          users:user_id (
             email,
             created_at
           )
@@ -35,11 +37,19 @@ export default function TenantAdminDashboard() {
         .eq('tenant_id', tenantId);
 
       if (userError) throw userError;
-      setUsers(userData);
+
+      // Transform the data to match the expected format
+      const transformedUsers = userData.map(user => ({
+        ...user,
+        users: user.users || { email: 'Loading...', created_at: new Date() }
+      }));
+
+      setUsers(transformedUsers);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error);
       setMessage('Error loading users');
+      setLoading(false);
     }
   };
 
