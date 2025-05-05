@@ -56,35 +56,39 @@ export default function TenantAdminDashboard() {
   const inviteUser = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setMessage('');
+    
     try {
-      // Generate invite link (this is a simplified version - you might want to add more security)
-      const { data, error } = await supabase.auth.signUp({
+      // First, create the user in auth.users
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: inviteEmail,
-        password: Math.random().toString(36).slice(-8), // temporary password
-        options: {
-          data: {
-            tenant_id: tenantId
-          }
+        email_confirm: true,
+        user_metadata: {
+          tenant_id: tenantId
         }
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
+
+      // Wait a moment for the user to be fully created
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Create user role
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert([{
-          user_id: data.user.id,
+          user_id: authData.user.id,
           tenant_id: tenantId,
           role: selectedRole
         }]);
 
       if (roleError) throw roleError;
 
-      setMessage('Invitation sent successfully');
+      setMessage('User invited successfully');
       setInviteEmail('');
       await fetchUsers();
     } catch (error) {
+      console.error('Invitation error:', error);
       setMessage(error.message);
     } finally {
       setLoading(false);
