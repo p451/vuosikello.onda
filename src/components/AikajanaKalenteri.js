@@ -8,11 +8,13 @@ const AikajanaKalenteri = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editEvent, setEditEvent] = useState(null);
+  const [tenantId, setTenantId] = useState(null);
   const [newEvent, setNewEvent] = useState({
     name: '',
     startDate: '',
     endDate: '',
-    type: 'general'
+    type: 'general',
+    tenant_id: null
   });
 
   // Add new state for detail view
@@ -57,6 +59,18 @@ const AikajanaKalenteri = () => {
       await initializeHolidays();
     };
     init();
+  }, [tenantId]);
+
+  // Get tenant_id from user metadata on component mount
+  useEffect(() => {
+    const getTenantId = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.user_metadata?.tenant_id) {
+        setTenantId(user.user_metadata.tenant_id);
+        setNewEvent(prev => ({ ...prev, tenant_id: user.user_metadata.tenant_id }));
+      }
+    };
+    getTenantId();
   }, []);
 
   const fetchEvents = async () => {
@@ -64,6 +78,7 @@ const AikajanaKalenteri = () => {
       const { data, error } = await supabase
         .from('events')
         .select('*')
+        .eq('tenant_id', tenantId)
         .order('start_date', { ascending: true });
 
       if (error) throw error;
@@ -83,7 +98,8 @@ const AikajanaKalenteri = () => {
             name: event.name,
             startDate: event.start_date,
             endDate: event.end_date,
-            type: event.type
+            type: event.type,
+            tenant_id: event.tenant_id
           });
         }
       });
@@ -99,16 +115,18 @@ const AikajanaKalenteri = () => {
       const { data: existingHolidays } = await supabase
         .from('events')
         .select('*')
-        .eq('type', 'pyhät');
+        .eq('type', 'pyhät')
+        .eq('tenant_id', tenantId);
 
-      if (!existingHolidays?.length) {
+      if (!existingHolidays?.length && tenantId) {
         const { error } = await supabase
           .from('events')
           .insert(defaultHolidays.map(holiday => ({
             name: holiday.name,
             start_date: holiday.startDate,
             end_date: holiday.endDate,
-            type: holiday.type
+            type: holiday.type,
+            tenant_id: tenantId
           })));
 
         if (error) throw error;
@@ -124,7 +142,8 @@ const AikajanaKalenteri = () => {
       const { error } = await supabase
         .from('events')
         .delete()
-        .eq('id', eventToDelete.id);
+        .eq('id', eventToDelete.id)
+        .eq('tenant_id', tenantId);
 
       if (error) throw error;
 
@@ -146,7 +165,8 @@ const AikajanaKalenteri = () => {
           name: newEvent.name,
           start_date: newEvent.startDate,
           end_date: newEvent.endDate,
-          type: newEvent.type
+          type: newEvent.type,
+          tenant_id: tenantId
         }])
         .select();
 
@@ -160,12 +180,13 @@ const AikajanaKalenteri = () => {
           name: data[0].name,
           startDate: data[0].start_date,
           endDate: data[0].end_date,
-          type: data[0].type
+          type: data[0].type,
+          tenant_id: data[0].tenant_id
         }]
       }));
 
       setShowAddModal(false);
-      setNewEvent({ name: '', startDate: '', endDate: '', type: 'general' });
+      setNewEvent({ name: '', startDate: '', endDate: '', type: 'general', tenant_id: tenantId });
     } catch (error) {
       console.error('Error adding event:', error);
     }
@@ -179,9 +200,11 @@ const AikajanaKalenteri = () => {
           name: editEvent.name,
           start_date: editEvent.startDate,
           end_date: editEvent.endDate,
-          type: editEvent.type
+          type: editEvent.type,
+          tenant_id: tenantId
         })
-        .eq('id', editEvent.id);
+        .eq('id', editEvent.id)
+        .eq('tenant_id', tenantId);
 
       if (error) throw error;
       await fetchEvents();
