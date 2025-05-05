@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase, supabaseAdmin } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 
@@ -59,8 +59,8 @@ export default function TenantAdminDashboard() {
     setMessage('');
     
     try {
-      // First, create the user in auth.users
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // Use supabaseAdmin for user creation
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: inviteEmail,
         email_confirm: true,
         user_metadata: {
@@ -70,11 +70,8 @@ export default function TenantAdminDashboard() {
 
       if (authError) throw authError;
 
-      // Wait a moment for the user to be fully created
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       // Create user role
-      const { error: roleError } = await supabase
+      const { error: roleError } = await supabaseAdmin
         .from('user_roles')
         .insert([{
           user_id: authData.user.id,
