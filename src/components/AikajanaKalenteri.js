@@ -22,6 +22,9 @@ const AikajanaKalenteri = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
+  const [eventTypes, setEventTypes] = useState([]);
+  const eventTypeMap = Object.fromEntries(eventTypes.map(type => [type.name, type.color]));
+
   const { tenantId } = useTenant();
   const { can } = useRole();
 
@@ -75,6 +78,18 @@ const AikajanaKalenteri = () => {
     };
     getTenantId();
   }, []);
+
+  useEffect(() => {
+    const fetchEventTypes = async () => {
+      if (!tenantId) return;
+      const { data, error } = await supabase
+        .from('tenant_event_types')
+        .select('*')
+        .eq('tenant_id', tenantId);
+      if (!error) setEventTypes(data);
+    };
+    fetchEventTypes();
+  }, [tenantId]);
 
   const fetchEvents = async () => {
     if (!tenantId) {
@@ -298,17 +313,19 @@ const AikajanaKalenteri = () => {
   };
 
   const getEventTypeColor = (type) => {
+    // Use tenant_event_types color if available
+    if (eventTypeMap[type]) return { backgroundColor: eventTypeMap[type] };
     switch (type) {
       case 'pyhät':
-        return 'bg-red-400';
+        return { backgroundColor: '#fc8181' };
       case 'general':
-        return 'bg-purple-200';
+        return { backgroundColor: '#d6bcfa' };
       case 'pending': // Changed from bakery
-        return 'bg-yellow-200';
+        return { backgroundColor: '#faf089' };
       case 'tablereservation': // Changed from gym
-        return 'bg-blue-200';
+        return { backgroundColor: '#90cdf4' };
       default:
-        return 'bg-gray-200';
+        return { backgroundColor: '#e2e8f0' };
     }
   };
 
@@ -438,13 +455,8 @@ const AikajanaKalenteri = () => {
   const EventItem = ({ event, onClick, scale = 1, isHoliday = false }) => (
     <div 
       onClick={onClick}
-      className={`event-row rounded cursor-pointer hover:opacity-80 ${getEventTypeColor(event.type)} ${
-        isHoliday ? 'h-2 w-2' : 'p-1 text-xs sm:text-sm'
-      }`}
-      style={!isHoliday ? { 
-        fontSize: `${scale * 0.75}rem`,
-        minHeight: `${scale * 1.25}rem`
-      } : undefined}
+      className={`event-row rounded cursor-pointer hover:opacity-80 ${isHoliday ? 'h-2 w-2' : 'p-1 text-xs sm:text-sm'}`}
+      style={!isHoliday ? { ...getEventTypeColor(event.type), fontSize: `${scale * 0.75}rem`, minHeight: `${scale * 1.25}rem` } : getEventTypeColor(event.type)}
     >
       {!isHoliday && <span className="truncate block">{event.name}</span>}
     </div>
@@ -782,7 +794,7 @@ const AikajanaKalenteri = () => {
       {showDetailModal && selectedEvent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
-            <div className={`p-4 rounded-t-lg ${getEventTypeColor(selectedEvent.type)}`}>
+            <div className="p-4 rounded-t-lg" style={getEventTypeColor(selectedEvent.type)}>
               <h3 className="text-xl font-bold">{selectedEvent.name}</h3>
               <p className="text-sm mt-2">
                 {new Date(selectedEvent.startDate).toLocaleDateString('fi-FI')} - {new Date(selectedEvent.endDate).toLocaleDateString('fi-FI')}
@@ -853,10 +865,13 @@ const AikajanaKalenteri = () => {
                   value={newEvent.type}
                   onChange={e => setNewEvent({...newEvent, type: e.target.value})}
                 >
-                  <option value="general">Yleinen</option>
-                  <option value="pending">Pending</option>
-                  <option value="tablereservation">Table Reservation</option>
-                  <option value="pyhät">Pyhäpäivä</option>
+                  {eventTypes.length > 0 ? (
+                    eventTypes.map(type => (
+                      <option key={type.id} value={type.name}>{type.name}</option>
+                    ))
+                  ) : (
+                    <option value="general">Yleinen</option>
+                  )}
                 </select>
               </div>
               <div className="flex justify-end gap-2">
@@ -917,10 +932,13 @@ const AikajanaKalenteri = () => {
                   value={editEvent.type}
                   onChange={e => setEditEvent({...editEvent, type: e.target.value})}
                 >
-                  <option value="general">Yleinen</option>
-                  <option value="pending">Pending</option>
-                  <option value="tablereservation">Table Reservation</option>
-                  <option value="pyhät">Pyhäpäivä</option>
+                  {eventTypes.length > 0 ? (
+                    eventTypes.map(type => (
+                      <option key={type.id} value={type.name}>{type.name}</option>
+                    ))
+                  ) : (
+                    <option value="general">Yleinen</option>
+                  )}
                 </select>
               </div>
               <div className="flex justify-between">

@@ -13,6 +13,7 @@ export default function TenantAdminDashboard() {
   const [message, setMessage] = useState('');
   const [eventTypes, setEventTypes] = useState([]);
   const [newEventType, setNewEventType] = useState('');
+  const [newEventTypeColor, setNewEventTypeColor] = useState('#2196f3');
 
   useEffect(() => {
     if (userRole !== 'admin') {
@@ -113,9 +114,10 @@ export default function TenantAdminDashboard() {
     if (!newEventType) return;
     const { error } = await supabase
       .from('tenant_event_types')
-      .insert([{ tenant_id: tenantId, name: newEventType }]);
+      .insert([{ tenant_id: tenantId, name: newEventType, color: newEventTypeColor }]);
     if (!error) {
       setNewEventType('');
+      setNewEventTypeColor('#2196f3');
       fetchEventTypes();
     }
   };
@@ -175,7 +177,7 @@ export default function TenantAdminDashboard() {
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Event Types</h2>
-        <form onSubmit={addEventType} className="flex space-x-2 mb-2">
+        <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center">
           <input
             type="text"
             value={newEventType}
@@ -183,12 +185,22 @@ export default function TenantAdminDashboard() {
             placeholder="New event type"
             className="p-2 border rounded"
           />
+          <input
+            type="color"
+            value={newEventTypeColor}
+            onChange={e => setNewEventTypeColor(e.target.value)}
+            className="w-8 h-8 border rounded"
+            title="Pick color"
+          />
           <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Add</button>
         </form>
         <ul>
           {eventTypes.map(type => (
             <li key={type.id} className="flex items-center justify-between">
-              <span>{type.name}</span>
+              <span className="flex items-center gap-2">
+                <span style={{ background: type.color || '#2196f3', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
+                {type.name}
+              </span>
               <button onClick={() => removeEventType(type.id)} className="text-red-500">Remove</button>
             </li>
           ))}
