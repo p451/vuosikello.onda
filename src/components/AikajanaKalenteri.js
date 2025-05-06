@@ -209,7 +209,7 @@ const AikajanaKalenteri = () => {
       const category = newEvent.type;
       setEvents(prev => ({
         ...prev,
-        [category]: [...prev[category], {
+        [category]: [...(prev[category] || []), {
           id: data[0].id,
           name: data[0].name,
           startDate: data[0].start_date,
