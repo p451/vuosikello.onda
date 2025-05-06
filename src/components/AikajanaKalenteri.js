@@ -53,12 +53,9 @@ const AikajanaKalenteri = () => {
     { id: 22, startDate: '2025-12-26', endDate: '2025-12-26', name: 'Tapaninpäivä', type: 'pyhät' }
   ];
 
-  const [events, setEvents] = useState({
-    pyhät: [],
-    holidays: [],
-    pending: [], // Changed from bakery
-    tablereservation: [] // Changed from gym
-  });
+  const [events, setEvents] = useState({});
+
+  const [selectedEventType, setSelectedEventType] = useState('all');
 
   useEffect(() => {
     const init = async () => {
@@ -114,28 +111,20 @@ const AikajanaKalenteri = () => {
         return;
       }
 
-      const formattedEvents = {
-        pyhät: [],
-        holidays: [],
-        pending: [],
-        tablereservation: []
-      };
-
+      const grouped = {};
       data.forEach(event => {
-        const category = event.type === 'general' ? 'holidays' : event.type;
-        if (formattedEvents[category]) {
-          formattedEvents[category].push({
-            id: event.id,
-            name: event.name,
-            startDate: event.start_date,
-            endDate: event.end_date,
-            type: event.type,
-            tenant_id: event.tenant_id
-          });
-        }
+        if (!grouped[event.type]) grouped[event.type] = [];
+        grouped[event.type].push({
+          id: event.id,
+          name: event.name,
+          startDate: event.start_date,
+          endDate: event.end_date,
+          type: event.type,
+          tenant_id: event.tenant_id
+        });
       });
 
-      setEvents(formattedEvents);
+      setEvents(grouped);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -192,7 +181,7 @@ const AikajanaKalenteri = () => {
 
       if (error) throw error;
 
-      const category = eventToDelete.type === 'general' ? 'holidays' : eventToDelete.type;
+      const category = eventToDelete.type;
       setEvents(prev => ({
         ...prev,
         [category]: prev[category].filter(event => event.id !== eventToDelete.id)
@@ -217,7 +206,7 @@ const AikajanaKalenteri = () => {
 
       if (error) throw error;
 
-      const category = newEvent.type === 'general' ? 'holidays' : newEvent.type;
+      const category = newEvent.type;
       setEvents(prev => ({
         ...prev,
         [category]: [...prev[category], {
@@ -315,33 +304,11 @@ const AikajanaKalenteri = () => {
   const getEventTypeColor = (type) => {
     // Use tenant_event_types color if available
     if (eventTypeMap[type]) return { backgroundColor: eventTypeMap[type] };
-    switch (type) {
-      case 'pyhät':
-        return { backgroundColor: '#fc8181' };
-      case 'general':
-        return { backgroundColor: '#d6bcfa' };
-      case 'pending': // Changed from bakery
-        return { backgroundColor: '#faf089' };
-      case 'tablereservation': // Changed from gym
-        return { backgroundColor: '#90cdf4' };
-      default:
-        return { backgroundColor: '#e2e8f0' };
-    }
+    return { backgroundColor: '#e2e8f0' };
   };
 
   const getEventTypeName = (type) => {
-    switch (type) {
-      case 'pyhät':
-        return 'Pyhäpäivät';
-      case 'general':
-        return 'Yleinen';
-      case 'pending': // Changed from bakery
-        return 'Pending';
-      case 'tablereservation': // Changed from gym
-        return 'Table Reservation';
-      default:
-        return type;
-    }
+    return type;
   };
 
   const getViewDateRange = () => {
@@ -375,7 +342,6 @@ const AikajanaKalenteri = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
   
-    const types = ['pyhät', 'general', 'pending', 'tablereservation'];
     const { start, end } = getViewDateRange();
     const viewTitle = {
       day: 'päivän',
@@ -401,10 +367,6 @@ const AikajanaKalenteri = () => {
               border-radius: 4px;
               color: black;
             }
-            .pyhät { background-color: #fc8181 !important; }
-            .general { background-color: #d6bcfa !important; }
-            .pending { background-color: #faf089 !important; }
-            .tablereservation { background-color: #90cdf4 !important; }
             @media print {
               @page { margin: 1cm; }
               .event-item { 
@@ -419,7 +381,7 @@ const AikajanaKalenteri = () => {
             month: 'long',
             year: 'numeric'
           })} ${viewTitle} tapahtumat</h1>
-          ${types.map(type => `
+          ${Object.keys(events).map(type => `
             <div class="event-type">
               <h2>${getEventTypeName(type)}</h2>
               <div class="event-list">
@@ -434,7 +396,7 @@ const AikajanaKalenteri = () => {
                   })
                   .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
                   .map(event => `
-                    <div class="event-item ${type}">
+                    <div class="event-item" style="background-color: ${eventTypeMap[type] || '#e2e8f0'}">
                       <strong>${event.name}</strong><br>
                       ${new Date(event.startDate).toLocaleDateString('fi-FI')} - 
                       ${new Date(event.endDate).toLocaleDateString('fi-FI')}
@@ -464,22 +426,12 @@ const AikajanaKalenteri = () => {
 
   const ColorLegend = () => (
     <div className="color-legend my-4 flex gap-4 justify-center border-t pt-4">
-      <div className="legend-item">
-        <div className="legend-color w-4 h-4 rounded bg-red-400"></div>
-        <span className="ml-2">Pyhäpäivät</span>
-      </div>
-      <div className="legend-item">
-        <div className="legend-color w-4 h-4 rounded bg-purple-200"></div>
-        <span className="ml-2">Yleinen</span>
-      </div>
-      <div className="legend-item">
-        <div className="legend-color w-4 h-4 rounded bg-yellow-200"></div>
-        <span className="ml-2">Pending</span>
-      </div>
-      <div className="legend-item">
-        <div className="legend-color w-4 h-4 rounded bg-blue-200"></div>
-        <span className="ml-2">Table Reservation</span>
-      </div>
+      {eventTypes.map(type => (
+        <div key={type.id} className="legend-item">
+          <div className="legend-color w-4 h-4 rounded" style={{ backgroundColor: type.color }}></div>
+          <span className="ml-2">{type.name}</span>
+        </div>
+      ))}
     </div>
   );
 
@@ -496,6 +448,8 @@ const AikajanaKalenteri = () => {
 
   // Update renderDayEvents to handle holidays differently
   const renderDayEvents = (events, day, type) => {
+    if (selectedEventType !== 'all' && type !== selectedEventType) return null;
+
     const matchingEvents = events.filter(event => {
       const startDate = parseLocalDate(event.startDate);
       const endDate = parseLocalDate(event.endDate);
@@ -560,10 +514,9 @@ const AikajanaKalenteri = () => {
                     </div>
                   </div>
                   <div className="space-y-1 flex flex-col mt-1">
-                    {/* Other event types */}
-                    {['general', 'pending', 'tablereservation'].map(type => (
+                    {Object.keys(events).map(type => (
                       <div key={type} className="event-row min-h-[1.5rem]">
-                        {renderDayEvents(events[type === 'general' ? 'holidays' : type], day, type)}
+                        {renderDayEvents(events[type], day, type)}
                       </div>
                     ))}
                   </div>
@@ -590,9 +543,9 @@ const AikajanaKalenteri = () => {
                   {renderDayEvents(events.pyhät, day, 'pyhät')}
                 </div>
                 {/* Other event types */}
-                {['general', 'pending', 'tablereservation'].map(type => (
+                {Object.keys(events).map(type => (
                   <div key={type} className="event-row min-h-[1.5rem]">
-                    {renderDayEvents(events[type === 'general' ? 'holidays' : type], day, type)}
+                    {renderDayEvents(events[type], day, type)}
                   </div>
                 ))}
               </div>
@@ -610,9 +563,9 @@ const AikajanaKalenteri = () => {
               {renderDayEvents(events.pyhät, currentDate, 'pyhät')}
             </div>
             {/* Other event types */}
-            {['general', 'pending', 'tablereservation'].map(type => (
+            {Object.keys(events).map(type => (
               <div key={type} className="event-row min-h-[1.5rem]">
-                {renderDayEvents(events[type === 'general' ? 'holidays' : type], currentDate, type)}
+                {renderDayEvents(events[type], currentDate, type)}
               </div>
             ))}
           </div>
@@ -706,6 +659,16 @@ const AikajanaKalenteri = () => {
         </div>
         
         <div className="flex flex-wrap gap-2">
+          <select
+            className="px-2 py-1 rounded border"
+            value={selectedEventType}
+            onChange={e => setSelectedEventType(e.target.value)}
+          >
+            <option value="all">Kaikki tapahtumatyypit</option>
+            {eventTypes.map(type => (
+              <option key={type.id} value={type.name}>{type.name}</option>
+            ))}
+          </select>
           <button
             className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
               selectedLayer === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'
@@ -713,30 +676,6 @@ const AikajanaKalenteri = () => {
             onClick={() => setSelectedLayer('all')}
           >
             Kaikki
-          </button>
-          <button
-            className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              selectedLayer === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setSelectedLayer('pending')}
-          >
-            Pending
-          </button>
-          <button
-            className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              selectedLayer === 'tablereservation' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setSelectedLayer('tablereservation')}
-          >
-            Table Reservation
-          </button>
-          <button
-            className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              selectedLayer === 'general' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setSelectedLayer('general')}
-          >
-            Yleinen
           </button>
           <button
             onClick={() => window.print()}
