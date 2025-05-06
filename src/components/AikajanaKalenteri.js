@@ -424,12 +424,13 @@ const AikajanaKalenteri = () => {
     </div>
   );
 
+  // Update ColorLegend to only show event types that exist in eventTypes
   const ColorLegend = () => (
     <div className="color-legend my-4 flex gap-4 justify-center border-t pt-4">
       {eventTypes.map(type => (
-        <div key={type.id} className="legend-item">
+        <div key={type.id} className="legend-item flex items-center gap-1">
           <div className="legend-color w-4 h-4 rounded" style={{ backgroundColor: type.color }}></div>
-          <span className="ml-2">{type.name}</span>
+          <span>{type.name}</span>
         </div>
       ))}
     </div>
@@ -446,11 +447,11 @@ const AikajanaKalenteri = () => {
     return new Date(year, month - 1, day);
   };
 
-  // Update renderDayEvents to handle holidays differently
-  const renderDayEvents = (events, day, type) => {
+  // Update renderDayEvents to default events to []
+  const renderDayEvents = (eventsForType, day, type) => {
+    const eventsArr = eventsForType || [];
     if (selectedEventType !== 'all' && type !== selectedEventType) return null;
-
-    const matchingEvents = events.filter(event => {
+    const matchingEvents = eventsArr.filter(event => {
       const startDate = parseLocalDate(event.startDate);
       const endDate = parseLocalDate(event.endDate);
       return (type === 'pyhät' ? 
@@ -459,12 +460,9 @@ const AikajanaKalenteri = () => {
         (day >= startDate && day <= endDate)) &&
         (selectedLayer === 'all' || selectedLayer === type);
     });
-  
     if (matchingEvents.length === 0) return null;
-  
     const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.2);
     const isHoliday = type === 'pyhät';
-  
     return (
       <div className={`flex ${isHoliday ? 'justify-center' : 'flex-col gap-0.5'}`}>
         {matchingEvents.map((event, idx) => (
