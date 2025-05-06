@@ -11,6 +11,8 @@ export default function TenantAdminDashboard() {
   const { userRole } = useRole();
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [eventTypes, setEventTypes] = useState([]);
+  const [newEventType, setNewEventType] = useState('');
 
   useEffect(() => {
     if (userRole !== 'admin') {
@@ -18,6 +20,7 @@ export default function TenantAdminDashboard() {
       return;
     }
     fetchUsers();
+    fetchEventTypes();
   }, [tenantId, userRole]);
 
   const fetchUsers = async () => {
@@ -36,6 +39,15 @@ export default function TenantAdminDashboard() {
       setMessage('Error loading users');
       setLoading(false);
     }
+  };
+
+  const fetchEventTypes = async () => {
+    if (!tenantId) return;
+    const { data, error } = await supabase
+      .from('tenant_event_types')
+      .select('*')
+      .eq('tenant_id', tenantId);
+    if (!error) setEventTypes(data);
   };
 
   const inviteUser = async (e) => {
@@ -96,6 +108,23 @@ export default function TenantAdminDashboard() {
     }
   };
 
+  const addEventType = async (e) => {
+    e.preventDefault();
+    if (!newEventType) return;
+    const { error } = await supabase
+      .from('tenant_event_types')
+      .insert([{ tenant_id: tenantId, name: newEventType }]);
+    if (!error) {
+      setNewEventType('');
+      fetchEventTypes();
+    }
+  };
+
+  const removeEventType = async (id) => {
+    await supabase.from('tenant_event_types').delete().eq('id', id);
+    fetchEventTypes();
+  };
+
   if (loading) return <div>Loading...</div>;
   if (userRole !== 'admin') return null;
 
@@ -142,6 +171,28 @@ export default function TenantAdminDashboard() {
             Send Invitation
           </button>
         </form>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Event Types</h2>
+        <form onSubmit={addEventType} className="flex space-x-2 mb-2">
+          <input
+            type="text"
+            value={newEventType}
+            onChange={e => setNewEventType(e.target.value)}
+            placeholder="New event type"
+            className="p-2 border rounded"
+          />
+          <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Add</button>
+        </form>
+        <ul>
+          {eventTypes.map(type => (
+            <li key={type.id} className="flex items-center justify-between">
+              <span>{type.name}</span>
+              <button onClick={() => removeEventType(type.id)} className="text-red-500">Remove</button>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div>
