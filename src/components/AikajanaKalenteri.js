@@ -951,7 +951,7 @@ const AikajanaKalenteri = () => {
 
       {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-lg z-50 overflow-y-auto p-4">
+        <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-lg z-50 overflow-y-auto p-4 no-print">
           <button className="absolute top-2 right-2 text-xl" onClick={() => setShowDayPanel(false)}>&times;</button>
           <h2 className="text-xl font-bold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
           <button
