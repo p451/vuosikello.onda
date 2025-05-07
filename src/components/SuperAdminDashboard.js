@@ -8,6 +8,13 @@ export default function SuperAdminDashboard() {
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showManageModal, setShowManageModal] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState(null);
+  const [newTenantName, setNewTenantName] = useState('');
+  const [manageUsers, setManageUsers] = useState([]);
+  const [manageEventTypes, setManageEventTypes] = useState([]);
+  const [newEventType, setNewEventType] = useState('');
+  const [newEventTypeColor, setNewEventTypeColor] = useState('#2196f3');
 
   useEffect(() => {
     const checkSuperadmin = async () => {
@@ -29,12 +36,84 @@ export default function SuperAdminDashboard() {
     setLoading(false);
   };
 
+  // Add tenant
+  const addTenant = async (e) => {
+    e.preventDefault();
+    if (!newTenantName) return;
+    const { error } = await supabase
+      .from('tenants')
+      .insert([{ name: newTenantName }]);
+    if (!error) {
+      setNewTenantName('');
+      fetchTenants();
+    }
+  };
+
+  // Delete tenant
+  const deleteTenant = async (tenantId) => {
+    if (!window.confirm('Are you sure you want to delete this tenant? This cannot be undone.')) return;
+    await supabase.from('tenants').delete().eq('id', tenantId);
+    fetchTenants();
+  };
+
+  // Open manage modal
+  const openManageModal = async (tenant) => {
+    setSelectedTenant(tenant);
+    // Fetch users
+    const { data: users } = await supabase
+      .from('user_roles')
+      .select('user_id,role,profiles(email)')
+      .eq('tenant_id', tenant.id);
+    setManageUsers(users || []);
+    // Fetch event types
+    const { data: eventTypes } = await supabase
+      .from('tenant_event_types')
+      .select('*')
+      .eq('tenant_id', tenant.id);
+    setManageEventTypes(eventTypes || []);
+    setShowManageModal(true);
+  };
+
+  // Remove user from tenant
+  const removeUser = async (userId) => {
+    await supabase.from('user_roles').delete().eq('user_id', userId).eq('tenant_id', selectedTenant.id);
+    openManageModal(selectedTenant);
+  };
+
+  // Add event type
+  const addEventType = async (e) => {
+    e.preventDefault();
+    if (!newEventType) return;
+    await supabase.from('tenant_event_types').insert([
+      { tenant_id: selectedTenant.id, name: newEventType, color: newEventTypeColor }
+    ]);
+    setNewEventType('');
+    setNewEventTypeColor('#2196f3');
+    openManageModal(selectedTenant);
+  };
+
+  // Remove event type
+  const removeEventType = async (id) => {
+    await supabase.from('tenant_event_types').delete().eq('id', id);
+    openManageModal(selectedTenant);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600 font-bold">{error}</div>;
 
   return (
     <div className="max-w-5xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Superadmin Dashboard</h1>
+      <form onSubmit={addTenant} className="flex gap-2 mb-6">
+        <input
+          type="text"
+          value={newTenantName}
+          onChange={e => setNewTenantName(e.target.value)}
+          placeholder="New tenant name"
+          className="p-2 border rounded"
+        />
+        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Add Tenant</button>
+      </form>
       <h2 className="text-xl font-semibold mb-4">Tenants</h2>
       <table className="min-w-full bg-white">
         <thead>
@@ -42,6 +121,7 @@ export default function SuperAdminDashboard() {
             <th className="px-6 py-3 border-b text-left">Tenant Name</th>
             <th className="px-6 py-3 border-b text-left">Created</th>
             <th className="px-6 py-3 border-b text-left">ID</th>
+            <th className="px-6 py-3 border-b text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -50,11 +130,65 @@ export default function SuperAdminDashboard() {
               <td className="px-6 py-4 border-b">{tenant.name}</td>
               <td className="px-6 py-4 border-b">{tenant.created_at}</td>
               <td className="px-6 py-4 border-b">{tenant.id}</td>
+              <td className="px-6 py-4 border-b flex gap-2">
+                <button onClick={() => openManageModal(tenant)} className="px-2 py-1 bg-blue-500 text-white rounded">Manage</button>
+                <button onClick={() => deleteTenant(tenant.id)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {/* Add more superadmin tools here as needed */}
+      {/* Manage Tenant Modal */}
+      {showManageModal && selectedTenant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl relative">
+            <button className="absolute top-2 right-2 text-xl" onClick={() => setShowManageModal(false)}>&times;</button>
+            <h2 className="text-xl font-bold mb-4">Manage Tenant: {selectedTenant.name}</h2>
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2">Users</h3>
+              <ul>
+                {manageUsers.map(user => (
+                  <li key={user.user_id} className="flex items-center justify-between mb-1">
+                    <span>{user.profiles?.email || user.user_id} ({user.role})</span>
+                    <button onClick={() => removeUser(user.user_id)} className="text-red-500 ml-2">Remove</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2">Event Types</h3>
+              <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center">
+                <input
+                  type="text"
+                  value={newEventType}
+                  onChange={e => setNewEventType(e.target.value)}
+                  placeholder="New event type"
+                  className="p-2 border rounded"
+                />
+                <input
+                  type="color"
+                  value={newEventTypeColor}
+                  onChange={e => setNewEventTypeColor(e.target.value)}
+                  className="w-8 h-8 border rounded"
+                  title="Pick color"
+                />
+                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Add</button>
+              </form>
+              <ul>
+                {manageEventTypes.map(type => (
+                  <li key={type.id} className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span style={{ background: type.color || '#2196f3', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
+                      {type.name}
+                    </span>
+                    <button onClick={() => removeEventType(type.id)} className="text-red-500">Remove</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
