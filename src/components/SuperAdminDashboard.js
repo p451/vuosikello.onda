@@ -15,6 +15,9 @@ export default function SuperAdminDashboard() {
   const [manageEventTypes, setManageEventTypes] = useState([]);
   const [newEventType, setNewEventType] = useState('');
   const [newEventTypeColor, setNewEventTypeColor] = useState('#2196f3');
+  const [editTenantName, setEditTenantName] = useState('');
+  const [userInviteEmail, setUserInviteEmail] = useState('');
+  const [userInviteRole, setUserInviteRole] = useState('viewer');
 
   useEffect(() => {
     const checkSuperadmin = async () => {
@@ -98,6 +101,31 @@ export default function SuperAdminDashboard() {
     openManageModal(selectedTenant);
   };
 
+  // Edit tenant name
+  const saveTenantName = async () => {
+    if (!selectedTenant || !editTenantName) return;
+    await supabase.from('tenants').update({ name: editTenantName }).eq('id', selectedTenant.id);
+    fetchTenants();
+    setSelectedTenant({ ...selectedTenant, name: editTenantName });
+  };
+
+  // Invite/create user for tenant
+  const inviteUser = async (e) => {
+    e.preventDefault();
+    if (!userInviteEmail) return;
+    // NOTE: This only works if you have a backend function for secure user creation!
+    setUserInviteEmail('');
+    setUserInviteRole('viewer');
+    openManageModal(selectedTenant);
+    alert('User invitation is not available from the frontend. Please use your backend function.');
+  };
+
+  // Change user role
+  const changeUserRole = async (userId, newRole) => {
+    await supabase.from('user_roles').update({ role: newRole }).eq('user_id', userId).eq('tenant_id', selectedTenant.id);
+    openManageModal(selectedTenant);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600 font-bold">{error}</div>;
 
@@ -144,13 +172,55 @@ export default function SuperAdminDashboard() {
           <div className="bg-white p-6 rounded-lg w-full max-w-2xl relative">
             <button className="absolute top-2 right-2 text-xl" onClick={() => setShowManageModal(false)}>&times;</button>
             <h2 className="text-xl font-bold mb-4">Manage Tenant: {selectedTenant.name}</h2>
+            <div className="mb-4 flex items-center gap-2">
+              <input
+                type="text"
+                value={editTenantName === '' ? selectedTenant.name : editTenantName}
+                onChange={e => setEditTenantName(e.target.value)}
+                className="p-2 border rounded"
+              />
+              <button onClick={saveTenantName} className="px-3 py-1 bg-blue-500 text-white rounded">Save</button>
+            </div>
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2">Invite/Create User</h3>
+              <form onSubmit={inviteUser} className="flex gap-2 items-center mb-2">
+                <input
+                  type="email"
+                  value={userInviteEmail}
+                  onChange={e => setUserInviteEmail(e.target.value)}
+                  placeholder="User email"
+                  className="p-2 border rounded"
+                />
+                <select
+                  value={userInviteRole}
+                  onChange={e => setUserInviteRole(e.target.value)}
+                  className="p-2 border rounded"
+                >
+                  <option value="viewer">Viewer</option>
+                  <option value="editor">Editor</option>
+                  <option value="admin">Admin</option>
+                </select>
+                <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded">Invite</button>
+              </form>
+            </div>
             <div className="mb-6">
               <h3 className="font-semibold mb-2">Users</h3>
               <ul>
                 {manageUsers.map(user => (
                   <li key={user.user_id} className="flex items-center justify-between mb-1">
-                    <span>{user.profiles?.email || user.user_id} ({user.role})</span>
-                    <button onClick={() => removeUser(user.user_id)} className="text-red-500 ml-2">Remove</button>
+                    <span>{user.profiles?.email || user.user_id}</span>
+                    <span className="flex items-center gap-2">
+                      <select
+                        value={user.role}
+                        onChange={e => changeUserRole(user.user_id, e.target.value)}
+                        className="p-1 border rounded"
+                      >
+                        <option value="viewer">Viewer</option>
+                        <option value="editor">Editor</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                      <button onClick={() => removeUser(user.user_id)} className="text-red-500 ml-2">Remove</button>
+                    </span>
                   </li>
                 ))}
               </ul>
