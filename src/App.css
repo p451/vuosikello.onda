@@ -2,74 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background: #f8f9fa;
-  font-family: 'Inter', 'SF Pro', system-ui, sans-serif;
-  color: #23243a;
-  letter-spacing: 0.01em;
-}
-
 .App {
   min-height: 100vh;
   background-color: #f5f5f5;
-}
-
-.calendar-container {
-  background: #f3f4f6;
-  border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(60,60,80,0.06);
-  padding: 2rem 1rem;
-}
-
-.day-cell {
-  background: #f8f9fa;
-  border-radius: 12px;
-  min-height: 5rem;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 1px 4px rgba(60,60,80,0.04);
-  transition: box-shadow 0.2s;
-}
-
-.day-cell:hover {
-  box-shadow: 0 4px 16px rgba(60,60,80,0.08);
-}
-
-.event-row {
-  background: #eae7de;
-  border-radius: 8px;
-  margin: 0.2rem 0;
-  padding: 0.5rem 0.75rem;
-  color: #23243a;
-  font-weight: 500;
-  box-shadow: 0 1px 2px rgba(60,60,80,0.03);
-  border: 1.5px solid #ececec;
-}
-
-.event-row[data-color] {
-  background: var(--event-color, #eae7de);
-  border-color: var(--event-color, #eae7de);
-  color: #23243a;
-}
-
-.legend-item {
-  background: #f3f4f6;
-  border-radius: 8px;
-  padding: 0.25rem 0.75rem;
-  margin: 0 0.25rem;
-  font-size: 0.95rem;
-  color: #23243a;
-  border: 1.5px solid #eae7de;
-}
-
-nav {
-  background: #f8f9fa;
-  border-bottom: 1.5px solid #eae7de;
-  box-shadow: 0 2px 8px rgba(60,60,80,0.03);
-  padding: 1.2rem 0;
-}
-
-button, .event-row, .legend-item {
-  transition: box-shadow 0.2s, background 0.2s, border 0.2s;
 }
 
 /* Add responsive styles */
