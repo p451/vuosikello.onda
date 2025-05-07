@@ -24,7 +24,7 @@ export default function Navigation() {
         <Link to="/" className="text-xl font-bold">
           Vuosikello
         </Link>
-        <div className="space-x-4">
+        <div className="space-x-4 flex items-center">
           <Link to="/" className="hover:text-gray-300">
             Calendar
           </Link>
@@ -37,6 +37,17 @@ export default function Navigation() {
             <Link to="/superadmin" className="hover:text-gray-300">
               Superadmin Dashboard
             </Link>
+          )}
+          {user && (
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.location.href = '/login';
+              }}
+              className="ml-4 px-3 py-1 bg-red-600 rounded hover:bg-red-700 text-white"
+            >
+              Logout
+            </button>
           )}
         </div>
       </div>
