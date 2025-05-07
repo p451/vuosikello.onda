@@ -15,7 +15,8 @@ const AikajanaKalenteri = () => {
     startDate: '',
     endDate: '',
     type: 'general',
-    tenant_id: null
+    tenant_id: null,
+    info: ''
   });
 
   // Add new state for detail view
@@ -42,6 +43,9 @@ const AikajanaKalenteri = () => {
   const commentInputRef = useRef(null);
 
   const [visibleEventTypes, setVisibleEventTypes] = useState([]);
+
+  // Lisää repeat state
+  const [repeat, setRepeat] = useState({ enabled: false, frequency: 'none', count: 1, until: '' });
 
   useEffect(() => {
     const init = async () => {
@@ -109,7 +113,8 @@ const AikajanaKalenteri = () => {
           startDate: event.start_date,
           endDate: event.end_date,
           type: event.type,
-          tenant_id: event.tenant_id
+          tenant_id: event.tenant_id,
+          info: event.info
         });
       });
 
@@ -139,41 +144,64 @@ const AikajanaKalenteri = () => {
     }
   };
 
+  // Päivitä addEvent logiikka toistuville tapahtumille
   const addEvent = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .insert([{
+      let eventsToInsert = [];
+      if (repeat.enabled && repeat.frequency !== 'none') {
+        // Luo toistuvat tapahtumat
+        let start = new Date(newEvent.startDate);
+        let end = new Date(newEvent.endDate);
+        let until = repeat.until ? new Date(repeat.until) : null;
+        let count = repeat.count || 1;
+        let i = 0;
+        while ((until ? start <= until : i < count)) {
+          eventsToInsert.push({
+            name: newEvent.name,
+            start_date: start.toISOString().slice(0, 10),
+            end_date: end.toISOString().slice(0, 10),
+            type: newEvent.type,
+            tenant_id: tenantId,
+            info: newEvent.info
+          });
+          // Siirrä seuraavaan sykliin
+          if (repeat.frequency === 'daily') {
+            start.setDate(start.getDate() + 1);
+            end.setDate(end.getDate() + 1);
+          } else if (repeat.frequency === 'weekly') {
+            start.setDate(start.getDate() + 7);
+            end.setDate(end.getDate() + 7);
+          } else if (repeat.frequency === 'monthly') {
+            start.setMonth(start.getMonth() + 1);
+            end.setMonth(end.getMonth() + 1);
+          }
+          i++;
+        }
+      } else {
+        eventsToInsert.push({
           name: newEvent.name,
           start_date: newEvent.startDate,
           end_date: newEvent.endDate,
           type: newEvent.type,
-          tenant_id: tenantId
-        }])
+          tenant_id: tenantId,
+          info: newEvent.info
+        });
+      }
+      const { data, error } = await supabase
+        .from('events')
+        .insert(eventsToInsert)
         .select();
-
       if (error) throw error;
-
-      const category = newEvent.type;
-      setEvents(prev => ({
-        ...prev,
-        [category]: [...(prev[category] || []), {
-          id: data[0].id,
-          name: data[0].name,
-          startDate: data[0].start_date,
-          endDate: data[0].end_date,
-          type: data[0].type,
-          tenant_id: data[0].tenant_id
-        }]
-      }));
-
+      await fetchEvents();
       setShowAddModal(false);
-      setNewEvent({ name: '', startDate: '', endDate: '', type: 'general', tenant_id: tenantId });
+      setNewEvent({ name: '', startDate: '', endDate: '', type: 'general', tenant_id: tenantId, info: '' });
+      setRepeat({ enabled: false, frequency: 'none', count: 1, until: '' });
     } catch (error) {
       console.error('Error adding event:', error);
     }
   };
 
+  // Päivitä eventin muokkaus (editEvent) info-kentälle
   const updateEvent = async () => {
     try {
       const { error } = await supabase
@@ -183,7 +211,8 @@ const AikajanaKalenteri = () => {
           start_date: editEvent.startDate,
           end_date: editEvent.endDate,
           type: editEvent.type,
-          tenant_id: tenantId
+          tenant_id: tenantId,
+          info: editEvent.info
         })
         .eq('id', editEvent.id)
         .eq('tenant_id', tenantId);
@@ -584,7 +613,8 @@ const AikajanaKalenteri = () => {
       startDate: day ? getLocalDateString(day) : '',
       endDate: day ? getLocalDateString(day) : '',
       type: defaultType,
-      tenant_id: tenantId
+      tenant_id: tenantId,
+      info: ''
     });
     setShowAddModal(true);
   };
@@ -756,6 +786,11 @@ const AikajanaKalenteri = () => {
               <p className="text-sm mt-1">
                 Tyyppi: {getEventTypeName(selectedEvent.type)}
               </p>
+              {selectedEvent.info && (
+                <div className="mt-2 p-2 bg-gray-50 border rounded text-sm">
+                  <span className="font-semibold">Lisätiedot:</span> {selectedEvent.info}
+                </div>
+              )}
             </div>
             {/* Comment Section */}
             <div className="mt-6">
@@ -822,6 +857,7 @@ const AikajanaKalenteri = () => {
         </div>
       )}
 
+      {/* Lisää info ja repeat eventin luontimodaliin */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-4 sm:p-6 rounded-lg w-full max-w-md">
@@ -834,6 +870,15 @@ const AikajanaKalenteri = () => {
                   className="w-full border p-2 rounded"
                   value={newEvent.name}
                   onChange={e => setNewEvent({...newEvent, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Lisätiedot</label>
+                <textarea
+                  className="w-full border p-2 rounded"
+                  value={newEvent.info}
+                  onChange={e => setNewEvent({...newEvent, info: e.target.value})}
+                  rows={2}
                 />
               </div>
               <div>
@@ -870,6 +915,49 @@ const AikajanaKalenteri = () => {
                   )}
                 </select>
               </div>
+              <div>
+                <label className="block mb-1">Toistuva tapahtuma?</label>
+                <input
+                  type="checkbox"
+                  checked={repeat.enabled}
+                  onChange={e => setRepeat(r => ({ ...r, enabled: e.target.checked, frequency: e.target.checked ? 'daily' : 'none' }))}
+                  className="mr-2"
+                />
+                <span>Kyllä</span>
+              </div>
+              {repeat.enabled && (
+                <div className="space-y-2">
+                  <div>
+                    <label className="block mb-1">Toistuvuus</label>
+                    <select
+                      className="w-full border p-2 rounded"
+                      value={repeat.frequency}
+                      onChange={e => setRepeat(r => ({ ...r, frequency: e.target.value }))}
+                    >
+                      <option value="daily">Päivittäin</option>
+                      <option value="weekly">Viikoittain</option>
+                      <option value="monthly">Kuukausittain</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block mb-1">Toistojen määrä</label>
+                    <input
+                      type="number"
+                      min={1}
+                      className="w-full border p-2 rounded"
+                      value={repeat.count}
+                      onChange={e => setRepeat(r => ({ ...r, count: Number(e.target.value) }))}
+                    />
+                    <span className="text-xs text-gray-500 ml-2">tai loppumispäivä</span>
+                    <input
+                      type="date"
+                      className="border p-2 rounded ml-2"
+                      value={repeat.until}
+                      onChange={e => setRepeat(r => ({ ...r, until: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="flex justify-end gap-2">
                 <button
                   className="px-4 py-2 bg-gray-200 rounded"
@@ -889,6 +977,7 @@ const AikajanaKalenteri = () => {
         </div>
       )}
 
+      {/* Lisää info eventin muokkausmodaaliin */}
       {showEditModal && editEvent && can('update') && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
@@ -901,6 +990,15 @@ const AikajanaKalenteri = () => {
                   className="w-full border p-2 rounded"
                   value={editEvent.name}
                   onChange={e => setEditEvent({...editEvent, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Lisätiedot</label>
+                <textarea
+                  className="w-full border p-2 rounded"
+                  value={editEvent.info || ''}
+                  onChange={e => setEditEvent({...editEvent, info: e.target.value})}
+                  rows={2}
                 />
               </div>
               <div>
