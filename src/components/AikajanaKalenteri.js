@@ -400,13 +400,13 @@ const AikajanaKalenteri = () => {
   };
 
   // Update the EventItem component to handle small holiday indicators
-  const EventItem = ({ event, onClick, scale = 1, isHoliday = false }) => (
+  const EventItem = ({ event, onClick, scale = 1 }) => (
     <div 
       onClick={onClick}
-      className={`event-row rounded cursor-pointer hover:opacity-80 ${isHoliday ? 'h-2 w-2' : 'p-1 text-xs sm:text-sm'}`}
-      style={!isHoliday ? { ...getEventTypeColor(event.type), fontSize: `${scale * 0.75}rem`, minHeight: `${scale * 1.25}rem` } : getEventTypeColor(event.type)}
+      className={`event-row rounded cursor-pointer hover:opacity-80 p-1 text-xs sm:text-sm`}
+      style={{ ...getEventTypeColor(event.type), fontSize: `${scale * 0.75}rem`, minHeight: `${scale * 1.25}rem` }}
     >
-      {!isHoliday && <span className="truncate block">{event.name}</span>}
+      <span className="truncate block">{event.name}</span>
     </div>
   );
 
@@ -425,7 +425,7 @@ const AikajanaKalenteri = () => {
   const isSameDay = (date1, date2) => {
     return date1.getFullYear() === date2.getFullYear() &&
            date1.getMonth() === date2.getMonth() &&
-           date1.getDate() === date2.getDate();
+           date1.getDate() === date1.getDate();
   };
 
   const parseLocalDate = (dateString) => {
@@ -440,24 +440,20 @@ const AikajanaKalenteri = () => {
     const matchingEvents = eventsArr.filter(event => {
       const startDate = parseLocalDate(event.startDate);
       const endDate = parseLocalDate(event.endDate);
-      return (type === 'pyhät' ? 
-        isSameDay(day, startDate) : 
-        isSameDay(day, startDate) || 
+      return (isSameDay(day, startDate) || 
         (day >= startDate && day <= endDate)) &&
         (selectedLayer === 'all' || selectedLayer === type);
     });
     if (matchingEvents.length === 0) return null;
     const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.2);
-    const isHoliday = type === 'pyhät';
     return (
-      <div className={`flex ${isHoliday ? 'justify-center' : 'flex-col gap-0.5'}`}>
+      <div className={`flex flex-col gap-0.5`}>
         {matchingEvents.map((event, idx) => (
           <EventItem 
             key={event.id}
             event={event}
             onClick={() => handleEventClick(event)}
             scale={scale}
-            isHoliday={isHoliday}
           />
         ))}
       </div>
@@ -496,9 +492,6 @@ const AikajanaKalenteri = () => {
                 <>
                   <div className="flex justify-between items-start">
                     <div className="font-bold">{day.getDate()}</div>
-                    <div className="flex-shrink-0 w-4">
-                      {renderDayEvents(events.pyhät, day, 'pyhät')}
-                    </div>
                   </div>
                   <div className="space-y-1 flex flex-col mt-1">
                     {Object.keys(events).map(type => (
@@ -525,10 +518,6 @@ const AikajanaKalenteri = () => {
                 {day.getDate()}.{day.getMonth() + 1}.
               </div>
               <div className="space-y-2">
-                {/* Holidays - always show */}
-                <div className="event-row min-h-[1.5rem]">
-                  {renderDayEvents(events.pyhät, day, 'pyhät')}
-                </div>
                 {/* Other event types */}
                 {Object.keys(events).map(type => (
                   <div key={type} className="event-row min-h-[1.5rem]">
@@ -545,10 +534,6 @@ const AikajanaKalenteri = () => {
         <div className="space-y-4">
           <h2 className="text-xl font-bold">{formatDate(currentDate)}</h2>
           <div className="space-y-2">
-            {/* Holidays - always show */}
-            <div className="event-row min-h-[1.5rem]">
-              {renderDayEvents(events.pyhät, currentDate, 'pyhät')}
-            </div>
             {/* Other event types */}
             {Object.keys(events).map(type => (
               <div key={type} className="event-row min-h-[1.5rem]">
@@ -962,7 +947,8 @@ const AikajanaKalenteri = () => {
           <ul>
             {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
             {dayPanelEvents.map(event => (
-              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer" onClick={() => handleEventClick(event)}>
+              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer flex items-center gap-2" onClick={() => handleEventClick(event)}>
+                <span style={{ background: eventTypeMap[event.type] || '#e2e8f0', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
                 <span className="font-bold">{event.name}</span> <span className="text-xs">({event.type})</span>
               </li>
             ))}
