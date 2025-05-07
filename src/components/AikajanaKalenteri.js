@@ -433,6 +433,13 @@ const AikajanaKalenteri = () => {
     return new Date(year, month - 1, day);
   };
 
+  // Helper to get local date string (YYYY-MM-DD)
+  const getLocalDateString = (date) => {
+    return date.getFullYear() + '-' +
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0');
+  };
+
   // Update renderDayEvents to default events to []
   const renderDayEvents = (eventsForType, day, type) => {
     const eventsArr = eventsForType || [];
@@ -544,6 +551,19 @@ const AikajanaKalenteri = () => {
         </div>
       );
     }
+  };
+
+  // When opening add event modal, set default type to first event type (if any)
+  const openAddEventModal = (day = null) => {
+    const defaultType = eventTypes.length > 0 ? eventTypes[0].name : 'general';
+    setNewEvent({
+      name: '',
+      startDate: day ? getLocalDateString(day) : '',
+      endDate: day ? getLocalDateString(day) : '',
+      type: defaultType,
+      tenant_id: tenantId
+    });
+    setShowAddModal(true);
   };
 
   return (
@@ -663,7 +683,7 @@ const AikajanaKalenteri = () => {
           </button>
           {can('create') && (
             <button
-              onClick={() => setShowAddModal(true)}
+              onClick={() => openAddEventModal()}
               className="px-4 py-2 rounded bg-blue-500 text-white"
             >
               Lisää tapahtuma
@@ -936,10 +956,7 @@ const AikajanaKalenteri = () => {
           <h2 className="text-xl font-bold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
           <button
             className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={() => {
-              setShowAddModal(true);
-              setNewEvent({ ...newEvent, startDate: selectedDay.toISOString().slice(0, 10), endDate: selectedDay.toISOString().slice(0, 10) });
-            }}
+            onClick={() => openAddEventModal(selectedDay)}
           >
             Lisää tapahtuma tälle päivälle
           </button>
