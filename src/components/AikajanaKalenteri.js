@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
@@ -28,39 +28,22 @@ const AikajanaKalenteri = () => {
   const { tenantId } = useTenant();
   const { can } = useRole();
 
-  const defaultHolidays = [
-    { id: 1, startDate: '2024-01-01', endDate: '2024-01-01', name: 'Uudenvuodenpäivä', type: 'pyhät' },
-    { id: 2, startDate: '2024-01-06', endDate: '2024-01-06', name: 'Loppiainen', type: 'pyhät' },
-    { id: 3, startDate: '2024-03-29', endDate: '2024-03-29', name: 'Pitkäperjantai', type: 'pyhät' },
-    { id: 4, startDate: '2024-03-31', endDate: '2024-03-31', name: 'Pääsiäispäivä', type: 'pyhät' },
-    { id: 5, startDate: '2024-04-01', endDate: '2024-04-01', name: 'Toinen pääsiäispäivä', type: 'pyhät' },
-    { id: 6, startDate: '2024-05-01', endDate: '2024-05-01', name: 'Vappu', type: 'pyhät' },
-    { id: 7, startDate: '2024-05-09', endDate: '2024-05-09', name: 'Helatorstai', type: 'pyhät' },
-    { id: 8, startDate: '2024-06-22', endDate: '2024-06-22', name: 'Juhannuspäivä', type: 'pyhät' },
-    { id: 9, startDate: '2024-12-06', endDate: '2024-12-06', name: 'Itsenäisyyspäivä', type: 'pyhät' },
-    { id: 10, startDate: '2024-12-25', endDate: '2024-12-25', name: 'Joulupäivä', type: 'pyhät' },
-    { id: 11, startDate: '2024-12-26', endDate: '2024-12-26', name: 'Tapaninpäivä', type: 'pyhät' },
-    { id: 12, startDate: '2025-01-01', endDate: '2025-01-01', name: 'Uudenvuodenpäivä', type: 'pyhät' },
-    { id: 13, startDate: '2025-01-06', endDate: '2025-01-06', name: 'Loppiainen', type: 'pyhät' },
-    { id: 14, startDate: '2025-04-18', endDate: '2025-04-18', name: 'Pitkäperjantai', type: 'pyhät' },
-    { id: 15, startDate: '2025-04-20', endDate: '2025-04-20', name: 'Pääsiäispäivä', type: 'pyhät' },
-    { id: 16, startDate: '2025-04-21', endDate: '2025-04-21', name: 'Toinen pääsiäispäivä', type: 'pyhät' },
-    { id: 17, startDate: '2025-05-01', endDate: '2025-05-01', name: 'Vappu', type: 'pyhät' },
-    { id: 18, startDate: '2025-05-29', endDate: '2025-05-29', name: 'Helatorstai', type: 'pyhät' },
-    { id: 19, startDate: '2025-06-21', endDate: '2025-06-21', name: 'Juhannuspäivä', type: 'pyhät' },
-    { id: 20, startDate: '2025-12-06', endDate: '2025-12-06', name: 'Itsenäisyyspäivä', type: 'pyhät' },
-    { id: 21, startDate: '2025-12-25', endDate: '2025-12-25', name: 'Joulupäivä', type: 'pyhät' },
-    { id: 22, startDate: '2025-12-26', endDate: '2025-12-26', name: 'Tapaninpäivä', type: 'pyhät' }
-  ];
-
   const [events, setEvents] = useState({});
 
   const [selectedEventType, setSelectedEventType] = useState('all');
 
+  const [showDayPanel, setShowDayPanel] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [dayPanelEvents, setDayPanelEvents] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [replyTo, setReplyTo] = useState(null);
+  const [commentLoading, setCommentLoading] = useState(false);
+  const commentInputRef = useRef(null);
+
   useEffect(() => {
     const init = async () => {
       await fetchEvents();
-      await initializeHolidays();
     };
     init();
   }, [tenantId]);
@@ -127,47 +110,6 @@ const AikajanaKalenteri = () => {
       setEvents(grouped);
     } catch (error) {
       console.error('Error fetching events:', error);
-    }
-  };
-
-  const initializeHolidays = async () => {
-    if (!tenantId) {
-      console.log('No tenant ID available');
-      return;
-    }
-
-    try {
-      const { data: existingHolidays, error: checkError } = await supabase
-        .from('events')
-        .select('id')
-        .eq('type', 'pyhät')
-        .eq('tenant_id', tenantId);
-
-      if (checkError) {
-        console.error('Error checking holidays:', checkError);
-        return;
-      }
-
-      if (!existingHolidays?.length) {
-        const { error: insertError } = await supabase
-          .from('events')
-          .insert(defaultHolidays.map(holiday => ({
-            name: holiday.name,
-            start_date: holiday.startDate,
-            end_date: holiday.endDate,
-            type: holiday.type,
-            tenant_id: tenantId
-          })));
-
-        if (insertError) {
-          console.error('Error inserting holidays:', insertError);
-          return;
-        }
-
-        await fetchEvents();
-      }
-    } catch (error) {
-      console.error('Error initializing holidays:', error);
     }
   };
 
@@ -249,10 +191,42 @@ const AikajanaKalenteri = () => {
     }
   };
 
+  // Fetch comments for an event
+  const fetchComments = async (eventId) => {
+    setCommentLoading(true);
+    const { data, error } = await supabase
+      .from('event_comments')
+      .select('*, profiles: user_id (email)')
+      .eq('event_id', eventId)
+      .order('created_at', { ascending: true });
+    setComments(data || []);
+    setCommentLoading(false);
+  };
+
+  // Add comment
+  const addComment = async (eventId, content, parentId = null) => {
+    setCommentLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from('event_comments').insert([
+      {
+        event_id: eventId,
+        user_id: user.id,
+        tenant_id: tenantId,
+        content,
+        parent_comment_id: parentId
+      }
+    ]);
+    setNewComment('');
+    setReplyTo(null);
+    await fetchComments(eventId);
+    setCommentLoading(false);
+  };
+
   // Update handleEventClick to show detail view first
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setShowDetailModal(true);
+    fetchComments(event.id);
   };
 
   // Add handler for opening edit from detail view
@@ -260,6 +234,18 @@ const AikajanaKalenteri = () => {
     setEditEvent(selectedEvent);
     setShowDetailModal(false);
     setShowEditModal(true);
+  };
+
+  const handleDayClick = (day) => {
+    setSelectedDay(day);
+    setShowDayPanel(true);
+    // Gather all events for this day
+    const eventsForDay = Object.values(events).flat().filter(event => {
+      const start = parseLocalDate(event.startDate);
+      const end = parseLocalDate(event.endDate);
+      return day >= start && day <= end;
+    });
+    setDayPanelEvents(eventsForDay);
   };
 
   const getDaysInMonth = (date) => {
@@ -502,7 +488,10 @@ const AikajanaKalenteri = () => {
             </div>
           ))}
           {days.map((day, index) => (
-            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base">
+            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base"
+              style={{ cursor: day ? 'pointer' : 'default' }}
+              onClick={day ? () => handleDayClick(day) : undefined}
+            >
               {day ? (
                 <>
                   <div className="flex justify-between items-start">
@@ -740,6 +729,48 @@ const AikajanaKalenteri = () => {
                 Tyyppi: {getEventTypeName(selectedEvent.type)}
               </p>
             </div>
+            {/* Comment Section */}
+            <div className="mt-6">
+              <h4 className="font-semibold mb-2">Kommentit</h4>
+              {commentLoading ? <div>Ladataan...</div> : (
+                <ul className="mb-4">
+                  {comments.filter(c => !c.parent_comment_id).map(comment => (
+                    <li key={comment.id} className="mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{comment.profiles?.email || comment.user_id}</span>
+                        <span className="text-xs text-gray-500">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
+                      </div>
+                      <div className="ml-2">{comment.content}</div>
+                      <button className="text-blue-500 text-xs ml-2" onClick={() => { setReplyTo(comment.id); commentInputRef.current?.focus(); }}>Vastaa</button>
+                      {/* Replies */}
+                      <ul className="ml-6 mt-1">
+                        {comments.filter(c => c.parent_comment_id === comment.id).map(reply => (
+                          <li key={reply.id} className="mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">{reply.profiles?.email || reply.user_id}</span>
+                              <span className="text-xs text-gray-500">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
+                            </div>
+                            <div className="ml-2">{reply.content}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <form onSubmit={e => { e.preventDefault(); addComment(selectedEvent.id, newComment, replyTo); }} className="flex gap-2 items-center">
+                <input
+                  ref={commentInputRef}
+                  type="text"
+                  className="flex-1 border p-2 rounded"
+                  placeholder={replyTo ? 'Vastaa kommenttiin...' : 'Lisää kommentti...'}
+                  value={newComment}
+                  onChange={e => setNewComment(e.target.value)}
+                />
+                {replyTo && <button type="button" className="text-xs text-gray-500" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
+                <button type="submit" className="px-3 py-1 bg-blue-500 text-white rounded">Lähetä</button>
+              </form>
+            </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
                 className="px-4 py-2 bg-gray-200 rounded"
@@ -910,6 +941,32 @@ const AikajanaKalenteri = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Add Day Panel */}
+      {showDayPanel && selectedDay && (
+        <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-lg z-50 overflow-y-auto p-4">
+          <button className="absolute top-2 right-2 text-xl" onClick={() => setShowDayPanel(false)}>&times;</button>
+          <h2 className="text-xl font-bold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
+          <button
+            className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
+            onClick={() => {
+              setShowAddModal(true);
+              setNewEvent({ ...newEvent, startDate: selectedDay.toISOString().slice(0, 10), endDate: selectedDay.toISOString().slice(0, 10) });
+            }}
+          >
+            Lisää tapahtuma tälle päivälle
+          </button>
+          <h3 className="font-semibold mb-2">Tapahtumat</h3>
+          <ul>
+            {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
+            {dayPanelEvents.map(event => (
+              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer" onClick={() => handleEventClick(event)}>
+                <span className="font-bold">{event.name}</span> <span className="text-xs">({event.type})</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
