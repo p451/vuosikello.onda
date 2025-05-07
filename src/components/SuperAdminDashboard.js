@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 
 // Set your superadmin email(s) here
-const SUPERADMINS = ['antoni.duhov@outlook.com']; // <-- replace with your email
+const SUPERADMINS = ['antoni.duhov@gmail.com']; // <-- updated to your email
 
 export default function SuperAdminDashboard() {
   const [tenants, setTenants] = useState([]);

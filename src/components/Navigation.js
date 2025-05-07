@@ -4,7 +4,7 @@ import { useRole } from '../contexts/RoleContext';
 import { supabase } from '../supabaseClient';
 import { useState, useEffect } from 'react';
 
-const SUPERADMINS = ['antoni.duhov@outlook.com']; // <-- replace with your email
+const SUPERADMINS = ['antoni.duhov@gmail.com']; // <-- replace with your email
 
 export default function Navigation() {
   const { userRole } = useRole();
