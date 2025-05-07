@@ -41,6 +41,8 @@ const AikajanaKalenteri = () => {
   const [commentLoading, setCommentLoading] = useState(false);
   const commentInputRef = useRef(null);
 
+  const [visibleEventTypes, setVisibleEventTypes] = useState([]);
+
   useEffect(() => {
     const init = async () => {
       await fetchEvents();
@@ -70,6 +72,10 @@ const AikajanaKalenteri = () => {
     };
     fetchEventTypes();
   }, [tenantId]);
+
+  useEffect(() => {
+    setVisibleEventTypes(eventTypes.map(type => type.name));
+  }, [eventTypes]);
 
   const fetchEvents = async () => {
     if (!tenantId) {
@@ -414,10 +420,21 @@ const AikajanaKalenteri = () => {
   const ColorLegend = () => (
     <div className="color-legend my-4 flex gap-4 justify-center border-t pt-4">
       {eventTypes.map(type => (
-        <div key={type.id} className="legend-item flex items-center gap-1">
+        <button
+          key={type.id}
+          className={`legend-item flex items-center gap-1 px-2 py-1 rounded ${visibleEventTypes.includes(type.name) ? 'bg-blue-100 border-blue-400 border' : 'bg-gray-100 border-gray-300 border opacity-50'}`}
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setVisibleEventTypes(prev =>
+              prev.includes(type.name)
+                ? prev.filter(t => t !== type.name)
+                : [...prev, type.name]
+            );
+          }}
+        >
           <div className="legend-color w-4 h-4 rounded" style={{ backgroundColor: type.color }}></div>
           <span>{type.name}</span>
-        </div>
+        </button>
       ))}
     </div>
   );
@@ -442,6 +459,7 @@ const AikajanaKalenteri = () => {
 
   // Update renderDayEvents to default events to []
   const renderDayEvents = (eventsForType, day, type) => {
+    if (!visibleEventTypes.includes(type)) return null;
     const eventsArr = eventsForType || [];
     if (selectedEventType !== 'all' && type !== selectedEventType) return null;
     const matchingEvents = eventsArr.filter(event => {
@@ -951,7 +969,7 @@ const AikajanaKalenteri = () => {
 
       {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-lg z-50 overflow-y-auto p-4 no-print">
+        <div className="fixed right-8 top-20 w-full max-w-md bg-white shadow-lg z-50 overflow-y-auto p-4 no-print rounded-lg border border-gray-300" style={{height: 'auto', maxHeight: '80vh'}}>
           <button className="absolute top-2 right-2 text-xl" onClick={() => setShowDayPanel(false)}>&times;</button>
           <h2 className="text-xl font-bold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
           <button
@@ -964,7 +982,7 @@ const AikajanaKalenteri = () => {
           <ul>
             {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
             {dayPanelEvents.map(event => (
-              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer flex items-center gap-2" onClick={() => handleEventClick(event)}>
+              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer flex items-center gap-2" onClick={() => { setShowDayPanel(false); handleEventClick(event); }}>
                 <span style={{ background: eventTypeMap[event.type] || '#e2e8f0', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
                 <span className="font-bold">{event.name}</span> <span className="text-xs">({event.type})</span>
               </li>
