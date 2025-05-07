@@ -982,7 +982,7 @@ const AikajanaKalenteri = () => {
           <ul>
             {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
             {dayPanelEvents.map(event => (
-              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer flex items-center gap-2" onClick={() => { setShowDayPanel(false); handleEventClick(event); }}>
+              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer flex items-center gap-2" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
                 <span style={{ background: eventTypeMap[event.type] || '#e2e8f0', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
                 <span className="font-bold">{event.name}</span> <span className="text-xs">({event.type})</span>
               </li>
