@@ -509,17 +509,19 @@ const AikajanaKalenteri = () => {
             </div>
           ))}
           {days.map((day, index) => (
-            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base"
-              style={{ cursor: day ? 'pointer' : 'default' }}
-              onClick={day ? (e) => {
-                if (e.target.closest('.event-list-item')) return;
-                handleDayClick(day);
-              } : undefined}
-            >
+            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base">
               {day ? (
                 <>
                   <div className="flex justify-between items-start">
-                    <div className="font-bold">{day.getDate()}</div>
+                    <button
+                      className="font-bold hover:bg-blue-100 rounded px-1 focus:outline-none"
+                      style={{ lineHeight: 1.2 }}
+                      onClick={() => handleDayClick(day)}
+                      tabIndex={0}
+                      aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
+                    >
+                      {day.getDate()}
+                    </button>
                   </div>
                   <div className="space-y-1 flex flex-col mt-1">
                     {Object.keys(events).map(type => (
