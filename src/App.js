@@ -7,6 +7,7 @@ import SignUp from './components/SignUp';
 import Navigation from './components/Navigation';
 import AikajanaKalenteri from './components/AikajanaKalenteri';
 import TenantAdminDashboard from './components/TenantAdminDashboard';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
 import { TenantProvider } from './contexts/TenantContext';
 import { RoleProvider } from './contexts/RoleContext';
 import './App.css';
@@ -46,6 +47,10 @@ function App() {
               <Route 
                 path="/admin" 
                 element={session ? <TenantAdminDashboard /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/superadmin" 
+                element={session ? <SuperAdminDashboard /> : <Navigate to="/login" />} 
               />
               <Route 
                 path="/" 
