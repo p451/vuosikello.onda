@@ -56,6 +56,8 @@ export default function TenantAdminDashboard() {
     setLoading(true);
     setMessage('');
     try {
+      // Odota hetki, että profiili ehtii syntyä ennen user_roles-inserttiä
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/create_user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
