@@ -1,3 +1,9 @@
+/*
+  VS Code näyttää @tailwind-virheitä, mutta ne voi ohittaa, koska ne ovat Tailwindin esiprosessorille.
+  Jos haluat, voit lisätä kommentin tiedoston alkuun:
+*/
+/* stylelint-disable unknownAtRules */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

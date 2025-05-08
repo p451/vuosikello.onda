@@ -119,8 +119,8 @@ const AikajanaKalenteri = () => {
       });
 
       setEvents(grouped);
-    } catch (error) {
-      console.error('Error fetching events:', error);
+    } catch (err) {
+      console.error('Error fetching events:', err);
     }
   };
 

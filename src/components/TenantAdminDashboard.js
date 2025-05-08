@@ -51,20 +51,6 @@ export default function TenantAdminDashboard() {
     if (!error) setEventTypes(data);
   };
 
-  const inviteUser = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    try {
-      // TODO: User creation should be handled in a secure backend/serverless function.
-      setMessage('User invitation is not available from the frontend. Please implement this in a secure backend function.');
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const addUserDirectly = async (e) => {
     e.preventDefault();
     setLoading(true);
