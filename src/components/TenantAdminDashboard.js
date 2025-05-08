@@ -65,6 +65,33 @@ export default function TenantAdminDashboard() {
     }
   };
 
+  const addUserDirectly = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    try {
+      const response = await fetch('/functions/v1/create_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: inviteEmail,
+          role: selectedRole,
+          tenant_id: tenantId
+        })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || 'Käyttäjän luonti epäonnistui');
+      setMessage('Käyttäjä lisätty ja kutsu lähetetty!');
+      setInviteEmail('');
+      setSelectedRole('viewer');
+      fetchUsers();
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const updateUserRole = async (userId, newRole) => {
     try {
       const { error } = await supabase
@@ -142,7 +169,7 @@ export default function TenantAdminDashboard() {
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Invite New User</h2>
-        <form onSubmit={inviteUser} className="space-y-4">
+        <form onSubmit={addUserDirectly} className="space-y-4">
           <div>
             <label className="block mb-2">Email:</label>
             <input
@@ -170,7 +197,7 @@ export default function TenantAdminDashboard() {
             disabled={loading}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Send Invitation
+            Lisää käyttäjä
           </button>
         </form>
       </div>
