@@ -10,11 +10,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storageKey: 'vuosikello-auth'
   }
 });
-
-(async () => {
-  const { data, error } = await supabase.functions.invoke('create_user', {
-    body: { name: 'Functions' },
-  })
-  console.log('invoke data:', data)
-  console.log('invoke error:', error)
-})();
