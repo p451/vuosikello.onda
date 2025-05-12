@@ -79,9 +79,9 @@ export default function Auth() {
         </div>
 
         <div className="text-center text-sm mt-4">
-          <button
-            className="text-blue-600 hover:underline"
-            onClick={async () => {
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
               if (!resetEmail) {
                 setResetMessage('Enter your email to reset password.');
                 return;
@@ -92,16 +92,22 @@ export default function Auth() {
               setResetMessage(error ? error.message : 'Reset link sent! Check your email.');
             }}
           >
-            Forgot password?
-          </button>
-          <input
-            type="email"
-            className="mt-2 w-full border rounded p-2"
-            placeholder="Enter your email for reset"
-            value={resetEmail}
-            onChange={e => setResetEmail(e.target.value)}
-          />
-          {resetMessage && <div className="text-blue-700 mt-2">{resetMessage}</div>}
+            <input
+              type="email"
+              className="mt-2 w-full border rounded p-2"
+              placeholder="Enter your email for reset"
+              value={resetEmail}
+              onChange={e => setResetEmail(e.target.value)}
+              required
+            />
+            <button
+              type="submit"
+              className="mt-2 w-full bg-blue-600 text-white py-2 rounded"
+            >
+              Send reset link
+            </button>
+            {resetMessage && <div className="text-blue-700 mt-2">{resetMessage}</div>}
+          </form>
         </div>
       </div>
     </div>
