@@ -38,11 +38,12 @@ export default function Navigation() {
   return (
     <nav className="bg-gray-800 text-white p-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Näytä tenantin nimi vain jos käyttäjä on kirjautunut */}
         <div className="flex items-center gap-2">
           <Link to="/" className="text-xl font-bold">
             Vuosikello
           </Link>
-          {tenantName && (
+          {user && tenantName && (
             <span className="ml-2 text-base font-semibold text-blue-200">{tenantName}</span>
           )}
         </div>
@@ -57,59 +58,64 @@ export default function Navigation() {
             </svg>
           </button>
         </div>
+        {/* Näytä valikkolinkit vain jos käyttäjä on kirjautunut */}
         <div className="hidden sm:flex space-x-4 items-center">
-          <Link to="/" className="hover:text-gray-300">
-            Calendar
-          </Link>
-          {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-            <Link to="/admin" className="hover:text-gray-300">
-              Admin Dashboard
-            </Link>
-          )}
-          {user && SUPERADMINS.includes(user.email) && (
-            <Link to="/superadmin" className="hover:text-gray-300">
-              Superadmin Dashboard
-            </Link>
-          )}
           {user && (
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = '/login';
-              }}
-              className="ml-4 px-3 py-1 bg-red-600 rounded hover:bg-red-700 text-white"
-            >
-              Logout
-            </button>
+            <>
+              <Link to="/" className="hover:text-gray-300">
+                Calendar
+              </Link>
+              {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
+                <Link to="/admin" className="hover:text-gray-300">
+                  Admin Dashboard
+                </Link>
+              )}
+              {user && SUPERADMINS.includes(user.email) && (
+                <Link to="/superadmin" className="hover:text-gray-300">
+                  Superadmin Dashboard
+                </Link>
+              )}
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = '/login';
+                }}
+                className="ml-4 px-3 py-1 bg-red-600 rounded hover:bg-red-700 text-white"
+              >
+                Logout
+              </button>
+            </>
           )}
         </div>
       </div>
       {/* Mobile menu */}
       {menuOpen && (
         <div className="sm:hidden mt-2 bg-gray-700 rounded shadow p-2 flex flex-col gap-2">
-          <Link to="/" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
-            Calendar
-          </Link>
-          {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-            <Link to="/admin" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
-              Admin Dashboard
-            </Link>
-          )}
-          {user && SUPERADMINS.includes(user.email) && (
-            <Link to="/superadmin" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
-              Superadmin Dashboard
-            </Link>
-          )}
           {user && (
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = '/login';
-              }}
-              className="px-3 py-1 bg-red-600 rounded hover:bg-red-700 text-white text-left"
-            >
-              Logout
-            </button>
+            <>
+              <Link to="/" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
+                Calendar
+              </Link>
+              {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
+                <Link to="/admin" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
+                  Admin Dashboard
+                </Link>
+              )}
+              {user && SUPERADMINS.includes(user.email) && (
+                <Link to="/superadmin" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
+                  Superadmin Dashboard
+                </Link>
+              )}
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = '/login';
+                }}
+                className="px-3 py-1 bg-red-600 rounded hover:bg-red-700 text-white text-left"
+              >
+                Logout
+              </button>
+            </>
           )}
         </div>
       )}

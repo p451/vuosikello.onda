@@ -19,6 +19,10 @@ export default function TenantAdminDashboard() {
   const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
+    if (!userRole || !tenantId) {
+      window.location.href = '/login';
+      return;
+    }
     if (userRole !== 'admin') {
       window.location.href = '/';
       return;
