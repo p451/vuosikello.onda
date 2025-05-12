@@ -6,6 +6,8 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -74,6 +76,32 @@ export default function Auth() {
           <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
             Sign up here
           </Link>
+        </div>
+
+        <div className="text-center text-sm mt-4">
+          <button
+            className="text-blue-600 hover:underline"
+            onClick={async () => {
+              if (!resetEmail) {
+                setResetMessage('Enter your email to reset password.');
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+                redirectTo: 'https://ondacalendar.netlify.app/reset-password'
+              });
+              setResetMessage(error ? error.message : 'Reset link sent! Check your email.');
+            }}
+          >
+            Forgot password?
+          </button>
+          <input
+            type="email"
+            className="mt-2 w-full border rounded p-2"
+            placeholder="Enter your email for reset"
+            value={resetEmail}
+            onChange={e => setResetEmail(e.target.value)}
+          />
+          {resetMessage && <div className="text-blue-700 mt-2">{resetMessage}</div>}
         </div>
       </div>
     </div>

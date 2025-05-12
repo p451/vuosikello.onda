@@ -8,6 +8,8 @@ import Navigation from './components/Navigation';
 import AikajanaKalenteri from './components/AikajanaKalenteri';
 import TenantAdminDashboard from './components/TenantAdminDashboard';
 import SuperAdminDashboard from './components/SuperAdminDashboard';
+import ResetPassword from './components/ResetPassword';
+import ActivateAccount from './components/ActivateAccount';
 import { TenantProvider } from './contexts/TenantContext';
 import { RoleProvider } from './contexts/RoleContext';
 import './App.css';
@@ -55,6 +57,14 @@ function App() {
               <Route 
                 path="/" 
                 element={session ? <AikajanaKalenteri /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/auth/callback" 
+                element={<ActivateAccount />} 
+              />
+              <Route 
+                path="/reset-password" 
+                element={<ResetPassword />} 
               />
             </Routes>
           </div>
