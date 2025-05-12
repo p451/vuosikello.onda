@@ -7,8 +7,16 @@ export default function ResetPassword() {
 
   const handleReset = async (e) => {
     e.preventDefault();
-    const params = new URLSearchParams(window.location.hash.replace('#', '?'));
-    const access_token = params.get('access_token');
+    // Kokeillaan sekä hash että query-parametreja
+    let access_token = null;
+    // 1. Yritä hash-parametreista
+    const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+    access_token = hashParams.get('access_token');
+    // 2. Jos ei löydy, kokeile query-parametreista
+    if (!access_token) {
+      const searchParams = new URLSearchParams(window.location.search);
+      access_token = searchParams.get('access_token');
+    }
     if (!access_token) {
       setMessage('Invalid or missing token');
       return;
@@ -31,6 +39,7 @@ export default function ResetPassword() {
         onChange={e => setPassword(e.target.value)}
         className="w-full border rounded p-2 mb-4"
         required
+        autoComplete="new-password"
       />
       <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">Set new password</button>
       {message && <div className="mt-4 text-blue-700">{message}</div>}
