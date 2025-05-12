@@ -7,6 +7,9 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [tenantName, setTenantName] = useState('');
   const [message, setMessage] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -27,7 +30,10 @@ export default function SignUp() {
         password,
         options: {
           data: {
-            tenant_id: tenant.id
+            tenant_id: tenant.id,
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone
           }
         }
       });
@@ -75,6 +81,49 @@ export default function SignUp() {
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                 value={tenantName}
                 onChange={(e) => setTenantName(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <div className="w-1/2">
+                <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+                  First name
+                </label>
+                <input
+                  id="first-name"
+                  name="first-name"
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                />
+              </div>
+              <div className="w-1/2">
+                <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+                  Last name
+                </label>
+                <input
+                  id="last-name"
+                  name="last-name"
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                Phone number
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
               />
             </div>
             <div>
