@@ -14,6 +14,9 @@ export default function TenantAdminDashboard() {
   const [eventTypes, setEventTypes] = useState([]);
   const [newEventType, setNewEventType] = useState('');
   const [newEventTypeColor, setNewEventTypeColor] = useState('#2196f3');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteInput, setDeleteInput] = useState('');
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     if (userRole !== 'admin') {
@@ -97,29 +100,31 @@ export default function TenantAdminDashboard() {
   };
 
   const removeUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to remove this user?')) return;
+    setUserToDelete(userId);
+    setDeleteInput('');
+    setShowDeleteModal(true);
+  };
 
-    // Optimistically update UI
-    setUsers(prev => prev.filter(user => user.user_id !== userId));
-    setMessage('');
+  const confirmDeleteUser = async () => {
+    if (deleteInput !== 'delete' || !userToDelete) return;
     setLoading(true);
-
+    setMessage('');
     try {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId)
-        .eq('tenant_id', tenantId);
-
-      if (error) throw error;
-      setMessage('User removed successfully');
-      // Optionally refetch users here if you want to be 100% sure
-      // await fetchUsers();
+      const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/delete_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userToDelete })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || 'Käyttäjän poisto epäonnistui');
+      setMessage('Käyttäjä poistettu onnistuneesti!');
+      setUsers(prev => prev.filter(user => user.user_id !== userToDelete));
     } catch (error) {
       setMessage(error.message);
-      // Rollback UI if needed
-      await fetchUsers();
     } finally {
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+      setDeleteInput('');
       setLoading(false);
     }
   };
@@ -264,6 +269,37 @@ export default function TenantAdminDashboard() {
           </table>
         </div>
       </div>
+      {/* Delete confirmation modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <h2 className="text-lg font-bold mb-4">Confirm User Deletion</h2>
+            <p className="mb-2">To delete this user permanently, type <span className="font-mono font-bold">delete</span> below and press confirm.</p>
+            <input
+              type="text"
+              value={deleteInput}
+              onChange={e => setDeleteInput(e.target.value)}
+              className="w-full border p-2 rounded mb-4"
+              placeholder="Type 'delete' to confirm"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteUser}
+                disabled={deleteInput !== 'delete'}
+                className={`px-4 py-2 rounded text-white ${deleteInput === 'delete' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'}`}
+              >
+                Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
