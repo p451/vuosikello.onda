@@ -61,7 +61,7 @@ export default function Navigation() {
           <Link to="/" className="hover:text-gray-300">
             Calendar
           </Link>
-          {userRole === 'admin' && (
+          {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
             <Link to="/admin" className="hover:text-gray-300">
               Admin Dashboard
             </Link>
@@ -90,7 +90,7 @@ export default function Navigation() {
           <Link to="/" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
             Calendar
           </Link>
-          {userRole === 'admin' && (
+          {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
             <Link to="/admin" className="hover:text-gray-300" onClick={() => setMenuOpen(false)}>
               Admin Dashboard
             </Link>
