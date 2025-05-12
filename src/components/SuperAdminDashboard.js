@@ -109,15 +109,31 @@ export default function SuperAdminDashboard() {
     setSelectedTenant({ ...selectedTenant, name: editTenantName });
   };
 
-  // Invite/create user for tenant
+  // Invite/create user for tenant (TenantAdminDashboard-tyyli)
   const inviteUser = async (e) => {
     e.preventDefault();
     if (!userInviteEmail) return;
-    // NOTE: This only works if you have a backend function for secure user creation!
-    setUserInviteEmail('');
-    setUserInviteRole('viewer');
-    openManageModal(selectedTenant);
-    alert('User invitation is not available from the frontend. Please use your backend function.');
+    try {
+      // Odota hetki, että profiili ehtii syntyä ennen user_roles-inserttiä
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/create_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userInviteEmail,
+          role: userInviteRole,
+          tenant_id: selectedTenant.id
+        })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || 'Käyttäjän luonti epäonnistui');
+      setUserInviteEmail('');
+      setUserInviteRole('viewer');
+      openManageModal(selectedTenant);
+      alert('Käyttäjä lisätty ja kutsu lähetetty!');
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   // Change user role
@@ -190,6 +206,7 @@ export default function SuperAdminDashboard() {
                   onChange={e => setUserInviteEmail(e.target.value)}
                   placeholder="User email"
                   className="p-2 border rounded"
+                  required
                 />
                 <select
                   value={userInviteRole}
