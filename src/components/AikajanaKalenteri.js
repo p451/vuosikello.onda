@@ -81,6 +81,28 @@ const AikajanaKalenteri = () => {
     setVisibleEventTypes(eventTypes.map(type => type.name));
   }, [eventTypes]);
 
+  useEffect(() => {
+    // Kuuntele sidebarin näkymätilan vaihtoa
+    const handler = (e) => {
+      if (e.detail === 'day' || e.detail === 'week' || e.detail === 'month') {
+        setViewMode(e.detail);
+      }
+    };
+    window.addEventListener('sidebar-set-viewmode', handler);
+
+    // Kuuntele sidebarin print-nappien tapahtumia
+    const printHandler = (e) => {
+      if (e.detail === 'agenda') printAgenda();
+      if (e.detail === 'calendar') window.print();
+    };
+    window.addEventListener('sidebar-print', printHandler);
+
+    return () => {
+      window.removeEventListener('sidebar-set-viewmode', handler);
+      window.removeEventListener('sidebar-print', printHandler);
+    };
+  }, []);
+
   const fetchEvents = async () => {
     if (!tenantId) {
       console.log('No tenant ID available');
