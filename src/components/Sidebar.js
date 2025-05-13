@@ -56,6 +56,95 @@ const Sidebar = () => {
     window.dispatchEvent(event);
   };
 
+  // Hyödynnetään AikajanaKalenterin printAgenda-funktion logiikkaa suoraan sidebarissa
+  const handlePrintAgenda = () => {
+    // Kopioitu printAgenda-funktio suoraan tähän
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    // Haetaan nykyinen näkymätila ja aikaväli
+    const viewTitle = {
+      day: 'päivän',
+      week: 'viikon',
+      month: 'kuukauden'
+    }[window.__vuosikello_viewMode || 'month'];
+    const currentDate = window.__vuosikello_currentDate ? new Date(window.__vuosikello_currentDate) : new Date();
+    const getViewDateRange = () => {
+      switch (window.__vuosikello_viewMode) {
+        case 'day':
+          return {
+            start: new Date(currentDate.setHours(0, 0, 0, 0)),
+            end: new Date(currentDate.setHours(23, 59, 59, 999))
+          };
+        case 'week': {
+          const start = new Date(currentDate);
+          start.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+          const end = new Date(start);
+          end.setDate(end.getDate() + 6);
+          return { start, end };
+        }
+        case 'month': {
+          const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          const end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+          return { start, end };
+        }
+        default:
+          return {
+            start: new Date(currentDate.setHours(0, 0, 0, 0)),
+            end: new Date(currentDate.setHours(23, 59, 59, 999))
+          };
+      }
+    };
+    const { start, end } = getViewDateRange();
+    const events = window.__vuosikello_events || {};
+    const eventTypeMap = window.__vuosikello_eventTypeMap || {};
+    const getEventTypeName = (type) => type;
+    const parseLocalDate = (dateString) => {
+      const [year, month, day] = dateString.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    };
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Vuosikello - ${viewTitle} agenda</title>
+          <style>
+            body { font-family: Arial, sans-serif; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .event-type { margin-top: 2em; }
+            .event-list { margin-left: 2em; }
+            .event-item { padding: 0.5em; margin: 0.5em 0; border-radius: 4px; color: black; }
+            @media print { @page { margin: 1cm; } .event-item { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
+          </style>
+        </head>
+        <body class="agenda-print">
+          <h1>Vuosikello - ${currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })} ${viewTitle} tapahtumat</h1>
+          ${Object.keys(events).map(type => `
+            <div class="event-type">
+              <h2>${getEventTypeName(type)}</h2>
+              <div class="event-list">
+                ${Object.values(events)
+                  .flat()
+                  .filter(event => {
+                    const eventStart = parseLocalDate(event.startDate);
+                    const eventEnd = parseLocalDate(event.endDate);
+                    return event.type === type && eventStart <= end && eventEnd >= start;
+                  })
+                  .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+                  .map(event => `
+                    <div class="event-item" style="background-color: ${eventTypeMap[type] || '#e2e8f0'}">
+                      <strong>${event.name}</strong><br>
+                      ${new Date(event.startDate).toLocaleDateString('fi-FI')} - 
+                      ${new Date(event.endDate).toLocaleDateString('fi-FI')}
+                    </div>
+                  `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
   if (!open) {
     return (
       <button
@@ -91,7 +180,7 @@ const Sidebar = () => {
           <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handleViewChange('week')}>Viikko</button>
           <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
           <div className="mt-4" />
-          <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handlePrint('agenda')}>Print Agenda</button>
+          <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
           <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
           <button onClick={handleLogout} className="py-2 px-4 rounded hover:bg-secondary text-left text-primary mt-4 font-semibold">Logout</button>
         </nav>

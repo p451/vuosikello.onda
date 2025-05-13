@@ -106,6 +106,14 @@ const AikajanaKalenteri = () => {
     };
   }, []);
 
+  // Synkronoidaan tärkeät tilat window-objektiin, jotta sidebarin print agenda toimii
+  useEffect(() => {
+    window.__vuosikello_viewMode = viewMode;
+    window.__vuosikello_currentDate = currentDate;
+    window.__vuosikello_events = events;
+    window.__vuosikello_eventTypeMap = eventTypeMap;
+  }, [viewMode, currentDate, events, eventTypeMap]);
+
   const fetchEvents = async () => {
     if (!tenantId) {
       console.log('No tenant ID available');
