@@ -710,31 +710,36 @@ const AikajanaKalenteri = () => {
       </style>
       {/* POISTETAAN: näkymän valinta, tapahtumatyypin valinta, print-napit, lisää tapahtuma */}
       {/* <div className="mb-4 space-y-2 sm:space-y-4 no-print"> ... </div> */}
-      <div className="flex items-center gap-2 sm:gap-4 mb-4 no-print">
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 rounded bg-gray-200"
-        >
-          &lt; Edellinen
-        </button>
-        <span className="font-bold">
-          {currentDate.toLocaleDateString('fi-FI', { 
-            month: 'long',
-            year: 'numeric'
-          })}
-        </span>
-        <button
-          onClick={() => navigate(1)}
-          className="px-4 py-2 rounded bg-gray-200"
-        >
-          Seuraava &gt;
-        </button>
-      </div>
-
+      {/* POISTETAAN: vanha edellinen/seuraava ja kuukauden nimi */}
+      {/* <div className="flex items-center gap-2 sm:gap-4 mb-4 no-print"> ... </div> */}
       <div className="border rounded-lg shadow-lg bg-white p-2 sm:p-4 calendar-container overflow-x-auto relative">
-        <h2 className="text-center text-lg sm:text-2xl font-bold mb-2 sm:mb-4 calendar-header">
-          {currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })}
-        </h2>
+        <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4 calendar-header">
+          <button
+            onClick={() => {
+              const prev = new Date(currentDate);
+              prev.setMonth(currentDate.getMonth() - 1);
+              setCurrentDate(prev);
+            }}
+            className="px-2 py-1 rounded bg-primary text-white font-bold hover:bg-primaryDark transition-all border border-primaryDark"
+            aria-label="Edellinen kuukausi"
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <h2 className="text-center text-lg sm:text-2xl font-bold m-0 p-0 select-none">
+            {currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => {
+              const next = new Date(currentDate);
+              next.setMonth(currentDate.getMonth() + 1);
+              setCurrentDate(next);
+            }}
+            className="px-2 py-1 rounded bg-primary text-white font-bold hover:bg-primaryDark transition-all border border-primaryDark"
+            aria-label="Seuraava kuukausi"
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
         {renderContent()}
         <ColorLegend />
         {/* UUSI: brändin mukainen kelluva nappi oikeaan alakulmaan */}

@@ -147,46 +147,52 @@ const Sidebar = () => {
 
   if (!open) {
     return (
-      <button
-        className="fixed top-4 left-4 z-50 bg-primary text-white rounded-full shadow-lg p-2 hover:bg-primaryDark transition"
-        aria-label="Avaa valikko"
+      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-primary/80 hover:bg-primary transition-all duration-300 w-4 group cursor-pointer"
         onClick={() => setOpen(true)}
+        aria-label="Avaa sivupalkki"
+        style={{ minWidth: '1rem', maxWidth: '1.5rem' }}
       >
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-      </button>
+        <div className="flex-1 flex flex-col justify-center items-center w-full">
+          <span className="block text-white text-xs rotate-90 group-hover:scale-110 transition-all select-none" style={{letterSpacing: '0.1em'}}>Avaa sidebar</span>
+        </div>
+        <div className="mb-4">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto text-white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </div>
+      </div>
     );
   }
 
   return (
-    <aside className="h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-lg z-40 font-sans transition-transform duration-300" style={{fontFamily: 'Inter, sans-serif'}}>
+    <aside className={`h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-lg z-40 font-sans transition-transform duration-300`} style={{fontFamily: 'Inter, sans-serif'}}>
       <div>
         <div className="flex items-center justify-between p-6 text-2xl font-bold border-b border-border bg-surface">
           <span className="font-serif tracking-elegant" style={{fontFamily: 'Spectral SC, serif', fontVariant: 'small-caps'}}>{tenantName || ""}</span>
           <button
-            className="ml-2 p-1 rounded hover:bg-secondary text-2xl text-primaryDark transition"
-            aria-label="Sulje valikko"
+            className="ml-2 px-3 py-1 rounded bg-secondary text-primaryDark font-semibold hover:bg-primary hover:text-white transition flex items-center gap-2"
+            aria-label="Siirrä sidebar sivuun"
             onClick={() => setOpen(false)}
           >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" /></svg>
+            <span className="text-sm font-medium">Siirrä sivuun</span>
           </button>
         </div>
         <nav className="flex flex-col gap-2 p-4">
           {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-            <Link to="/admin" className="py-2 px-4 rounded hover:bg-secondary text-left font-medium transition">Admin dashboard</Link>
+            <Link to="/admin" className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition">Admin dashboard</Link>
           )}
-          <Link to="/" className="py-2 px-4 rounded hover:bg-secondary text-left font-medium transition">Calendar</Link>
+          <Link to="/" className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition">Calendar</Link>
           <div className="mt-4 mb-2 text-xs text-placeholder uppercase tracking-wider">Näkymä</div>
-          <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handleViewChange('day')}>Päivä</button>
-          <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handleViewChange('week')}>Viikko</button>
-          <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
+          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handleViewChange('day')}>Päivä</button>
+          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handleViewChange('week')}>Viikko</button>
+          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
           <div className="mt-4" />
-          <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
-          <button className="py-2 px-4 rounded hover:bg-secondary text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
-          <button onClick={handleLogout} className="py-2 px-4 rounded hover:bg-secondary text-left text-primary mt-4 font-semibold">Logout</button>
+          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
+          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
+          <button onClick={handleLogout} className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left mt-4">Logout</button>
         </nav>
       </div>
       <div className="p-4 border-t border-border">
-        <button className="w-full py-2 px-4 rounded hover:bg-secondary text-left font-medium">Oma profiili</button>
+        <button className="w-full py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left">Oma profiili</button>
       </div>
     </aside>
   );
