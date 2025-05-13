@@ -16,10 +16,10 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-md">
+    <div className="flex min-h-screen items-center justify-center bg-sakura">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-surface p-6 shadow-soft">
         <div>
-          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-textPrimary">
             Sign in to your account
           </h2>
         </div>
@@ -39,7 +39,7 @@ export default function Auth() {
               type="email"
               autoComplete="email"
               required
-              className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              className="relative block w-full appearance-none rounded-md border border-metal px-3 py-2 text-textPrimary placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -55,7 +55,7 @@ export default function Auth() {
               type="password"
               autoComplete="current-password"
               required
-              className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              className="relative block w-full appearance-none rounded-md border border-metal px-3 py-2 text-textPrimary placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -73,7 +73,7 @@ export default function Auth() {
         
         <div className="text-center text-sm">
           <span className="text-gray-600">Don't have an account? </span>
-          <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link to="/signup" className="font-medium text-accentPink hover:text-accentPink/80">
             Sign up here
           </Link>
         </div>

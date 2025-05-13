@@ -471,7 +471,7 @@ const AikajanaKalenteri = () => {
   const EventItem = ({ event, onClick, scale = 1 }) => (
     <div 
       onClick={onClick}
-      className={`event-row rounded cursor-pointer hover:opacity-80 p-1 text-xs sm:text-sm`}
+      className={`event-row rounded-md cursor-pointer hover:opacity-80 p-1 text-xs sm:text-sm`}
       style={{ ...getEventTypeColor(event.type), fontSize: `${scale * 0.75}rem`, minHeight: `${scale * 1.25}rem` }}
     >
       <span className="truncate block">{event.name}</span>
@@ -484,7 +484,7 @@ const AikajanaKalenteri = () => {
       {eventTypes.map(type => (
         <button
           key={type.id}
-          className={`legend-item flex items-center gap-1 px-2 py-1 rounded ${visibleEventTypes.includes(type.name) ? 'bg-blue-100 border-blue-400 border' : 'bg-gray-100 border-gray-300 border opacity-50'}`}
+          className={`legend-item flex items-center gap-1 px-2 py-1 rounded-md ${visibleEventTypes.includes(type.name) ? 'bg-accentPink/30 border-accentPink/30 border' : 'bg-sakura border-metal border opacity-50'}`}
           style={{ cursor: 'pointer' }}
           onClick={() => {
             setVisibleEventTypes(prev =>
@@ -494,7 +494,7 @@ const AikajanaKalenteri = () => {
             );
           }}
         >
-          <div className="legend-color w-4 h-4 rounded" style={{ backgroundColor: type.color }}></div>
+          <div className="legend-color w-4 h-4 rounded-md" style={{ backgroundColor: type.color }}></div>
           <span>{type.name}</span>
         </button>
       ))}
@@ -566,7 +566,7 @@ const AikajanaKalenteri = () => {
       return (
         <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
           {['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'].map(day => (
-            <div key={day} className="p-2 text-center font-bold bg-gray-100 day-header">
+            <div key={day} className="p-2 text-center font-bold bg-sakura day-header">
               {day}
             </div>
           ))}
@@ -576,7 +576,7 @@ const AikajanaKalenteri = () => {
                 <>
                   <div className="flex justify-between items-start">
                     <button
-                      className="font-bold hover:bg-blue-100 rounded px-1 focus:outline-none"
+                      className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none"
                       style={{ lineHeight: 1.2 }}
                       onClick={() => handleDayClick(day)}
                       tabIndex={0}
@@ -712,7 +712,7 @@ const AikajanaKalenteri = () => {
       {/* <div className="mb-4 space-y-2 sm:space-y-4 no-print"> ... </div> */}
       {/* POISTETAAN: vanha edellinen/seuraava ja kuukauden nimi */}
       {/* <div className="flex items-center gap-2 sm:gap-4 mb-4 no-print"> ... </div> */}
-      <div className="border rounded-lg shadow-lg bg-white p-2 sm:p-4 calendar-container overflow-x-auto relative">
+      <div className="border rounded-lg shadow-glass bg-surface p-2 sm:p-4 calendar-container overflow-x-auto relative">
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4 calendar-header">
           <button
             onClick={() => {
@@ -720,7 +720,7 @@ const AikajanaKalenteri = () => {
               prev.setMonth(currentDate.getMonth() - 1);
               setCurrentDate(prev);
             }}
-            className="px-2 py-1 rounded bg-[#D04C2A] text-white font-serif font-bold hover:bg-[#B13E1F] transition-all border border-[#23211A]"
+            className="px-2 py-1 rounded-md bg-primary text-white font-serif font-bold hover:bg-primaryHover transition-all border border-metal"
             aria-label="Edellinen kuukausi"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -734,7 +734,7 @@ const AikajanaKalenteri = () => {
               next.setMonth(currentDate.getMonth() + 1);
               setCurrentDate(next);
             }}
-            className="px-2 py-1 rounded bg-[#D04C2A] text-white font-serif font-bold hover:bg-[#B13E1F] transition-all border border-[#23211A]"
+            className="px-2 py-1 rounded-md bg-primary text-white font-serif font-bold hover:bg-primaryHover transition-all border border-metal"
             aria-label="Seuraava kuukausi"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -746,7 +746,7 @@ const AikajanaKalenteri = () => {
         {can('create') && (
           <button
             onClick={() => openAddEventModal()}
-            className="fixed bottom-8 right-8 z-50 bg-[#D04C2A] text-white font-serif rounded-full shadow-lg px-6 py-4 text-lg font-bold hover:bg-[#B13E1F] transition-all border-2 border-[#23211A] no-print"
+            className="fixed bottom-8 right-8 z-50 bg-primary text-white font-serif rounded-lg shadow-glass px-6 py-4 text-lg font-bold hover:bg-primaryHover transition-all border-2 border-metal no-print"
             style={{ boxShadow: '0 4px 16px rgba(208,76,42,0.15)' }}
             aria-label="Lisää tapahtuma"
           >
@@ -757,8 +757,8 @@ const AikajanaKalenteri = () => {
 
       {/* Add Detail Modal */}
       {showDetailModal && selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
+          <div className="bg-surface p-6 rounded-lg w-full max-w-2xl">
             <div className="p-4 rounded-t-lg" style={getEventTypeColor(selectedEvent.type)}>
               <h3 className="text-xl font-bold">{selectedEvent.name}</h3>
               <p className="text-sm mt-2">
@@ -768,7 +768,7 @@ const AikajanaKalenteri = () => {
                 Tyyppi: {getEventTypeName(selectedEvent.type)}
               </p>
               {selectedEvent.info && (
-                <div className="mt-2 p-2 bg-gray-50 border rounded text-sm">
+                <div className="mt-2 p-2 bg-surface border rounded-md text-sm">
                   <span className="font-semibold">Lisätiedot:</span> {selectedEvent.info}
                 </div>
               )}
@@ -782,17 +782,17 @@ const AikajanaKalenteri = () => {
                     <li key={comment.id} className="mb-2">
                       <div className="flex items-center gap-2">
                         <span className="font-bold">{comment.profiles?.email || comment.user_id}</span>
-                        <span className="text-xs text-gray-500">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
+                        <span className="text-xs text-lowlightText">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
                       </div>
                       <div className="ml-2">{comment.content}</div>
-                      <button className="text-blue-500 text-xs ml-2" onClick={() => { setReplyTo(comment.id); commentInputRef.current?.focus(); }}>Vastaa</button>
+                      <button className="text-accentPink text-xs ml-2" onClick={() => { setReplyTo(comment.id); commentInputRef.current?.focus(); }}>Vastaa</button>
                       {/* Replies */}
                       <ul className="ml-6 mt-1">
                         {comments.filter(c => c.parent_comment_id === comment.id).map(reply => (
                           <li key={reply.id} className="mb-1">
                             <div className="flex items-center gap-2">
                               <span className="font-bold">{reply.profiles?.email || reply.user_id}</span>
-                              <span className="text-xs text-gray-500">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
+                              <span className="text-xs text-lowlightText">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
                             </div>
                             <div className="ml-2">{reply.content}</div>
                           </li>
@@ -806,18 +806,18 @@ const AikajanaKalenteri = () => {
                 <input
                   ref={commentInputRef}
                   type="text"
-                  className="flex-1 border p-2 rounded"
+                  className="flex-1 border p-2 rounded-md"
                   placeholder={replyTo ? 'Vastaa kommenttiin...' : 'Lisää kommentti...'}
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                 />
-                {replyTo && <button type="button" className="text-xs text-gray-500" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
-                <button type="submit" className="px-3 py-1 bg-blue-500 text-white rounded">Lähetä</button>
+                {replyTo && <button type="button" className="text-xs text-lowlightText" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
+                <button type="submit" className="px-3 py-1 bg-accentPink text-white rounded-md">Lähetä</button>
               </form>
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
-                className="px-4 py-2 bg-gray-200 rounded"
+                className="px-4 py-2 bg-metal/20 rounded-md"
                 onClick={() => {
                   setShowDetailModal(false);
                   setSelectedEvent(null);
@@ -827,7 +827,7 @@ const AikajanaKalenteri = () => {
               </button>
               {can('update') && (
                 <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                  className="px-4 py-2 bg-accentPink text-white rounded-md"
                   onClick={handleEditClick}
                 >
                   Muokkaa
@@ -840,15 +840,15 @@ const AikajanaKalenteri = () => {
 
       {/* Lisää info ja repeat eventin luontimodaliin */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-4 sm:p-6 rounded-lg w-full max-w-md">
+        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
+          <div className="bg-surface p-4 sm:p-6 rounded-lg w-full max-w-md">
             <h3 className="text-lg font-bold mb-4">Lisää uusi tapahtuma</h3>
             <div className="space-y-4">
               <div>
                 <label className="block mb-1">Nimi</label>
                 <input
                   type="text"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={newEvent.name}
                   onChange={e => setNewEvent({...newEvent, name: e.target.value})}
                 />
@@ -856,7 +856,7 @@ const AikajanaKalenteri = () => {
               <div>
                 <label className="block mb-1">Lisätiedot</label>
                 <textarea
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={newEvent.info}
                   onChange={e => setNewEvent({...newEvent, info: e.target.value})}
                   rows={2}
@@ -866,7 +866,7 @@ const AikajanaKalenteri = () => {
                 <label className="block mb-1">Alkamispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={newEvent.startDate}
                   onChange={e => setNewEvent({...newEvent, startDate: e.target.value})}
                 />
@@ -875,7 +875,7 @@ const AikajanaKalenteri = () => {
                 <label className="block mb-1">Päättymispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={newEvent.endDate}
                   onChange={e => setNewEvent({...newEvent, endDate: e.target.value})}
                 />
@@ -883,7 +883,7 @@ const AikajanaKalenteri = () => {
               <div>
                 <label className="block mb-1">Tyyppi</label>
                 <select
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={newEvent.type}
                   onChange={e => setNewEvent({...newEvent, type: e.target.value})}
                 >
@@ -911,7 +911,7 @@ const AikajanaKalenteri = () => {
                   <div>
                     <label className="block mb-1">Toistuvuus</label>
                     <select
-                      className="w-full border p-2 rounded"
+                      className="w-full border p-2 rounded-md"
                       value={repeat.frequency}
                       onChange={e => setRepeat(r => ({ ...r, frequency: e.target.value }))}
                     >
@@ -925,14 +925,14 @@ const AikajanaKalenteri = () => {
                     <input
                       type="number"
                       min={1}
-                      className="w-full border p-2 rounded"
+                      className="w-full border p-2 rounded-md"
                       value={repeat.count}
                       onChange={e => setRepeat(r => ({ ...r, count: Number(e.target.value) }))}
                     />
-                    <span className="text-xs text-gray-500 ml-2">tai loppumispäivä</span>
+                    <span className="text-xs text-lowlightText ml-2">tai loppumispäivä</span>
                     <input
                       type="date"
-                      className="border p-2 rounded ml-2"
+                      className="border p-2 rounded-md ml-2"
                       value={repeat.until}
                       onChange={e => setRepeat(r => ({ ...r, until: e.target.value }))}
                     />
@@ -941,13 +941,13 @@ const AikajanaKalenteri = () => {
               )}
               <div className="flex justify-end gap-2">
                 <button
-                  className="px-4 py-2 bg-gray-200 rounded"
+                  className="px-4 py-2 bg-metal/20 rounded-md"
                   onClick={() => setShowAddModal(false)}
                 >
                   Peruuta
                 </button>
                 <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                  className="px-4 py-2 bg-accentPink text-white rounded-md"
                   onClick={addEvent}
                 >
                   Lisää
@@ -960,15 +960,15 @@ const AikajanaKalenteri = () => {
 
       {/* Lisää info eventin muokkausmodaaliin */}
       {showEditModal && editEvent && can('update') && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center">
+          <div className="bg-surface p-6 rounded-lg max-w-md w-full">
             <h3 className="text-lg font-bold mb-4">Muokkaa tapahtumaa</h3>
             <div className="space-y-4">
               <div>
                 <label className="block mb-1">Nimi</label>
                 <input
                   type="text"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={editEvent.name}
                   onChange={e => setEditEvent({...editEvent, name: e.target.value})}
                 />
@@ -976,7 +976,7 @@ const AikajanaKalenteri = () => {
               <div>
                 <label className="block mb-1">Lisätiedot</label>
                 <textarea
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={editEvent.info || ''}
                   onChange={e => setEditEvent({...editEvent, info: e.target.value})}
                   rows={2}
@@ -986,7 +986,7 @@ const AikajanaKalenteri = () => {
                 <label className="block mb-1">Alkamispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={editEvent.startDate}
                   onChange={e => setEditEvent({...editEvent, startDate: e.target.value})}
                 />
@@ -995,7 +995,7 @@ const AikajanaKalenteri = () => {
                 <label className="block mb-1">Päättymispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={editEvent.endDate}
                   onChange={e => setEditEvent({...editEvent, endDate: e.target.value})}
                 />
@@ -1003,7 +1003,7 @@ const AikajanaKalenteri = () => {
               <div>
                 <label className="block mb-1">Tyyppi</label>
                 <select
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded-md"
                   value={editEvent.type}
                   onChange={e => setEditEvent({...editEvent, type: e.target.value})}
                 >
@@ -1019,7 +1019,7 @@ const AikajanaKalenteri = () => {
               <div className="flex justify-between">
                 {can('delete') && (
                   <button
-                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    className="px-4 py-2 bg-error text-white rounded-md"
                     onClick={() => {
                       deleteEvent(editEvent);
                       setShowEditModal(false);
@@ -1030,7 +1030,7 @@ const AikajanaKalenteri = () => {
                 )}
                 <div className="flex gap-2">
                   <button
-                    className="px-4 py-2 bg-gray-200 rounded"
+                    className="px-4 py-2 bg-metal/20 rounded-md"
                     onClick={() => {
                       setShowEditModal(false);
                       setEditEvent(null);
@@ -1039,7 +1039,7 @@ const AikajanaKalenteri = () => {
                     Peruuta
                   </button>
                   <button
-                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                    className="px-4 py-2 bg-accentPink text-white rounded-md"
                     onClick={updateEvent}
                   >
                     Tallenna
@@ -1053,11 +1053,11 @@ const AikajanaKalenteri = () => {
 
       {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed right-8 top-20 w-full max-w-md bg-white shadow-lg z-50 overflow-y-auto p-4 no-print rounded-lg border border-gray-300" style={{height: 'auto', maxHeight: '80vh'}}>
+        <div className="fixed right-8 top-20 w-full max-w-md bg-surface shadow-glass z-50 overflow-y-auto p-4 no-print rounded-lg border border-metal" style={{height: 'auto', maxHeight: '80vh'}}>
           <button className="absolute top-2 right-2 text-xl" onClick={() => setShowDayPanel(false)}>&times;</button>
           <h2 className="text-xl font-bold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
           <button
-            className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
+            className="mb-4 px-4 py-2 bg-accentPink text-white rounded-md"
             onClick={() => openAddEventModal(selectedDay)}
           >
             Lisää tapahtuma tälle päivälle
@@ -1066,7 +1066,7 @@ const AikajanaKalenteri = () => {
           <ul>
             {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
             {dayPanelEvents.map(event => (
-              <li key={event.id} className="mb-2 p-2 border rounded cursor-pointer flex items-center gap-2 event-list-item" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
+              <li key={event.id} className="mb-2 p-2 border rounded-md cursor-pointer flex items-center gap-2 event-list-item" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
                 <span style={{ background: eventTypeMap[event.type] || '#e2e8f0', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
                 <span className="font-bold">{event.name}</span> <span className="text-xs">({event.type})</span>
               </li>

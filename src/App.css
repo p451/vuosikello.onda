@@ -5,46 +5,30 @@
 @tailwind utilities;
 
 /*
-  Poistetaan kaikki nappeihin, fontteihin, inputteihin, kortteihin ja väreihin liittyvät tyylit, jotka on nyt aikumo-teema.css:ssä.
-  Jätetään vain mahdolliset layout- ja utility-tyylit, jos niitä tarvitaan.
+  Jätetään vain mahdolliset layout- ja utility-tyylit, joita ei voi toteuttaa Tailwindilla.
 */
 .App {
   min-height: 100vh;
-  background-color: #F9F6F1;
-}
-
-.card, .bg-card, .modal, .rounded-lg, .rounded-md {
-  background-color: #FAF8F5 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 6px rgba(35,33,26,0.06);
 }
 
 hr, .separator {
   border: none;
-  border-top: 1px solid #E5DED5;
 }
 
-/* Empty state */
 .empty-state {
-  color: #A0A0A0;
   font-style: italic;
-  background: #FAF8F5;
-  border-radius: 6px;
   padding: 1em;
   text-align: center;
 }
 
-/* Responsive tweaks */
 @media (max-width: 640px) {
   .day-cell {
     font-size: 0.75rem;
   }
-
   .event-row {
     font-size: 0.7rem;
     padding: 0.1rem;
   }
-
   .color-legend {
     flex-wrap: wrap;
     justify-content: center;
@@ -56,7 +40,6 @@ hr, .separator {
   .App {
     background-color: white;
   }
-
   header {
     display: none;
   }

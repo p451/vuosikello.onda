@@ -159,7 +159,7 @@ export default function TenantAdminDashboard() {
       <h1 className="text-2xl font-bold mb-6">Tenant Administration</h1>
       
       {message && (
-        <div className="mb-4 p-4 rounded bg-blue-100 text-blue-700">
+        <div className="mb-4 p-4 rounded-md bg-surface text-textPrimary">
           {message}
         </div>
       )}
@@ -173,7 +173,7 @@ export default function TenantAdminDashboard() {
               type="email"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border border-metal rounded-md"
               required
             />
           </div>
@@ -182,7 +182,7 @@ export default function TenantAdminDashboard() {
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border border-metal rounded-md"
             >
               <option value="viewer">Viewer</option>
               <option value="editor">Editor</option>
@@ -192,7 +192,7 @@ export default function TenantAdminDashboard() {
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
           >
             Lisää käyttäjä
           </button>
@@ -207,16 +207,16 @@ export default function TenantAdminDashboard() {
             value={newEventType}
             onChange={e => setNewEventType(e.target.value)}
             placeholder="New event type"
-            className="p-2 border rounded"
+            className="p-2 border border-metal rounded-md"
           />
           <input
             type="color"
             value={newEventTypeColor}
             onChange={e => setNewEventTypeColor(e.target.value)}
-            className="w-8 h-8 border rounded"
+            className="w-8 h-8 border border-metal rounded-md"
             title="Pick color"
           />
-          <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Add</button>
+          <button type="submit" className="px-4 py-2 bg-success text-white rounded-md">Add</button>
         </form>
         <ul>
           {eventTypes.map(type => (
@@ -225,7 +225,7 @@ export default function TenantAdminDashboard() {
                 <span style={{ background: type.color || '#2196f3', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
                 {type.name}
               </span>
-              <button onClick={() => removeEventType(type.id)} className="text-red-500">Remove</button>
+              <button onClick={() => removeEventType(type.id)} className="text-danger">Remove</button>
             </li>
           ))}
         </ul>
@@ -234,35 +234,35 @@ export default function TenantAdminDashboard() {
       <div>
         <h2 className="text-xl font-semibold mb-4">Current Users</h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
+          <table className="min-w-full bg-surface">
             <thead>
               <tr>
-                <th className="px-6 py-3 border-b text-left">Email</th>
-                <th className="px-6 py-3 border-b text-left">Role</th>
-                <th className="px-6 py-3 border-b text-left">Actions</th>
+                <th className="px-6 py-3 border-b border-metal text-left">Email</th>
+                <th className="px-6 py-3 border-b border-metal text-left">Role</th>
+                <th className="px-6 py-3 border-b border-metal text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.user_id}>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b border-metal">
                     {user.profiles?.email || user.user_id}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b border-metal">
                     <select
                       value={user.role}
                       onChange={(e) => updateUserRole(user.user_id, e.target.value)}
-                      className="p-1 border rounded"
+                      className="p-1 border border-metal rounded-md"
                     >
                       <option value="viewer">Viewer</option>
                       <option value="editor">Editor</option>
                       <option value="admin">Admin</option>
                     </select>
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b border-metal">
                     <button
                       onClick={() => removeUser(user.user_id)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                      className="px-3 py-1 bg-danger text-white rounded-md hover:bg-danger-dark"
                     >
                       Remove
                     </button>
@@ -275,28 +275,28 @@ export default function TenantAdminDashboard() {
       </div>
       {/* Delete confirmation modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+        <div className="fixed inset-0 flex items-center justify-center bg-overlay bg-opacity-50 z-50">
+          <div className="bg-surface p-6 rounded-md shadow-glass max-w-sm w-full">
             <h2 className="text-lg font-bold mb-4">Confirm User Deletion</h2>
             <p className="mb-2">To delete this user permanently, type <span className="font-mono font-bold">delete</span> below and press confirm.</p>
             <input
               type="text"
               value={deleteInput}
               onChange={e => setDeleteInput(e.target.value)}
-              className="w-full border p-2 rounded mb-4"
+              className="w-full border border-metal p-2 rounded-md mb-4"
               placeholder="Type 'delete' to confirm"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded"
+                className="px-4 py-2 bg-gray-200 rounded-md"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteUser}
                 disabled={deleteInput !== 'delete'}
-                className={`px-4 py-2 rounded text-white ${deleteInput === 'delete' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'}`}
+                className={`px-4 py-2 rounded-md text-white ${deleteInput === 'delete' ? 'bg-danger hover:bg-danger-dark' : 'bg-gray-400 cursor-not-allowed'}`}
               >
                 Confirm Delete
               </button>

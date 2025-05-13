@@ -41,7 +41,7 @@ export default function Navigation() {
   }, [tenantId, user]);
 
   return (
-    <nav className="bg-[#F3F1EE] text-[#2D3E50] p-4 border-b border-[#DDD6CE]" style={{ fontFamily: 'IBM Plex Sans, sans-serif', lineHeight: '1.6em' }}>
+    <nav className="bg-sakura text-textPrimary p-4 border-b border-metal" style={{ fontFamily: 'IBM Plex Sans, sans-serif', lineHeight: '1.6em' }}>
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Näytä tenantin nimi vain jos käyttäjä on kirjautunut */}
         <div className="flex items-center gap-2">
@@ -49,7 +49,7 @@ export default function Navigation() {
             Aikumo
           </Link>
           {user && tenantName && (
-            <span className="ml-2 text-base font-semibold text-[#8C2F39] bg-[#F8F6F3] px-2 py-1 rounded border border-[#8C2F39]" style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}>{tenantName}</span>
+            <span className="ml-2 text-base font-semibold text-primary bg-surface px-2 py-1 rounded-md border border-primary" style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}>{tenantName}</span>
           )}
         </div>
         <div className="sm:hidden">
@@ -68,16 +68,16 @@ export default function Navigation() {
         <div className="hidden sm:flex space-x-4 items-center">
           {user && (
             <>
-              <Link to="/" className="hover:text-[#8C2F39] px-3 py-1 rounded transition-all border-b-2 border-transparent hover:border-[#8C2F39] focus:border-[#8C2F39]">
+              <Link to="/" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary">
                 Calendar
               </Link>
               {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-                <Link to="/admin" className="hover:text-[#8C2F39] px-3 py-1 rounded transition-all border-b-2 border-transparent hover:border-[#8C2F39] focus:border-[#8C2F39]">
+                <Link to="/admin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary">
                   Admin Dashboard
                 </Link>
               )}
               {user && SUPERADMINS.includes(user.email) && (
-                <Link to="/superadmin" className="hover:text-[#8C2F39] px-3 py-1 rounded transition-all border-b-2 border-transparent hover:border-[#8C2F39] focus:border-[#8C2F39]">
+                <Link to="/superadmin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary">
                   Superadmin Dashboard
                 </Link>
               )}
@@ -86,7 +86,7 @@ export default function Navigation() {
                   await supabase.auth.signOut();
                   window.location.href = '/login';
                 }}
-                className="ml-4 px-3 py-1 rounded bg-gradient-to-b from-[#8C2F39] to-[#7A2631] text-white font-semibold shadow-sm hover:shadow-lg transition-all border border-[#8C2F39]"
+                className="ml-4 px-3 py-1 rounded-md bg-gradient-to-b from-primary to-primaryHover text-white font-semibold shadow-soft hover:shadow-glass transition-all border border-primary"
                 style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}
               >
                 Logout
@@ -97,19 +97,19 @@ export default function Navigation() {
       </div>
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="sm:hidden mt-2 bg-[#F8F6F3] rounded shadow p-2 flex flex-col gap-2 border border-[#DDD6CE]">
+        <div className="sm:hidden mt-2 bg-surface rounded-md shadow-soft p-2 flex flex-col gap-2 border border-metal">
           {user && (
             <>
-              <Link to="/" className="hover:text-[#8C2F39] px-3 py-1 rounded transition-all border-b-2 border-transparent hover:border-[#8C2F39] focus:border-[#8C2F39]" onClick={() => setMenuOpen(false)}>
+              <Link to="/" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary" onClick={() => setMenuOpen(false)}>
                 Calendar
               </Link>
               {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-                <Link to="/admin" className="hover:text-[#8C2F39] px-3 py-1 rounded transition-all border-b-2 border-transparent hover:border-[#8C2F39] focus:border-[#8C2F39]" onClick={() => setMenuOpen(false)}>
+                <Link to="/admin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary" onClick={() => setMenuOpen(false)}>
                   Admin Dashboard
                 </Link>
               )}
               {user && SUPERADMINS.includes(user.email) && (
-                <Link to="/superadmin" className="hover:text-[#8C2F39] px-3 py-1 rounded transition-all border-b-2 border-transparent hover:border-[#8C2F39] focus:border-[#8C2F39]" onClick={() => setMenuOpen(false)}>
+                <Link to="/superadmin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary" onClick={() => setMenuOpen(false)}>
                   Superadmin Dashboard
                 </Link>
               )}
@@ -118,7 +118,7 @@ export default function Navigation() {
                   await supabase.auth.signOut();
                   window.location.href = '/login';
                 }}
-                className="px-3 py-1 rounded bg-gradient-to-b from-[#8C2F39] to-[#7A2631] text-white font-semibold shadow-sm hover:shadow-lg transition-all border border-[#8C2F39] text-left"
+                className="px-3 py-1 rounded-md bg-gradient-to-b from-primary to-primaryHover text-white font-semibold shadow-soft hover:shadow-glass transition-all border border-primary text-left"
                 style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}
               >
                 Logout

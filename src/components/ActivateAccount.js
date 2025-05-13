@@ -15,5 +15,5 @@ export default function ActivateAccount() {
     }
   }, [navigate]);
 
-  return <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">Activating account...</div>;
+  return <div className="max-w-md mx-auto mt-10 p-6 bg-surface rounded-md shadow-soft">Activating account...</div>;
 }

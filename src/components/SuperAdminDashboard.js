@@ -154,29 +154,29 @@ export default function SuperAdminDashboard() {
           value={newTenantName}
           onChange={e => setNewTenantName(e.target.value)}
           placeholder="New tenant name"
-          className="p-2 border rounded"
+          className="p-2 border rounded-md"
         />
-        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Add Tenant</button>
+        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md">Add Tenant</button>
       </form>
       <h2 className="text-xl font-semibold mb-4">Tenants</h2>
-      <table className="min-w-full bg-white">
+      <table className="min-w-full bg-surface">
         <thead>
           <tr>
-            <th className="px-6 py-3 border-b text-left">Tenant Name</th>
-            <th className="px-6 py-3 border-b text-left">Created</th>
-            <th className="px-6 py-3 border-b text-left">ID</th>
-            <th className="px-6 py-3 border-b text-left">Actions</th>
+            <th className="px-6 py-3 border-b border-metal text-left">Tenant Name</th>
+            <th className="px-6 py-3 border-b border-metal text-left">Created</th>
+            <th className="px-6 py-3 border-b border-metal text-left">ID</th>
+            <th className="px-6 py-3 border-b border-metal text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
           {tenants.map(tenant => (
             <tr key={tenant.id}>
-              <td className="px-6 py-4 border-b">{tenant.name}</td>
-              <td className="px-6 py-4 border-b">{tenant.created_at}</td>
-              <td className="px-6 py-4 border-b">{tenant.id}</td>
-              <td className="px-6 py-4 border-b flex gap-2">
-                <button onClick={() => openManageModal(tenant)} className="px-2 py-1 bg-blue-500 text-white rounded">Manage</button>
-                <button onClick={() => deleteTenant(tenant.id)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+              <td className="px-6 py-4 border-b border-metal">{tenant.name}</td>
+              <td className="px-6 py-4 border-b border-metal">{tenant.created_at}</td>
+              <td className="px-6 py-4 border-b border-metal">{tenant.id}</td>
+              <td className="px-6 py-4 border-b border-metal flex gap-2">
+                <button onClick={() => openManageModal(tenant)} className="px-2 py-1 bg-blue-500 text-white rounded-md">Manage</button>
+                <button onClick={() => deleteTenant(tenant.id)} className="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>
               </td>
             </tr>
           ))}
@@ -185,7 +185,7 @@ export default function SuperAdminDashboard() {
       {/* Manage Tenant Modal */}
       {showManageModal && selectedTenant && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-2xl relative">
+          <div className="bg-surface p-6 rounded-md w-full max-w-2xl relative shadow-soft">
             <button className="absolute top-2 right-2 text-xl" onClick={() => setShowManageModal(false)}>&times;</button>
             <h2 className="text-xl font-bold mb-4">Manage Tenant: {selectedTenant.name}</h2>
             <div className="mb-4 flex items-center gap-2">
@@ -193,9 +193,9 @@ export default function SuperAdminDashboard() {
                 type="text"
                 value={editTenantName === '' ? selectedTenant.name : editTenantName}
                 onChange={e => setEditTenantName(e.target.value)}
-                className="p-2 border rounded"
+                className="p-2 border rounded-md"
               />
-              <button onClick={saveTenantName} className="px-3 py-1 bg-blue-500 text-white rounded">Save</button>
+              <button onClick={saveTenantName} className="px-3 py-1 bg-blue-500 text-white rounded-md">Save</button>
             </div>
             <div className="mb-6">
               <h3 className="font-semibold mb-2">Invite/Create User</h3>
@@ -205,19 +205,19 @@ export default function SuperAdminDashboard() {
                   value={userInviteEmail}
                   onChange={e => setUserInviteEmail(e.target.value)}
                   placeholder="User email"
-                  className="p-2 border rounded"
+                  className="p-2 border rounded-md"
                   required
                 />
                 <select
                   value={userInviteRole}
                   onChange={e => setUserInviteRole(e.target.value)}
-                  className="p-2 border rounded"
+                  className="p-2 border rounded-md"
                 >
                   <option value="viewer">Viewer</option>
                   <option value="editor">Editor</option>
                   <option value="admin">Admin</option>
                 </select>
-                <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded">Invite</button>
+                <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded-md">Invite</button>
               </form>
             </div>
             <div className="mb-6">
@@ -230,7 +230,7 @@ export default function SuperAdminDashboard() {
                       <select
                         value={user.role}
                         onChange={e => changeUserRole(user.user_id, e.target.value)}
-                        className="p-1 border rounded"
+                        className="p-1 border rounded-md"
                       >
                         <option value="viewer">Viewer</option>
                         <option value="editor">Editor</option>
@@ -250,16 +250,16 @@ export default function SuperAdminDashboard() {
                   value={newEventType}
                   onChange={e => setNewEventType(e.target.value)}
                   placeholder="New event type"
-                  className="p-2 border rounded"
+                  className="p-2 border rounded-md"
                 />
                 <input
                   type="color"
                   value={newEventTypeColor}
                   onChange={e => setNewEventTypeColor(e.target.value)}
-                  className="w-8 h-8 border rounded"
+                  className="w-8 h-8 border rounded-md"
                   title="Pick color"
                 />
-                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Add</button>
+                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md">Add</button>
               </form>
               <ul>
                 {manageEventTypes.map(type => (

@@ -147,7 +147,7 @@ const Sidebar = () => {
 
   if (!open) {
     return (
-      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-[#D04C2A]/80 hover:bg-[#D04C2A] transition-all duration-300 w-4 group cursor-pointer border-r-2 border-[#23211A]"
+      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-primary/80 hover:bg-primary transition-all duration-300 w-4 group cursor-pointer border-r-2 border-metal"
         onClick={() => setOpen(true)}
         aria-label="Avaa sivupalkki"
         style={{ minWidth: '1rem', maxWidth: '1.5rem' }}
@@ -163,12 +163,12 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className={`h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-lg z-40 font-sans transition-transform duration-300`} style={{fontFamily: 'Inter, sans-serif'}}>
+    <aside className={`h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-soft z-40 font-sans transition-transform duration-300`}>
       <div>
-        <div className="flex items-center justify-between p-6 text-2xl font-bold border-b border-border bg-surface">
-          <span className="font-serif tracking-elegant" style={{fontFamily: 'Spectral SC, serif', fontVariant: 'small-caps'}}>{tenantName || ""}</span>
+        <div className="flex items-center justify-between p-6 text-2xl font-bold border-b border-metal bg-surface">
+          <span className="font-serif tracking-elegant" style={{fontVariant: 'small-caps'}}>{tenantName || ""}</span>
           <button
-            className="ml-2 px-3 py-1 rounded bg-[#E5DED5] text-[#23211A] font-serif font-semibold hover:bg-[#D04C2A] hover:text-white transition flex items-center gap-2 border border-[#23211A]"
+            className="ml-2 px-3 py-1 rounded-md bg-secondary text-textPrimary font-serif font-semibold hover:bg-primary hover:text-white transition flex items-center gap-2 border border-metal"
             aria-label="Siirrä sidebar sivuun"
             onClick={() => setOpen(false)}
           >
@@ -178,21 +178,21 @@ const Sidebar = () => {
         </div>
         <nav className="flex flex-col gap-2 p-4">
           {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-            <Link to="/admin" className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition">Admin dashboard</Link>
+            <Link to="/admin" className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition">Admin dashboard</Link>
           )}
-          <Link to="/" className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition">Calendar</Link>
+          <Link to="/" className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition">Calendar</Link>
           <div className="mt-4 mb-2 text-xs text-placeholder uppercase tracking-wider">Näkymä</div>
-          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handleViewChange('day')}>Päivä</button>
-          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handleViewChange('week')}>Viikko</button>
-          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handleViewChange('day')}>Päivä</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handleViewChange('week')}>Viikko</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
           <div className="mt-4" />
-          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
-          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
-          <button onClick={handleLogout} className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left mt-4">Logout</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
+          <button onClick={handleLogout} className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left mt-4">Logout</button>
         </nav>
       </div>
-      <div className="p-4 border-t border-border">
-        <button className="w-full py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left">Oma profiili</button>
+      <div className="p-4 border-t border-metal">
+        <button className="w-full py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left">Oma profiili</button>
       </div>
     </aside>
   );

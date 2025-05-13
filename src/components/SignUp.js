@@ -60,10 +60,10 @@ export default function SignUp() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-md">
+    <div className="flex min-h-screen items-center justify-center bg-sakura">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-surface p-6 shadow-soft">
         <div>
-          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-textPrimary">
             Create a new account
           </h2>
         </div>
@@ -78,7 +78,7 @@ export default function SignUp() {
                 name="organization"
                 type="text"
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
                 value={tenantName}
                 onChange={(e) => setTenantName(e.target.value)}
               />
@@ -93,7 +93,7 @@ export default function SignUp() {
                   name="first-name"
                   type="text"
                   required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                 />
@@ -107,7 +107,7 @@ export default function SignUp() {
                   name="last-name"
                   type="text"
                   required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                 />
@@ -121,7 +121,7 @@ export default function SignUp() {
                 id="phone"
                 name="phone"
                 type="tel"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
               />
@@ -135,7 +135,7 @@ export default function SignUp() {
                 name="email"
                 type="email"
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -149,7 +149,7 @@ export default function SignUp() {
                 name="password"
                 type="password"
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -166,7 +166,7 @@ export default function SignUp() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="group relative flex w-full justify-center rounded-md border border-transparent bg-accentPink px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-accentPink focus:ring-offset-2"
             >
               {loading ? 'Creating account...' : 'Sign up'}
             </button>
