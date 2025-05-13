@@ -1,41 +1,19 @@
+/*
+  Poistetaan kaikki päällekkäiset ja vanhat tyylit, jotka eivät liity layoutiin, utilityihin tai muihin globaaleihin rakenteisiin.
+  Jätetään vain mahdolliset layout- ja reset-tyylit, jos niitä tarvitaan.
+*/
 body {
   margin: 0;
-  font-family: 'IBM Plex Sans', Arial, sans-serif;
-  background-color: #F3F1EE;
-  color: #2D3E50;
-  line-height: 1.6em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Spectral SC', serif;
-  font-variant: small-caps;
-  letter-spacing: 0.5px;
-  color: #2D3E50;
-  line-height: 1.3em;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  background-color: #F9F6F1;
 }
 
 hr, .separator {
   border: none;
-  border-top: 1px solid #DDD6CE;
+  border-top: 1px solid #E5DED5;
   margin: 1.5em 0;
 }
 
-.placeholder, .empty-state {
-  color: #B0AFAE;
-  font-style: italic;
-  background: #F8F6F3;
-  border-radius: 6px;
-  padding: 1em;
-  text-align: center;
-}
-
 .avatar {
-  border: 2px solid rgba(45,62,80,0.2);
+  border: 2px solid rgba(35,33,26,0.2);
   border-radius: 50%;
 }

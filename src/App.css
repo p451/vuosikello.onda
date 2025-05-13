@@ -4,76 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Poistetaan kaikki nappeihin, fontteihin, inputteihin, kortteihin ja väreihin liittyvät tyylit, jotka on nyt aikumo-teema.css:ssä.
+  Jätetään vain mahdolliset layout- ja utility-tyylit, jos niitä tarvitaan.
+*/
 .App {
   min-height: 100vh;
   background-color: #F9F6F1;
-  color: #2D2D2D;
-  font-family: 'Inter', sans-serif;
 }
 
 .card, .bg-card, .modal, .rounded-lg, .rounded-md {
   background-color: #FAF8F5 !important;
   border-radius: 12px !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
-
-button, .btn, .primary-btn {
-  background-color: #C44B3F;
-  color: #FFFFFF;
-  border: 1px solid #A03C33;
-  border-radius: 8px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-size: 1rem;
-  padding: 0.6em 1.2em;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-  transition: all 0.15s ease-out;
-}
-button:hover, .btn:hover, .primary-btn:hover {
-  background-color: #A03C33;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-}
-
-.secondary-btn {
-  background-color: #FAF8F5;
-  color: #C44B3F;
-  border: 1px solid #C44B3F;
-  border-radius: 8px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-size: 1rem;
-  padding: 0.6em 1.2em;
-  letter-spacing: 0.5px;
-  transition: all 0.15s ease-out;
-}
-.secondary-btn:hover {
-  background-color: #F0EDE9;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-input, select, textarea {
-  background-color: #FAF8F5;
-  border: 1px solid #DDD6CE;
-  color: #2D2D2D;
-  border-radius: 6px;
-  font-family: 'Inter', sans-serif;
-}
-input:focus, select:focus, textarea:focus {
-  outline: 2px solid #C44B3F;
-  border-color: #C44B3F;
-}
-
-.active, .selected, .calendar-day.selected {
-  border: 2px solid #C44B3F !important;
-  background-color: #F3E6E8 !important;
+  box-shadow: 0 2px 6px rgba(35,33,26,0.06);
 }
 
 hr, .separator {
   border: none;
-  border-top: 1px solid #DDD6CE;
+  border-top: 1px solid #E5DED5;
 }
 
 /* Empty state */
