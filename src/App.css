@@ -1,65 +1,47 @@
-/* stylelint-disable unknownAtRules */
+/* Elegant Corporate Theme CSS */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*
-  Jätetään vain mahdolliset layout- ja utility-tyylit, joita ei voi toteuttaa Tailwindilla.
-*/
+/* Layout- ja utiliteettityylit */
 .App {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #181A20 0%, #23262F 100%);
-  font-family: 'Inter', 'DM Sans', 'Satoshi', 'Space Grotesk', sans-serif;
-  color: #F4F5F6;
+  @apply min-h-screen bg-background font-sans text-textPrimary;
 }
 
 hr, .separator {
-  border: none;
+  @apply border-0;
 }
 
 .empty-state {
-  font-style: italic;
-  padding: 2.5em;
-  text-align: center;
-  background: rgba(255,255,255,0.10);
-  border-radius: 32px;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10), 0 0 16px 2px #7B61FF;
-  color: #A3A7B7;
+  @apply italic p-8 text-center bg-surface rounded-md shadow-soft text-textSecondary;
 }
 
 .card, .glass {
-  background: rgba(255,255,255,0.10);
-  border-radius: 32px;
-  box-shadow: 0 8px 32px 0 rgba(31, 42, 55, 0.18);
-  backdrop-filter: blur(12px);
-  border: 1.5px solid #353945;
+  @apply bg-surface rounded-md shadow-card border border-border;
 }
 
-.neon {
-  box-shadow: 0 0 16px 2px #7B61FF, 0 0 32px 8px #00FFA3;
+.btn-primary {
+  @apply inline-flex items-center justify-center bg-primary text-white font-medium py-2 px-4 rounded-md shadow-sm hover:bg-primaryHover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
 }
 
 @media (max-width: 640px) {
   .day-cell {
-    font-size: 0.75rem;
+    @apply text-sm;
   }
   .event-row {
-    font-size: 0.7rem;
-    padding: 0.1rem;
+    @apply text-xs p-2;
   }
   .color-legend {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
+    @apply flex-wrap justify-center gap-2;
   }
 }
 
 @media print {
   .App {
-    background-color: white;
+    @apply bg-white text-black;
   }
   header {
-    display: none;
+    @apply hidden;
   }
 }
