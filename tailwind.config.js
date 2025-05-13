@@ -6,39 +6,48 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#F9F6F1',            // Päätausta
-        surface: '#FAF8F5',               // Kortit, inputit, neutral surface
-        primary: '#D04C2A',               // Primary-painikkeet (terrakotta)
-        primaryHover: '#A03C33',          // Hover-tila
-        secondary: '#E5DED5',             // Secondary-pohjat, inputit
-        border: '#DDD6CE',                // Borderit, separatorit
-        textPrimary: '#2D2D2D',           // Pääteksti
-        textSecondary: '#5A5A5A',         // Labelit, selitteet
-        placeholder: '#A0A0A0',           // Placeholder-tekstit
-        highlight: '#F3E6E8',             // Valittu tila (calendar-day etc.)
-        graphite: '#4A4A4A',              // Ikonit ja graafiset elementit
-        accentPink: '#FBB1C1',            // Sävytys-elementteihin (optionaalinen)
-        sakura: '#F2E1E6',                // Visuaalinen aksenttisävy
+        // 2025 trend: tumma tausta, vaaleat kortit, neon-aksentit
+        background: '#181A20', // Soft dark
+        surface: 'rgba(255,255,255,0.10)', // Glassmorphism
+        card: '#23262F', // Kortit
+        border: '#353945',
+        primary: '#7B61FF', // Neon violetti
+        primaryHover: '#6246EA',
+        accent: '#00FFA3', // Neon lime
+        accent2: '#FF61C7', // Neon pinkki
+        accent3: '#1FAAFF', // Neon sininen
+        textPrimary: '#F4F5F6',
+        textSecondary: '#A3A7B7',
+        placeholder: '#6E7381',
+        error: '#FF4D4F',
+        success: '#00E197',
+        warning: '#FFD600',
+        glass: 'rgba(255,255,255,0.18)',
+        // Legacy/compat
+        graphite: '#4A4A4A',
+        sakura: '#F2E1E6',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],    // Body-teksti ja nappien fontti
-        serif: ['Noto Serif', 'serif'],    // Otsikot
+        sans: ['Inter', 'DM Sans', 'Satoshi', 'Space Grotesk', 'sans-serif'],
+        serif: ['Space Grotesk', 'serif'],
       },
       borderRadius: {
-        sm: '6px',
-        md: '8px',
-        lg: '12px',
+        sm: '12px',
+        md: '18px',
+        lg: '32px',
+        xl: '48px',
+        full: '9999px',
       },
       boxShadow: {
-        soft: '0 2px 4px rgba(0,0,0,0.06)',
-        softHover: '0 4px 8px rgba(0,0,0,0.08)',
-        subtle: '0 1px 2px rgba(0,0,0,0.04)',
-        card: '0 2px 6px rgba(35,33,26,0.06), 0 8px 16px rgba(35,33,26,0.08)',
+        soft: '0 4px 24px 0 rgba(0,0,0,0.10)',
+        glass: '0 8px 32px 0 rgba(31, 42, 55, 0.18)',
+        neon: '0 0 16px 2px #7B61FF, 0 0 32px 8px #00FFA3',
+        card: '0 8px 32px 0 rgba(31, 42, 55, 0.18)',
       },
       letterSpacing: {
         tight: '-0.01em',
         normal: '0em',
-        elegant: '0.5px',                 // Otsikoiden spacing
+        elegant: '0.5px',
       },
       lineHeight: {
         relaxed: '1.6em',                 // Body-tekstin riviväli

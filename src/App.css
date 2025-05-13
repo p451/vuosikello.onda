@@ -9,6 +9,9 @@
 */
 .App {
   min-height: 100vh;
+  background: linear-gradient(135deg, #181A20 0%, #23262F 100%);
+  font-family: 'Inter', 'DM Sans', 'Satoshi', 'Space Grotesk', sans-serif;
+  color: #F4F5F6;
 }
 
 hr, .separator {
@@ -17,8 +20,24 @@ hr, .separator {
 
 .empty-state {
   font-style: italic;
-  padding: 1em;
+  padding: 2.5em;
   text-align: center;
+  background: rgba(255,255,255,0.10);
+  border-radius: 32px;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10), 0 0 16px 2px #7B61FF;
+  color: #A3A7B7;
+}
+
+.card, .glass {
+  background: rgba(255,255,255,0.10);
+  border-radius: 32px;
+  box-shadow: 0 8px 32px 0 rgba(31, 42, 55, 0.18);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid #353945;
+}
+
+.neon {
+  box-shadow: 0 0 16px 2px #7B61FF, 0 0 32px 8px #00FFA3;
 }
 
 @media (max-width: 640px) {
