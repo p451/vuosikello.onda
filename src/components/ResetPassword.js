@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [email, setEmail] = useState(''); // For accessibility hidden field
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -34,6 +35,17 @@ export default function ResetPassword() {
   return (
     <form onSubmit={handleReset} className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
       <h2 className="text-xl font-bold mb-4">Set a new password</h2>
+      {/* Hidden email field for accessibility and autofill */}
+      <input
+        type="email"
+        name="email"
+        autoComplete="username"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        style={{ display: 'none' }}
+        tabIndex={-1}
+        aria-hidden="true"
+      />
       <input
         type="password"
         placeholder="New password"

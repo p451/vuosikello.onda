@@ -24,16 +24,21 @@ export default function Navigation() {
 
   useEffect(() => {
     const fetchTenantName = async () => {
-      if (!tenantId) return;
-      const { data, error } = await supabase
-        .from('tenants')
-        .select('name')
-        .eq('id', tenantId)
-        .single();
-      if (!error && data) setTenantName(data.name);
+      if (!tenantId || !user) return;
+      try {
+        const { data, error, status } = await supabase
+          .from('tenants')
+          .select('name')
+          .eq('id', tenantId)
+          .single();
+        if (!error && data) setTenantName(data.name);
+        else if (status === 406) setTenantName(''); // Gracefully handle 406 (unauthenticated)
+      } catch (err) {
+        setTenantName(''); // Fallback: clear tenant name on error
+      }
     };
     fetchTenantName();
-  }, [tenantId]);
+  }, [tenantId, user]);
 
   return (
     <nav className="bg-gray-800 text-white p-4">
