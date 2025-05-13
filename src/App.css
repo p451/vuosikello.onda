@@ -10,7 +10,63 @@
 
 .App {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #F3F1EE;
+  color: #2D3E50;
+  font-family: 'IBM Plex Sans', Arial, sans-serif;
+}
+
+.card, .bg-card, .modal, .rounded-lg, .rounded-md {
+  background-color: #F8F6F3 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+button, .btn, .primary-btn {
+  background: linear-gradient(180deg, #8C2F39 2%, #7A2631 98%);
+  color: #fff;
+  border: 1px solid #8C2F39;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans', Arial, sans-serif;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+button:hover, .btn:hover, .primary-btn:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  background: linear-gradient(180deg, #9B3843 2%, #8C2F39 98%);
+}
+.secondary-btn {
+  background: #E5DED5;
+  color: #2D3E50;
+  border: 1px solid #DDD6CE;
+}
+input, select, textarea {
+  background: #F8F6F3;
+  border: 1px solid #DDD6CE;
+  color: #2D3E50;
+  border-radius: 6px;
+  font-family: 'IBM Plex Sans', Arial, sans-serif;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid #8C2F39;
+  border-color: #8C2F39;
+}
+.active, .selected, .calendar-day.selected {
+  border: 2px solid #8C2F39 !important;
+  background: #F3E6E8 !important;
+}
+hr, .separator {
+  border: none;
+  border-top: 1px solid #DDD6CE;
+}
+/* Empty state */
+.empty-state {
+  color: #B0AFAE;
+  font-style: italic;
+  background: #F8F6F3;
+  border-radius: 6px;
+  padding: 1em;
+  text-align: center;
 }
 
 /* Add responsive styles */
