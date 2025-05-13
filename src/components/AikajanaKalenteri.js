@@ -720,12 +720,12 @@ const AikajanaKalenteri = () => {
               prev.setMonth(currentDate.getMonth() - 1);
               setCurrentDate(prev);
             }}
-            className="px-2 py-1 rounded bg-primary text-white font-bold hover:bg-primaryDark transition-all border border-primaryDark"
+            className="px-2 py-1 rounded bg-[#D04C2A] text-white font-serif font-bold hover:bg-[#B13E1F] transition-all border border-[#23211A]"
             aria-label="Edellinen kuukausi"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
-          <h2 className="text-center text-lg sm:text-2xl font-bold m-0 p-0 select-none">
+          <h2 className="text-center text-lg sm:text-2xl font-serif font-bold m-0 p-0 select-none">
             {currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })}
           </h2>
           <button
@@ -734,7 +734,7 @@ const AikajanaKalenteri = () => {
               next.setMonth(currentDate.getMonth() + 1);
               setCurrentDate(next);
             }}
-            className="px-2 py-1 rounded bg-primary text-white font-bold hover:bg-primaryDark transition-all border border-primaryDark"
+            className="px-2 py-1 rounded bg-[#D04C2A] text-white font-serif font-bold hover:bg-[#B13E1F] transition-all border border-[#23211A]"
             aria-label="Seuraava kuukausi"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -746,8 +746,8 @@ const AikajanaKalenteri = () => {
         {can('create') && (
           <button
             onClick={() => openAddEventModal()}
-            className="fixed bottom-8 right-8 z-50 bg-primary text-white rounded-full shadow-lg px-6 py-4 text-lg font-bold hover:bg-primaryDark transition-all border-2 border-primaryDark no-print"
-            style={{ boxShadow: '0 4px 16px rgba(196,75,63,0.15)' }}
+            className="fixed bottom-8 right-8 z-50 bg-[#D04C2A] text-white font-serif rounded-full shadow-lg px-6 py-4 text-lg font-bold hover:bg-[#B13E1F] transition-all border-2 border-[#23211A] no-print"
+            style={{ boxShadow: '0 4px 16px rgba(208,76,42,0.15)' }}
             aria-label="Lisää tapahtuma"
           >
             + Lisää tapahtuma

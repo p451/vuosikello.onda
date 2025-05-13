@@ -1,0 +1,68 @@
+/* aikumo-teema.css */
+body {
+  font-family: 'Noto Serif', serif;
+  background: #F9F6F1;
+  color: #23211A;
+}
+
+h1, h2, h3, h4, h5, h6, .heading, .card-title {
+  font-family: 'Noto Serif', serif;
+  color: #23211A;
+  font-weight: 700;
+}
+
+button, .btn, .primary-btn {
+  font-family: 'Noto Serif', serif;
+  background: #D04C2A;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.7em 1.5em;
+  box-shadow: 0 2px 6px rgba(208,76,42,0.08);
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+button:hover, .btn:hover, .primary-btn:hover {
+  background: #B13E1F;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(208,76,42,0.12);
+}
+.secondary-btn {
+  font-family: 'Noto Serif', serif;
+  background: #F9F6F1;
+  color: #23211A;
+  border: 2px solid #23211A;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.7em 1.5em;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+.secondary-btn:hover {
+  background: #E5DED5;
+  color: #23211A;
+  border-color: #D04C2A;
+}
+input, select, textarea {
+  font-family: 'Noto Serif', serif;
+  background: #F9F6F1;
+  border: 1.5px solid #E5DED5;
+  color: #23211A;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 0.6em 1.2em;
+  transition: border 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid #D04C2A;
+  border-color: #D04C2A;
+}
+.card, .bg-card, .modal, .rounded-lg, .rounded-md {
+  background: #FAF8F5 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 6px rgba(35,33,26,0.06);
+  font-family: 'Noto Serif', serif;
+}

@@ -147,16 +147,16 @@ const Sidebar = () => {
 
   if (!open) {
     return (
-      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-primary/80 hover:bg-primary transition-all duration-300 w-4 group cursor-pointer"
+      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-[#D04C2A]/80 hover:bg-[#D04C2A] transition-all duration-300 w-4 group cursor-pointer border-r-2 border-[#23211A]"
         onClick={() => setOpen(true)}
         aria-label="Avaa sivupalkki"
         style={{ minWidth: '1rem', maxWidth: '1.5rem' }}
       >
         <div className="flex-1 flex flex-col justify-center items-center w-full">
-          <span className="block text-white text-xs rotate-90 group-hover:scale-110 transition-all select-none" style={{letterSpacing: '0.1em'}}>Avaa sidebar</span>
+          <span className="block text-white text-xs rotate-90 group-hover:scale-110 transition-all select-none font-serif tracking-wider">Avaa sidebar</span>
         </div>
         <div className="mb-4">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto text-white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#fff"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
         </div>
       </div>
     );
@@ -168,31 +168,31 @@ const Sidebar = () => {
         <div className="flex items-center justify-between p-6 text-2xl font-bold border-b border-border bg-surface">
           <span className="font-serif tracking-elegant" style={{fontFamily: 'Spectral SC, serif', fontVariant: 'small-caps'}}>{tenantName || ""}</span>
           <button
-            className="ml-2 px-3 py-1 rounded bg-secondary text-primaryDark font-semibold hover:bg-primary hover:text-white transition flex items-center gap-2"
+            className="ml-2 px-3 py-1 rounded bg-[#E5DED5] text-[#23211A] font-serif font-semibold hover:bg-[#D04C2A] hover:text-white transition flex items-center gap-2 border border-[#23211A]"
             aria-label="Siirrä sidebar sivuun"
             onClick={() => setOpen(false)}
           >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" /></svg>
-            <span className="text-sm font-medium">Siirrä sivuun</span>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#23211A"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" /></svg>
+            <span className="text-sm font-serif font-medium">Siirrä sivuun</span>
           </button>
         </div>
         <nav className="flex flex-col gap-2 p-4">
           {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-            <Link to="/admin" className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition">Admin dashboard</Link>
+            <Link to="/admin" className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition">Admin dashboard</Link>
           )}
-          <Link to="/" className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition">Calendar</Link>
+          <Link to="/" className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition">Calendar</Link>
           <div className="mt-4 mb-2 text-xs text-placeholder uppercase tracking-wider">Näkymä</div>
-          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handleViewChange('day')}>Päivä</button>
-          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handleViewChange('week')}>Viikko</button>
-          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
+          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handleViewChange('day')}>Päivä</button>
+          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handleViewChange('week')}>Viikko</button>
+          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
           <div className="mt-4" />
-          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
-          <button className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
-          <button onClick={handleLogout} className="py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left mt-4">Logout</button>
+          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
+          <button className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
+          <button onClick={handleLogout} className="py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left mt-4">Logout</button>
         </nav>
       </div>
       <div className="p-4 border-t border-border">
-        <button className="w-full py-2 px-4 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition text-left">Oma profiili</button>
+        <button className="w-full py-2 px-4 rounded bg-[#D04C2A] text-white font-serif font-semibold hover:bg-[#B13E1F] transition text-left">Oma profiili</button>
       </div>
     </aside>
   );

@@ -14,6 +14,7 @@ import Sidebar from './components/Sidebar';
 import { TenantProvider } from './contexts/TenantContext';
 import { RoleProvider } from './contexts/RoleContext';
 import './App.css';
+import './aikumo-teema.css';
 
 function App() {
   const [session, setSession] = useState(null);
