@@ -29,7 +29,14 @@ export default function ResetPassword() {
       refresh_token ? { accessToken: access_token, refreshToken: refresh_token } : { accessToken: access_token }
     );
     if (error) setMessage(error.message);
-    else setMessage('Password updated! You can now log in.');
+    else {
+      setMessage('Password updated! Please log in with your new password.');
+      // Kirjaa ulos ja ohjaa login-sivulle pienen viiveen jälkeen
+      setTimeout(async () => {
+        await supabase.auth.signOut();
+        window.location.href = '/login';
+      }, 1500);
+    }
   };
 
   return (
