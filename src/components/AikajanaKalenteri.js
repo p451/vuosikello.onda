@@ -3,8 +3,8 @@ import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 
-const AikajanaKalenteri = () => {
-  const [viewMode, setViewMode] = useState('month');
+const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('month');
+  // eslint-disable-next-line no-unused-vars
   const [selectedLayer, setSelectedLayer] = useState('all');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showAddModal, setShowAddModal] = useState(false);
@@ -28,9 +28,9 @@ const AikajanaKalenteri = () => {
 
   const { tenantId } = useTenant();
   const { can } = useRole();
-
   const [events, setEvents] = useState({});
 
+  // eslint-disable-next-line no-unused-vars
   const [selectedEventType, setSelectedEventType] = useState('all');
 
   const [showDayPanel, setShowDayPanel] = useState(false);
@@ -219,12 +219,28 @@ const AikajanaKalenteri = () => {
           tenant_id: tenantId,
           info: newEvent.info
         });
-      }
-      const { data, error } = await supabase
+      }      const { data, error } = await supabase
         .from('events')
         .insert(eventsToInsert)
         .select();
       if (error) throw error;
+      if (data) {
+        // Update the events state with the new data
+        const newEvents = { ...events };
+        data.forEach(event => {
+          if (!newEvents[event.type]) newEvents[event.type] = [];
+          newEvents[event.type].push({
+            id: event.id,
+            name: event.name,
+            startDate: event.start_date,
+            endDate: event.end_date,
+            type: event.type,
+            tenant_id: event.tenant_id,
+            info: event.info
+          });
+        });
+        setEvents(newEvents);
+      }
       await fetchEvents();
       setShowAddModal(false);
       setNewEvent({ name: '', startDate: '', endDate: '', type: 'general', tenant_id: tenantId, info: '' });
@@ -258,7 +274,6 @@ const AikajanaKalenteri = () => {
       console.error('Error updating event:', error);
     }
   };
-
   // Fetch comments for an event
   const fetchComments = async (eventId) => {
     setCommentLoading(true);
@@ -267,6 +282,10 @@ const AikajanaKalenteri = () => {
       .select('*, profiles: user_id (email)')
       .eq('event_id', eventId)
       .order('created_at', { ascending: true });
+    if (error) {
+      console.error('Error fetching comments:', error);
+      return;
+    }
     setComments(data || []);
     setCommentLoading(false);
   };
@@ -342,18 +361,7 @@ const AikajanaKalenteri = () => {
       day: 'numeric' 
     });
   };
-
-  const navigate = (direction) => {
-    const newDate = new Date(currentDate);
-    if (viewMode === 'month') {
-      newDate.setMonth(currentDate.getMonth() + direction);
-    } else if (viewMode === 'week') {
-      newDate.setDate(currentDate.getDate() + direction * 7);
-    } else {
-      newDate.setDate(currentDate.getDate() + direction);
-    }
-    setCurrentDate(newDate);
-  };
+  // Removed unused navigate function as its functionality is handled elsewhere
 
   const getEventTypeColor = (type) => {
     // Use tenant_event_types color if available
