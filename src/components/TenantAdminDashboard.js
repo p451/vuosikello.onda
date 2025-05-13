@@ -200,33 +200,31 @@ export default function TenantAdminDashboard() {
       </div>
 
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Event Types</h2>
-        <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center">
+        <h2 className="text-xl font-semibold mb-4">Event Types</h2>        <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center p-2 bg-surface rounded-lg shadow-soft">
           <input
             type="text"
             value={newEventType}
             onChange={e => setNewEventType(e.target.value)}
             placeholder="New event type"
-            className="p-2 border border-metal rounded-md"
+            className="p-2 border border-metal rounded-md bg-white/80 backdrop-blur-sm placeholder:text-placeholder focus:border-primary focus:ring-1 focus:ring-primary transition-all"
           />
           <input
             type="color"
             value={newEventTypeColor}
             onChange={e => setNewEventTypeColor(e.target.value)}
-            className="w-8 h-8 border border-metal rounded-md"
+            className="w-8 h-8 border border-metal rounded-md shadow-subtle hover:shadow-soft transition-all cursor-pointer"
             title="Pick color"
           />
-          <button type="submit" className="px-4 py-2 bg-success text-white rounded-md">Add</button>
+          <button type="submit" className="px-4 py-2 bg-primary text-white rounded-md font-serif tracking-elegant shadow-soft hover:shadow-softHover hover:bg-primaryHover transition-all border border-primary">Add</button>
         </form>
         <ul>
-          {eventTypes.map(type => (
-            <li key={type.id} className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <span style={{ background: type.color || '#2196f3', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
-                {type.name}
-              </span>
-              <button onClick={() => removeEventType(type.id)} className="text-danger">Remove</button>
-            </li>
+          {eventTypes.map(type => (              <li key={type.id} className="flex items-center justify-between p-2 hover:bg-secondary/20 rounded-md transition-all">
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-sm border border-metal shadow-subtle" style={{ background: type.color || '#2196f3' }}></span>
+                  <span className="text-textPrimary font-medium">{type.name}</span>
+                </span>
+                <button onClick={() => removeEventType(type.id)} className="text-error hover:text-error/80 font-serif tracking-elegant transition-all px-2">Remove</button>
+              </li>
           ))}
         </ul>
       </div>

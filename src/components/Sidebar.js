@@ -146,17 +146,16 @@ const Sidebar = () => {
   };
 
   if (!open) {
-    return (
-      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-primary/80 hover:bg-primary transition-all duration-300 w-4 group cursor-pointer border-r-2 border-metal"
+    return (      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-primary/80 hover:bg-primary shadow-glass hover:shadow-softHover transition-all duration-300 w-4 group cursor-pointer border-r border-metal"
         onClick={() => setOpen(true)}
         aria-label="Avaa sivupalkki"
         style={{ minWidth: '1rem', maxWidth: '1.5rem' }}
       >
         <div className="flex-1 flex flex-col justify-center items-center w-full">
-          <span className="block text-white text-xs rotate-90 group-hover:scale-110 transition-all select-none font-serif tracking-wider">Avaa sidebar</span>
+          <span className="block text-white text-xs rotate-90 group-hover:scale-110 transition-all select-none font-serif tracking-elegant">Avaa sidebar</span>
         </div>
         <div className="mb-4">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#fff"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
         </div>
       </div>
     );
@@ -181,14 +180,13 @@ const Sidebar = () => {
             <Link to="/admin" className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition">Admin dashboard</Link>
           )}
           <Link to="/" className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition">Calendar</Link>
-          <div className="mt-4 mb-2 text-xs text-placeholder uppercase tracking-wider">Näkymä</div>
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handleViewChange('day')}>Päivä</button>
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handleViewChange('week')}>Viikko</button>
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handleViewChange('month')}>Kuukausi</button>
+          <div className="mt-4 mb-2 text-xs text-placeholder uppercase tracking-wider">Näkymä</div>          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handleViewChange('day')}>Päivä</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handleViewChange('week')}>Viikko</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handleViewChange('month')}>Kuukausi</button>
           <div className="mt-4" />
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handlePrintAgenda()}>Print Agenda</button>
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
-          <button onClick={handleLogout} className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left mt-4">Logout</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handlePrintAgenda()}>Print Agenda</button>
+          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handlePrint('calendar')}>Print Calendar</button>
+          <button onClick={handleLogout} className="py-2 px-4 rounded-md bg-error text-white font-serif font-semibold hover:bg-error/90 shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant mt-4 border border-error">Logout</button>
         </nav>
       </div>
       <div className="p-4 border-t border-metal">

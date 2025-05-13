@@ -65,29 +65,26 @@ export default function Navigation() {
           </button>
         </div>
         {/* Näytä valikkolinkit vain jos käyttäjä on kirjautunut */}
-        <div className="hidden sm:flex space-x-4 items-center">
-          {user && (
+        <div className="hidden sm:flex space-x-4 items-center">          {user && (
             <>
-              <Link to="/" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary">
+              <Link to="/" className="hover:text-primary font-serif tracking-elegant px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5">
                 Calendar
               </Link>
               {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-                <Link to="/admin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary">
+                <Link to="/admin" className="hover:text-primary font-serif tracking-elegant px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5">
                   Admin Dashboard
                 </Link>
               )}
               {user && SUPERADMINS.includes(user.email) && (
-                <Link to="/superadmin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary">
+                <Link to="/superadmin" className="hover:text-primary font-serif tracking-elegant px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5">
                   Superadmin Dashboard
                 </Link>
               )}
               <button
-                onClick={async () => {
-                  await supabase.auth.signOut();
+                onClick={async () => {                  await supabase.auth.signOut();
                   window.location.href = '/login';
                 }}
-                className="ml-4 px-3 py-1 rounded-md bg-gradient-to-b from-primary to-primaryHover text-white font-semibold shadow-soft hover:shadow-glass transition-all border border-primary"
-                style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}
+                className="ml-4 px-3 py-1 rounded-md bg-error text-white font-serif font-semibold tracking-elegant shadow-soft hover:shadow-softHover transition-all border border-error hover:bg-error/90"
               >
                 Logout
               </button>

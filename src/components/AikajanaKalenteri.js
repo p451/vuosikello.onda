@@ -468,25 +468,25 @@ const AikajanaKalenteri = () => {
   };
 
   // Update the EventItem component to handle small holiday indicators
-  const EventItem = ({ event, onClick, scale = 1 }) => (
-    <div 
+  const EventItem = ({ event, onClick, scale = 1 }) => (    <div 
       onClick={onClick}
-      className={`event-row rounded-md cursor-pointer hover:opacity-80 p-1 text-xs sm:text-sm`}
+      className={`event-row rounded-md cursor-pointer hover:opacity-80 hover:shadow-subtle transition-all p-1 text-xs sm:text-sm text-textPrimary`}
       style={{ ...getEventTypeColor(event.type), fontSize: `${scale * 0.75}rem`, minHeight: `${scale * 1.25}rem` }}
     >
-      <span className="truncate block">{event.name}</span>
+      <span className="truncate block font-medium">{event.name}</span>
     </div>
   );
 
   // Update ColorLegend to only show event types that exist in eventTypes
   const ColorLegend = () => (
     <div className="color-legend my-4 flex gap-4 justify-center border-t pt-4">
-      {eventTypes.map(type => (
-        <button
-          key={type.id}
-          className={`legend-item flex items-center gap-1 px-2 py-1 rounded-md ${visibleEventTypes.includes(type.name) ? 'bg-accentPink/30 border-accentPink/30 border' : 'bg-sakura border-metal border opacity-50'}`}
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
+      {eventTypes.map(type => (          <button
+            key={type.id}
+            className={`legend-item flex items-center gap-1 px-2 py-1 rounded-md transition-all cursor-pointer hover:shadow-soft
+              ${visibleEventTypes.includes(type.name) 
+                ? 'bg-accentPink/30 border-accentPink/30 border shadow-glass' 
+                : 'bg-sakura border-metal border opacity-50 hover:opacity-80'}`}
+            onClick={() => {
             setVisibleEventTypes(prev =>
               prev.includes(type.name)
                 ? prev.filter(t => t !== type.name)
@@ -652,8 +652,7 @@ const AikajanaKalenteri = () => {
     setShowAddModal(true);
   };
 
-  return (
-    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl">
+  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen">
       <style>
         {`
           @media print {
@@ -666,6 +665,7 @@ const AikajanaKalenteri = () => {
               padding: 0.5cm !important;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+              background-color: white !important;
             }
             .calendar-header {
               font-size: 1rem !important;
@@ -756,15 +756,14 @@ const AikajanaKalenteri = () => {
       </div>
 
       {/* Add Detail Modal */}
-      {showDetailModal && selectedEvent && (
-        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
-          <div className="bg-surface p-6 rounded-lg w-full max-w-2xl">
-            <div className="p-4 rounded-t-lg" style={getEventTypeColor(selectedEvent.type)}>
-              <h3 className="text-xl font-bold">{selectedEvent.name}</h3>
-              <p className="text-sm mt-2">
+      {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface p-6 rounded-lg w-full max-w-2xl shadow-glass border border-metal">
+            <div className="p-4 rounded-t-lg shadow-subtle" style={getEventTypeColor(selectedEvent.type)}>
+              <h3 className="text-xl font-serif font-bold tracking-elegant">{selectedEvent.name}</h3>
+              <p className="text-sm mt-2 text-textSecondary">
                 {new Date(selectedEvent.startDate).toLocaleDateString('fi-FI')} - {new Date(selectedEvent.endDate).toLocaleDateString('fi-FI')}
               </p>
-              <p className="text-sm mt-1">
+              <p className="text-sm mt-1 text-textSecondary">
                 Tyyppi: {getEventTypeName(selectedEvent.type)}
               </p>
               {selectedEvent.info && (
@@ -1015,11 +1014,10 @@ const AikajanaKalenteri = () => {
                     <option value="general">Yleinen</option>
                   )}
                 </select>
-              </div>
-              <div className="flex justify-between">
+              </div>              <div className="flex justify-between">
                 {can('delete') && (
                   <button
-                    className="px-4 py-2 bg-error text-white rounded-md"
+                    className="px-4 py-2 bg-error text-white rounded-md font-serif hover:bg-error/90 shadow-soft hover:shadow-softHover transition-all"
                     onClick={() => {
                       deleteEvent(editEvent);
                       setShowEditModal(false);
@@ -1030,7 +1028,7 @@ const AikajanaKalenteri = () => {
                 )}
                 <div className="flex gap-2">
                   <button
-                    className="px-4 py-2 bg-metal/20 rounded-md"
+                    className="px-4 py-2 bg-secondary rounded-md font-serif text-textPrimary hover:bg-secondary/80 shadow-soft hover:shadow-softHover transition-all border border-metal"
                     onClick={() => {
                       setShowEditModal(false);
                       setEditEvent(null);
@@ -1039,7 +1037,7 @@ const AikajanaKalenteri = () => {
                     Peruuta
                   </button>
                   <button
-                    className="px-4 py-2 bg-accentPink text-white rounded-md"
+                    className="px-4 py-2 bg-primary text-white rounded-md font-serif hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all"
                     onClick={updateEvent}
                   >
                     Tallenna
