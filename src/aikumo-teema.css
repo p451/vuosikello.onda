@@ -1,19 +1,33 @@
 /* aikumo-teema.css */
-body {
-  font-family: 'Noto Serif', serif;
-  background: #F9F6F1;
-  color: #23211A;
+
+/* 1. Teemavariables */
+:root {
+  --aikumo-primary:  #D04C2A;
+  --aikumo-dark:     #3F4A59;
+  --aikumo-sakura:   #F2E1E6;
+  --aikumo-metal:    #939AA2;
+  --aikumo-pink:     #FBB1C1;
+  --glass-bg:        rgba(255, 255, 255, 0.6);
+  --lowlight-bg:     #2E3034;
+  --lowlight-text:   #BBBFC4;
 }
 
+/* 2. Perusfontit ja värit */
+body {
+  font-family: 'Noto Serif', serif;
+  background: var(--aikumo-sakura);
+  color: var(--aikumo-dark);
+}
 h1, h2, h3, h4, h5, h6, .heading, .card-title {
   font-family: 'Noto Serif', serif;
-  color: #23211A;
+  color: var(--aikumo-dark);
   font-weight: 700;
 }
 
+/* 3. Nappulat */
 button, .btn, .primary-btn {
   font-family: 'Noto Serif', serif;
-  background: #D04C2A;
+  background: var(--aikumo-primary);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -22,18 +36,18 @@ button, .btn, .primary-btn {
   letter-spacing: 0.04em;
   padding: 0.7em 1.5em;
   box-shadow: 0 2px 6px rgba(208,76,42,0.08);
-  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 button:hover, .btn:hover, .primary-btn:hover {
-  background: #B13E1F;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(208,76,42,0.12);
+  transform: scale(1.04);
+  box-shadow: 0 8px 24px rgba(35,33,26,0.16);
+  background: var(--aikumo-pink);
 }
 .secondary-btn {
   font-family: 'Noto Serif', serif;
-  background: #F9F6F1;
-  color: #23211A;
-  border: 2px solid #23211A;
+  background: var(--aikumo-sakura);
+  color: var(--aikumo-dark);
+  border: 2px solid var(--aikumo-dark);
   border-radius: 8px;
   font-size: 1.1rem;
   font-weight: 600;
@@ -42,27 +56,71 @@ button:hover, .btn:hover, .primary-btn:hover {
   transition: background 0.15s, color 0.15s, border 0.15s;
 }
 .secondary-btn:hover {
-  background: #E5DED5;
-  color: #23211A;
-  border-color: #D04C2A;
+  background: var(--aikumo-sakura);
+  color: var(--aikumo-dark);
+  border-color: var(--aikumo-primary);
 }
+
+/* 4. Lomakekentät */
 input, select, textarea {
   font-family: 'Noto Serif', serif;
-  background: #F9F6F1;
-  border: 1.5px solid #E5DED5;
-  color: #23211A;
+  background: var(--aikumo-sakura);
+  border: 1.5px solid var(--aikumo-metal);
+  color: var(--aikumo-dark);
   border-radius: 8px;
   font-size: 1rem;
   padding: 0.6em 1.2em;
   transition: border 0.15s;
 }
 input:focus, select:focus, textarea:focus {
-  outline: 2px solid #D04C2A;
-  border-color: #D04C2A;
+  outline: 3px solid var(--aikumo-primary);
+  outline-offset: 2px;
+  border-color: var(--aikumo-primary);
 }
-.card, .bg-card, .modal, .rounded-lg, .rounded-md {
-  background: #FAF8F5 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 6px rgba(35,33,26,0.06);
-  font-family: 'Noto Serif', serif;
+
+/* 5. Kortit ja modaalit (glassmorphism) */
+.card, .bg-card, .modal, .rounded-lg, .rounded-md, .glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(35,33,26,0.06), 0 8px 16px rgba(35,33,26,0.08);
+}
+
+/* 6. Low-light -teema */
+body.lowlight {
+  background: var(--lowlight-bg);
+  color: var(--lowlight-text);
+}
+body.lowlight button.primary-btn {
+  background: var(--aikumo-pink);
+}
+
+/* 7. Bento-grid -asettelu */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* 8. Sakura-petals animaatio */
+@keyframes petals-fall {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(200px) rotate(15deg); opacity: 0; }
+}
+.icon--petal {
+  animation: petals-fall 4s infinite ease-in;
+}
+
+/* 9. Globaalit rajaukset ja siirtymät */
+.card, button, .btn {
+  border-radius: 12px;
+  transition: box-shadow 0.3s, transform 0.2s;
+}
+
+/* 10. Muiden elementtien syvyysvarjostus */
+.card {
+  box-shadow: 
+    0 2px 8px rgba(35,33,26,0.06),
+    0 8px 16px rgba(35,33,26,0.08);
 }
