@@ -102,11 +102,11 @@ export default function Auth() {
             />
             <button
               type="submit"
-              className="mt-2 w-full bg-blue-600 text-white py-2 rounded"
+              className="mt-2 w-full bg-accentPink text-white py-2 rounded-md"
             >
               Send reset link
             </button>
-            {resetMessage && <div className="text-blue-700 mt-2">{resetMessage}</div>}
+            {resetMessage && <div className="text-accentPink/80 mt-2">{resetMessage}</div>}
           </form>
         </div>
       </div>
