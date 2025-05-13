@@ -1,7 +1,3 @@
-/*
-  VS Code näyttää @tailwind-virheitä, mutta ne voi ohittaa, koska ne ovat Tailwindin esiprosessorille.
-  Jos haluat, voit lisätä kommentin tiedoston alkuun:
-*/
 /* stylelint-disable unknownAtRules */
 
 @tailwind base;
@@ -10,85 +6,97 @@
 
 .App {
   min-height: 100vh;
-  background-color: #F3F1EE;
-  color: #2D3E50;
-  font-family: 'IBM Plex Sans', Arial, sans-serif;
+  background-color: #F9F6F1;
+  color: #2D2D2D;
+  font-family: 'Inter', sans-serif;
 }
 
 .card, .bg-card, .modal, .rounded-lg, .rounded-md {
-  background-color: #F8F6F3 !important;
+  background-color: #FAF8F5 !important;
   border-radius: 12px !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
 button, .btn, .primary-btn {
-  background: linear-gradient(180deg, #8C2F39 2%, #7A2631 98%);
-  color: #fff;
-  border: 1px solid #8C2F39;
-  border-radius: 4px;
-  font-family: 'IBM Plex Sans', Arial, sans-serif;
-  font-weight: 600;
-  font-size: 0.97em;
-  padding: 0.45em 1.1em;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: box-shadow 0.2s, background 0.2s;
-  letter-spacing: 0.01em;
+  background-color: #C44B3F;
+  color: #FFFFFF;
+  border: 1px solid #A03C33;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.6em 1.2em;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  transition: all 0.15s ease-out;
 }
 button:hover, .btn:hover, .primary-btn:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  background: linear-gradient(180deg, #9B3843 2%, #8C2F39 98%);
+  background-color: #A03C33;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
+
 .secondary-btn {
-  background: #E5DED5;
-  color: #2D3E50;
-  border: 1px solid #DDD6CE;
-  border-radius: 4px;
-  font-family: 'IBM Plex Sans', Arial, sans-serif;
-  font-size: 0.97em;
-  padding: 0.45em 1.1em;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  background-color: #FAF8F5;
+  color: #C44B3F;
+  border: 1px solid #C44B3F;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.6em 1.2em;
+  letter-spacing: 0.5px;
+  transition: all 0.15s ease-out;
 }
+.secondary-btn:hover {
+  background-color: #F0EDE9;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
 input, select, textarea {
-  background: #F8F6F3;
+  background-color: #FAF8F5;
   border: 1px solid #DDD6CE;
-  color: #2D3E50;
+  color: #2D2D2D;
   border-radius: 6px;
-  font-family: 'IBM Plex Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 input:focus, select:focus, textarea:focus {
-  outline: 2px solid #8C2F39;
-  border-color: #8C2F39;
+  outline: 2px solid #C44B3F;
+  border-color: #C44B3F;
 }
+
 .active, .selected, .calendar-day.selected {
-  border: 2px solid #8C2F39 !important;
-  background: #F3E6E8 !important;
+  border: 2px solid #C44B3F !important;
+  background-color: #F3E6E8 !important;
 }
+
 hr, .separator {
   border: none;
   border-top: 1px solid #DDD6CE;
 }
+
 /* Empty state */
 .empty-state {
-  color: #B0AFAE;
+  color: #A0A0A0;
   font-style: italic;
-  background: #F8F6F3;
+  background: #FAF8F5;
   border-radius: 6px;
   padding: 1em;
   text-align: center;
 }
 
-/* Add responsive styles */
+/* Responsive tweaks */
 @media (max-width: 640px) {
   .day-cell {
     font-size: 0.75rem;
   }
-  
+
   .event-row {
     font-size: 0.7rem;
     padding: 0.1rem;
   }
-  
+
   .color-legend {
     flex-wrap: wrap;
     justify-content: center;
@@ -100,7 +108,7 @@ hr, .separator {
   .App {
     background-color: white;
   }
-  
+
   header {
     display: none;
   }
