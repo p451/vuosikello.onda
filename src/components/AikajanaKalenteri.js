@@ -92,7 +92,10 @@ const AikajanaKalenteri = () => {
 
     // Kuuntele sidebarin print-nappien tapahtumia
     const printHandler = (e) => {
-      if (e.detail === 'agenda') printAgenda();
+      if (e.detail === 'agenda') {
+        // Käytetään täsmälleen samaa printAgenda-funktiota kuin kalenterin omassa napissa
+        printAgenda();
+      }
       if (e.detail === 'calendar') window.print();
     };
     window.addEventListener('sidebar-print', printHandler);
@@ -192,10 +195,10 @@ const AikajanaKalenteri = () => {
             end.setDate(end.getDate() + 1);
           } else if (repeat.frequency === 'weekly') {
             start.setDate(start.getDate() + 7);
-            end.setDate(end.getDate() + 7);
+            end.setDate(start.getDate() + 7);
           } else if (repeat.frequency === 'monthly') {
             start.setMonth(start.getMonth() + 1);
-            end.setMonth(end.getMonth() + 1);
+            end.setMonth(start.getMonth() + 1);
           }
           i++;
         }
@@ -493,7 +496,7 @@ const AikajanaKalenteri = () => {
   const isSameDay = (date1, date2) => {
     return date1.getFullYear() === date2.getFullYear() &&
            date1.getMonth() === date2.getMonth() &&
-           date1.getDate() === date2.getDate();
+           date1.getDate() === date1.getDate();
   };
 
   const parseLocalDate = (dateString) => {
@@ -697,103 +700,46 @@ const AikajanaKalenteri = () => {
           }
         `}
       </style>
-      <div className="mb-4 space-y-2 sm:space-y-4 no-print">
-        <div className="flex flex-wrap gap-2">
-          <button
-            className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              viewMode === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setViewMode('day')}
-          >
-            Päivä
-          </button>
-          <button
-            className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              viewMode === 'week' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setViewMode('week')}
-          >
-            Viikko
-          </button>
-          <button
-            className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              viewMode === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setViewMode('month')}
-          >
-            Kuukausi
-          </button>
-        </div>
-        
-        <div className="flex flex-wrap gap-2">
-          <select
-            className="px-2 py-1 rounded border"
-            value={selectedEventType}
-            onChange={e => setSelectedEventType(e.target.value)}
-          >
-            <option value="all">Kaikki tapahtumatyypit</option>
-            {eventTypes.map(type => (
-              <option key={type.id} value={type.name}>{type.name}</option>
-            ))}
-          </select>
-          <button
-            className={`px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base ${
-              selectedLayer === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setSelectedLayer('all')}
-          >
-            Kaikki
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="px-4 py-2 rounded bg-green-500 text-white"
-          >
-            Tulosta kalenteri
-          </button>
-          <button
-            onClick={printAgenda}
-            className="px-4 py-2 rounded bg-green-500 text-white"
-          >
-            Tulosta agenda
-          </button>
-          {can('create') && (
-            <button
-              onClick={() => openAddEventModal()}
-              className="px-4 py-2 rounded bg-blue-500 text-white"
-            >
-              Lisää tapahtuma
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 rounded bg-gray-200"
-          >
-            &lt; Edellinen
-          </button>
-          <span className="font-bold">
-            {currentDate.toLocaleDateString('fi-FI', { 
-              month: 'long',
-              year: 'numeric'
-            })}
-          </span>
-          <button
-            onClick={() => navigate(1)}
-            className="px-4 py-2 rounded bg-gray-200"
-          >
-            Seuraava &gt;
-          </button>
-        </div>
+      {/* POISTETAAN: näkymän valinta, tapahtumatyypin valinta, print-napit, lisää tapahtuma */}
+      {/* <div className="mb-4 space-y-2 sm:space-y-4 no-print"> ... </div> */}
+      <div className="flex items-center gap-2 sm:gap-4 mb-4 no-print">
+        <button
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 rounded bg-gray-200"
+        >
+          &lt; Edellinen
+        </button>
+        <span className="font-bold">
+          {currentDate.toLocaleDateString('fi-FI', { 
+            month: 'long',
+            year: 'numeric'
+          })}
+        </span>
+        <button
+          onClick={() => navigate(1)}
+          className="px-4 py-2 rounded bg-gray-200"
+        >
+          Seuraava &gt;
+        </button>
       </div>
 
-      <div className="border rounded-lg shadow-lg bg-white p-2 sm:p-4 calendar-container overflow-x-auto">
+      <div className="border rounded-lg shadow-lg bg-white p-2 sm:p-4 calendar-container overflow-x-auto relative">
         <h2 className="text-center text-lg sm:text-2xl font-bold mb-2 sm:mb-4 calendar-header">
           {currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })}
         </h2>
         {renderContent()}
         <ColorLegend />
+        {/* UUSI: brändin mukainen kelluva nappi oikeaan alakulmaan */}
+        {can('create') && (
+          <button
+            onClick={() => openAddEventModal()}
+            className="fixed bottom-8 right-8 z-50 bg-primary text-white rounded-full shadow-lg px-6 py-4 text-lg font-bold hover:bg-primaryDark transition-all border-2 border-primaryDark no-print"
+            style={{ boxShadow: '0 4px 16px rgba(196,75,63,0.15)' }}
+            aria-label="Lisää tapahtuma"
+          >
+            + Lisää tapahtuma
+          </button>
+        )}
       </div>
 
       {/* Add Detail Modal */}

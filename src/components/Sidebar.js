@@ -3,13 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { useRole } from "../contexts/RoleContext";
 import { useState, useEffect } from "react";
+import { useTenant } from "../contexts/TenantContext";
 
 const SUPERADMINS = ["antoni.duhov@gmail.com"];
 
 const Sidebar = () => {
   const { userRole } = useRole();
+  const { tenantId } = useTenant();
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(true);
+  const [tenantName, setTenantName] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +24,19 @@ const Sidebar = () => {
     };
     getUser();
   }, []);
+
+  useEffect(() => {
+    const fetchTenantName = async () => {
+      if (!tenantId) return;
+      const { data, error } = await supabase
+        .from("tenants")
+        .select("name")
+        .eq("id", tenantId)
+        .single();
+      if (!error && data) setTenantName(data.name);
+    };
+    fetchTenantName();
+  }, [tenantId]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -56,7 +72,7 @@ const Sidebar = () => {
     <aside className="h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-lg z-40 font-sans transition-transform duration-300" style={{fontFamily: 'Inter, sans-serif'}}>
       <div>
         <div className="flex items-center justify-between p-6 text-2xl font-bold border-b border-border bg-surface">
-          <span className="font-serif tracking-elegant" style={{fontFamily: 'Spectral SC, serif', fontVariant: 'small-caps'}}>Vuosikello</span>
+          <span className="font-serif tracking-elegant" style={{fontFamily: 'Spectral SC, serif', fontVariant: 'small-caps'}}>{tenantName || ""}</span>
           <button
             className="ml-2 p-1 rounded hover:bg-secondary text-2xl text-primaryDark transition"
             aria-label="Sulje valikko"
