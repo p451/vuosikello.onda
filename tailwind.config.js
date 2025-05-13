@@ -7,15 +7,15 @@ module.exports = {
     extend: {
       colors: {
         // 2025 trend: tumma tausta, vaaleat kortit, neon-aksentit
-        background: '#181A20', // Soft dark
+        background: '#181A20',       // Soft dark
         surface: 'rgba(255,255,255,0.10)', // Glassmorphism
-        card: '#23262F', // Kortit
+        card: '#23262F',             // Kortit
         border: '#353945',
-        primary: '#7B61FF', // Neon violetti
+        primary: '#7B61FF',          // Neon violetti
         primaryHover: '#6246EA',
-        accent: '#00FFA3', // Neon lime
-        accent2: '#FF61C7', // Neon pinkki
-        accent3: '#1FAAFF', // Neon sininen
+        accent: '#00FFA3',           // Neon lime
+        accent2: '#FF61C7',          // Neon pinkki
+        accent3: '#1FAAFF',          // Neon sininen
         textPrimary: '#F4F5F6',
         textSecondary: '#A3A7B7',
         placeholder: '#6E7381',
@@ -50,15 +50,15 @@ module.exports = {
         elegant: '0.5px',
       },
       lineHeight: {
-        relaxed: '1.6em',                 // Body-tekstin riviväli
-        heading: '1.3em',                 // Otsikoiden riviväli
+        relaxed: '1.6em',   // Body-tekstin riviväli
+        heading: '1.3em',   // Otsikoiden riviväli
       },
       transitionTimingFunction: {
         softEase: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       translate: {
-        'press': '1px',                   // Aktiivinen painallus
-        'hoverLift': '-1px',              // Hover-lift efekti
+        press: '1px',       // Aktiivinen painallus
+        hoverLift: '-1px',  // Hover-lift efekti
       },
       backdropBlur: {
         xs: '4px',
