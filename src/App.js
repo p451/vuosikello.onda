@@ -10,6 +10,7 @@ import TenantAdminDashboard from './components/TenantAdminDashboard';
 import SuperAdminDashboard from './components/SuperAdminDashboard';
 import ResetPassword from './components/ResetPassword';
 import ActivateAccount from './components/ActivateAccount';
+import Sidebar from './components/Sidebar';
 import { TenantProvider } from './contexts/TenantContext';
 import { RoleProvider } from './contexts/RoleContext';
 import './App.css';
@@ -35,8 +36,9 @@ function App() {
     <Router>
       <TenantProvider>
         <RoleProvider>
+          {session && <Sidebar />}
           {session && <Navigation />}
-          <div className="container">
+          <div className="container" style={{ marginLeft: session ? '16rem' : 0 }}>
             <Routes>
               <Route 
                 path="/signup" 
