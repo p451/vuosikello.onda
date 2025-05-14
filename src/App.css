@@ -32,12 +32,16 @@ hr, .separator {
   @apply inline-flex items-center justify-center bg-accent text-white font-semibold py-2 px-6 rounded-full shadow-soft hover:bg-highlight focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50 transition-all;
 }
 
+.color-legend {
+  @apply font-sans flex-wrap justify-center gap-2;
+}
+
 @media (max-width: 640px) {
   .day-cell {
     @apply text-sm;
   }
   .event-row {
-    @apply text-xs p-2;
+    @apply p-0 text-xs;
   }
   .color-legend {
     @apply flex-wrap justify-center gap-2;

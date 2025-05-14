@@ -369,6 +369,26 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     return { backgroundColor: '#e2e8f0' };
   };
 
+  // Helper to parse local date string (YYYY-MM-DD)
+  const parseLocalDate = (dateString) => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  // Helper to get local date string (YYYY-MM-DD)
+  const getLocalDateString = (date) => {
+    return date.getFullYear() + '-' +
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0');
+  };
+
+  // Helper to check if two dates are the same day
+  const isSameDay = (date1, date2) => {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+  };
+
   const getEventTypeName = (type) => {
     return type;
   };
@@ -475,59 +495,19 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     printWindow.print();
   };
 
-  // Update the EventItem component to handle small holiday indicators
-  const EventItem = ({ event, onClick, scale = 1 }) => (    <div 
+  // Update the EventItem component to use absolute positioning to fill the day cell in mobile
+  const EventItem = ({ event, onClick, scale = 1 }) => (
+    <div 
       onClick={onClick}
-      className={`event-row rounded-lg cursor-pointer hover:opacity-80 hover:shadow-card transition-all duration-200 ease-in-out p-1 text-xs sm:text-sm text-textPrimary font-medium`}
-      style={getEventTypeColor(event.type)}
+      className={`event-row rounded-md cursor-pointer hover:opacity-80 hover:shadow-card transition-all duration-200 ease-in-out flex items-center justify-center bg-primary text-white font-medium text-xs sm:text-sm overflow-hidden m-0 p-0`}
+      style={{ ...getEventTypeColor(event.type), fontSize: scale < 1 ? `${scale}em` : undefined, minHeight: '100%', minWidth: '100%', position: 'static' }}
+      title={event.name}
     >
-      <span className="truncate block font-medium">{event.name}</span>
+      <span className="truncate block w-full text-center leading-tight px-1">{event.name}</span>
     </div>
   );
 
-  // Update ColorLegend to only show event types that exist in eventTypes
-  const ColorLegend = () => (
-    <div className="color-legend my-4 flex gap-4 justify-center border-t pt-4">
-      {eventTypes.map(type => (          <button
-            key={type.id}
-            className={`legend-item flex items-center gap-1 px-2 py-1 rounded-lg transition-all duration-200 ease-in-out cursor-pointer hover:shadow-card
-              ${visibleEventTypes.includes(type.name) 
-                ? 'bg-accent/30 border-accent/30 border shadow-modal' 
-                : 'bg-surface border-metal border opacity-50 hover:opacity-80'}`}
-            onClick={() => {
-            setVisibleEventTypes(prev =>
-              prev.includes(type.name)
-                ? prev.filter(t => t !== type.name)
-                : [...prev, type.name]
-            );
-          }}
-        >
-          <div className="legend-color w-4 h-4 rounded-lg" style={{ backgroundColor: type.color }}></div>
-          <span className="font-medium text-xs">{type.name}</span>
-        </button>
-      ))}
-    </div>
-  );
-
-  const isSameDay = (date1, date2) => {
-    return date1.getFullYear() === date2.getFullYear() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getDate() === date2.getDate();
-  };
-
-  const parseLocalDate = (dateString) => {
-    const [year, month, day] = dateString.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  };
-
-  // Helper to get local date string (YYYY-MM-DD)
-  const getLocalDateString = (date) => {
-    return date.getFullYear() + '-' +
-      String(date.getMonth() + 1).padStart(2, '0') + '-' +
-      String(date.getDate()).padStart(2, '0');
-  };
-
-  // Update renderDayEvents to default events to []
+  // Update renderDayEvents to wrap EventItem in a relative container for mobile
   const renderDayEvents = (eventsForType, day, type) => {
     if (!visibleEventTypes.includes(type)) return null;
     const eventsArr = eventsForType || [];
@@ -542,7 +522,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     if (matchingEvents.length === 0) return null;
     const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.2);
     return (
-      <div className={`flex flex-col gap-0.5`}>
+      <div className="relative w-full h-7 sm:h-auto">
         {matchingEvents.map((event, idx) => (
           <EventItem 
             key={event.id}
@@ -646,8 +626,9 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     }
   };
 
-  // When opening add event modal, set default type to first event type (if any)
+  // When opening add event modal, always close the day panel first
   const openAddEventModal = (day = null) => {
+    setShowDayPanel(false); // Sulje päivämodaali ennen uuden avaamista
     const defaultType = eventTypes.length > 0 ? eventTypes[0].name : 'general';
     setNewEvent({
       name: '',
@@ -659,6 +640,31 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     });
     setShowAddModal(true);
   };
+
+  // Update ColorLegend to only show event types that exist in eventTypes
+  const ColorLegend = () => (
+    <div className="color-legend my-4 flex gap-4 justify-center border-t pt-4">
+      {eventTypes.map(type => (
+        <button
+          key={type.id}
+          className={`legend-item flex items-center gap-1 px-2 py-1 rounded-lg transition-all duration-200 ease-in-out cursor-pointer hover:shadow-card
+            ${visibleEventTypes.includes(type.name) 
+              ? 'bg-accent/30 border-accent/30 border shadow-modal' 
+              : 'bg-surface border-metal border opacity-50 hover:opacity-80'}`}
+          onClick={() => {
+            setVisibleEventTypes(prev =>
+              prev.includes(type.name)
+                ? prev.filter(t => t !== type.name)
+                : [...prev, type.name]
+            );
+          }}
+        >
+          <div className="legend-color w-4 h-4 rounded-lg" style={{ backgroundColor: type.color }}></div>
+          <span className="font-medium text-xs">{type.name}</span>
+        </button>
+      ))}
+    </div>
+  );
 
   return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans">
       <style>
@@ -848,7 +854,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       {showAddModal && (
         <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
           <div className="bg-surface/90 p-6 rounded-lg w-full max-w-md shadow-modal border border-border backdrop-blur-sm">
-            <h3 className="text-lg font-semibold mb-4">Lisää uusi tapahtuma</h3>
+            <h3 className="modal-header text-lg font-semibold mb-4">Lisää uusi tapahtuma</h3>
             <div className="space-y-4">
               <div>
                 <label className="block mb-1 font-medium">Nimi</label>
@@ -947,13 +953,13 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
               )}
               <div className="flex justify-end gap-2 mt-4">
                 <button
-                  className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary"
+                  className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-sans font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary"
                   onClick={() => setShowAddModal(false)}
                 >
                   Peruuta
                 </button>
                 <button
-                  className="px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
+                  className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
                   onClick={addEvent}
                 >
                   Lisää tapahtuma
@@ -968,7 +974,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       {showEditModal && editEvent && can('update') && (
         <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center">
           <div className="bg-surface/90 p-6 rounded-lg max-w-md w-full shadow-modal border border-border backdrop-blur-sm">
-            <h3 className="text-lg font-semibold mb-4">Muokkaa tapahtumaa</h3>
+            <h3 className="modal-header text-lg font-semibold mb-4">Muokkaa tapahtumaa</h3>
             <div className="space-y-4">
               <div>
                 <label className="block mb-1 font-medium">Nimi</label>
@@ -1024,7 +1030,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
               </div>              <div className="flex justify-between">
                 {can('delete') && (
                   <button
-                    className="px-4 py-2 rounded-lg bg-error text-white font-medium shadow-card hover:bg-error/90 transition-all duration-200 ease-in-out border border-error"
+                    className="delete-event-btn px-4 py-2 rounded-lg font-sans font-medium shadow-card hover:bg-error/90 transition-all duration-200 ease-in-out border"
                     onClick={() => {
                       deleteEvent(editEvent);
                       setShowEditModal(false);
@@ -1035,7 +1041,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                 )}
                 <div className="flex gap-2">
                   <button
-                    className="px-4 py-2 rounded-lg bg-secondary text-textPrimary font-medium shadow-card hover:bg-accent transition-all duration-200 ease-in-out border border-secondary"
+                    className="px-4 py-2 rounded-lg bg-secondary text-textPrimary font-sans font-medium shadow-card hover:bg-accent transition-all duration-200 ease-in-out border border-secondary"
                     onClick={() => {
                       setShowEditModal(false);
                       setEditEvent(null);
@@ -1044,7 +1050,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                     Peruuta
                   </button>
                   <button
-                    className="px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
+                    className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
                     onClick={updateEvent}
                   >
                     Tallenna
@@ -1058,25 +1064,27 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
 
       {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed right-8 top-20 w-full max-w-md bg-surface shadow-modal z-50 overflow-y-auto p-4 no-print rounded-lg border border-metal">
-          <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out" onClick={() => setShowDayPanel(false)}>&times;</button>
-          <h2 className="text-xl font-semibold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
-          <button
-            className="mb-4 px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
-            onClick={() => openAddEventModal(selectedDay)}
-          >
-            Lisää tapahtuma tälle päivälle
-          </button>
-          <h3 className="font-semibold mb-2">Tapahtumat</h3>
-          <ul>
-            {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
-            {dayPanelEvents.map(event => (
-              <li key={event.id} className="mb-2 p-2 border rounded-lg cursor-pointer flex items-center gap-2 event-list-item hover:bg-accent/10 transition-all duration-200 ease-in-out" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
-                <span className="w-4 h-4 rounded-lg border border-border" style={{ backgroundColor: eventTypeMap[event.type] || '#e2e8f0' }}></span>
-                <span className="font-semibold">{event.name}</span> <span className="text-xs">({event.type})</span>
-              </li>
-            ))}
-          </ul>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/40">
+          <div className="relative w-full max-w-xs sm:max-w-md bg-surface shadow-modal overflow-y-auto p-3 sm:p-4 no-print rounded-lg border border-metal max-h-[90vh]">
+            <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out" onClick={() => setShowDayPanel(false)}>&times;</button>
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
+            <button
+              className="mb-4 px-3 sm:px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary w-full"
+              onClick={() => openAddEventModal(selectedDay)}
+            >
+              Lisää tapahtuma tälle päivälle
+            </button>
+            <h3 className="font-semibold mb-2">Tapahtumat</h3>
+            <ul>
+              {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
+              {dayPanelEvents.map(event => (
+                <li key={event.id} className="mb-2 p-2 border rounded-lg cursor-pointer flex items-center gap-2 event-list-item hover:bg-accent/10 transition-all duration-200 ease-in-out" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
+                  <span className="w-4 h-4 rounded-lg border border-border" style={{ backgroundColor: eventTypeMap[event.type] || '#e2e8f0' }}></span>
+                  <span className="font-semibold">{event.name}</span> <span className="text-xs">({event.type})</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </div>

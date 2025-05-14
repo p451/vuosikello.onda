@@ -205,7 +205,12 @@ export default function SuperAdminDashboard() {
                     <option value="editor">Editor</option>
                     <option value="admin">Admin</option>
                   </select>
-                  <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded-md">Invite</button>
+                  <button
+                    type="submit"
+                    className="px-3 py-1 bg-green-500 text-white rounded-md font-sans"
+                  >
+                    Invite
+                  </button>
                 </form>
               </div>
               <div className="mb-6">
@@ -256,7 +261,12 @@ export default function SuperAdminDashboard() {
                         <span style={{ background: type.color || '#2196f3', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
                         {type.name}
                       </span>
-                      <button onClick={() => removeEventType(type.id)} className="text-red-500">Remove</button>
+                      <button
+                        className="px-4 py-2 rounded-lg bg-error text-white font-sans font-medium shadow-card hover:bg-error/90 transition-all duration-200 ease-in-out border border-error"
+                        onClick={() => removeEventType(type.id)}
+                      >
+                        Remove
+                      </button>
                     </li>
                   ))}
                 </ul>

@@ -163,16 +163,15 @@ const Sidebar = () => {
   // Sidebar closed state: hide sidebar fully, show open icon at bottom left with animation
   if (!open) {
     return (
-      <div className="fixed bottom-8 left-4 z-50">
+      <div className="fixed bottom-4 left-2 z-50 sm:bottom-8 sm:left-4">
         <button
-          className="rounded-full bg-surface shadow-card border border-accent p-3 flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-110"
+          className="rounded-full bg-surface shadow-card border border-accent p-2 sm:p-3 flex items-center justify-center transition-all duration-700 ease-in-out hover:scale-110"
           onClick={() => setOpen(true)}
           aria-label="Avaa sivupalkki"
         >
-          {/* ChatGPT-style hamburger icon */}
-          <svg width="28" height="28" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="6" y="10" width="16" height="2" rx="1"/>
-            <rect x="6" y="16" width="16" height="2" rx="1"/>
+          {/* Arrow icon for opening sidebar */}
+          <svg width="24" height="24" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 6l6 6-6 6" />
           </svg>
         </button>
       </div>
@@ -180,56 +179,56 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className="h-full w-64 bg-surface/95 text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-card z-40 font-sans transition-all duration-500 ease-in-out border-r border-accent rounded-lg animate-sidebar-open">
+    <aside className="h-full w-5/6 max-w-xs sm:w-64 bg-surface/95 text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-card z-40 font-sans transition-all duration-500 ease-in-out border-r border-accent rounded-lg animate-sidebar-open">
       <div>
-        <div className="flex items-center justify-between p-4 text-xl font-semibold border-b border-accent bg-surface/95 rounded-t-lg">
-          <span className="font-sans font-semibold text-[18px]">{tenantName || ""}</span>
+        <div className="flex items-center justify-between p-3 sm:p-4 text-lg sm:text-xl font-semibold border-b border-accent bg-surface/95 rounded-t-lg">
+          <span className="font-sans font-semibold text-[16px] sm:text-[18px]">{tenantName || ""}</span>
           <button
             className="ml-2 p-2 rounded-lg hover:bg-primary/20 transition-all duration-150 flex items-center"
             aria-label="Sulje sivupalkki"
             onClick={() => setOpen(false)}
           >
             {/* ChatGPT-style close icon */}
-            <svg width="24" height="24" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 6L18 18M6 18L18 6" />
             </svg>
           </button>
         </div>
-        <nav className="flex flex-col gap-2 p-4">
+        <nav className="flex flex-col gap-1 sm:gap-2 p-2 sm:p-4">
           {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
             <Link to="/admin"
-              className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+              className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
                 ${isActive('/admin') ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
             >Admin dashboard</Link>
           )}
           <Link to="/"
-            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+            className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
               ${isActive('/') ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
           >Calendar</Link>
-          <div className="mt-4 mb-2 text-xs text-textSecondary uppercase tracking-wide">Näkymä</div>
+          <div className="mt-2 sm:mt-4 mb-1 sm:mb-2 text-xs text-textSecondary uppercase tracking-wide">Näkymä</div>
           <button
-            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+            className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
               ${viewMode === 'day' ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
             onClick={() => handleViewChange('day')}
           >Päivä</button>
           <button
-            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+            className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
               ${viewMode === 'week' ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
             onClick={() => handleViewChange('week')}
           >Viikko</button>
           <button
-            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+            className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
               ${viewMode === 'month' ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
             onClick={() => handleViewChange('month')}
           >Kuukausi</button>
-          <div className="mt-4" />
-          <button className="py-2 px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[14px] border border-secondary hover:bg-highlight shadow-card transition-all text-left" onClick={handlePrintAgenda}>Print Agenda</button>
-          <button className="py-2 px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[14px] border border-accent hover:bg-highlight shadow-card transition-all text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
-          <button onClick={handleLogout} className="py-2 px-4 rounded-lg bg-error text-black font-sans font-medium text-[14px] hover:bg-error/90 shadow-card transition-all text-left mt-4 border border-error">Logout</button>
+          <div className="mt-2 sm:mt-4" />
+          <button className="py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-secondary hover:bg-highlight shadow-card transition-all text-left" onClick={handlePrintAgenda}>Print Agenda</button>
+          <button className="py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-accent hover:bg-highlight shadow-card transition-all text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
+          <button onClick={handleLogout} className="py-2 px-3 sm:px-4 rounded-lg bg-error text-black font-sans font-medium text-[13px] sm:text-[14px] hover:bg-error/90 shadow-card transition-all text-left mt-2 sm:mt-4 border border-error">Logout</button>
         </nav>
       </div>
-      <div className="p-4 border-t border-accent bg-surface/95 rounded-b-lg">
-        <button className="w-full py-2 px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[14px] border border-primary hover:bg-highlight shadow-card transition-all text-left">Oma profiili</button>
+      <div className="p-2 sm:p-4 border-t border-accent bg-surface/95 rounded-b-lg">
+        <button className="w-full py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-primary hover:bg-highlight shadow-card transition-all text-left">Oma profiili</button>
       </div>
     </aside>
   );

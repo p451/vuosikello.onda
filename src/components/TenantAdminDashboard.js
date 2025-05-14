@@ -133,37 +133,37 @@ export default function TenantAdminDashboard() {
   if (loading) return <div className="flex items-center justify-center min-h-screen bg-background text-xl text-primary font-serif">Loading...</div>;
 
   return (
-    <div className="w-full min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto bg-surface/90 rounded-lg shadow-glass border border-border p-8 backdrop-blur-sm">
-        <h1 className="text-3xl font-serif font-bold text-primary mb-6 tracking-elegant">Tenant Admin Dashboard</h1>
-        <form onSubmit={addUserDirectly} className="flex gap-2 mb-6">
+    <div className="w-full min-h-screen bg-background p-2 sm:p-4">
+      <div className="max-w-4xl mx-auto bg-surface/90 rounded-lg shadow-glass border border-border p-2 sm:p-4 md:p-8 backdrop-blur-sm">
+        <h1 className="admin-header text-2xl sm:text-3xl font-serif font-bold text-primary mb-4 sm:mb-6 tracking-elegant">Tenant Admin Dashboard</h1>
+        <form onSubmit={addUserDirectly} className="flex flex-col sm:flex-row gap-2 sm:gap-2 mb-4 sm:mb-6">
           <input
             type="email"
             value={inviteEmail}
             onChange={e => setInviteEmail(e.target.value)}
             placeholder="Invite user by email"
-            className="flex-1 px-4 py-3 rounded-lg border border-border bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all"
+            className="flex-1 px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-border bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all text-sm sm:text-base"
           />
           <select
             value={selectedRole}
             onChange={e => setSelectedRole(e.target.value)}
-            className="px-4 py-3 rounded-lg border border-border bg-white/80 backdrop-blur-sm text-textPrimary focus:border-primary focus:ring-2 focus:ring-primary transition-all"
+            className="px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-border bg-white/80 backdrop-blur-sm text-textPrimary focus:border-primary focus:ring-2 focus:ring-primary transition-all text-sm sm:text-base"
           >
             <option value="viewer">Viewer</option>
             <option value="editor">Editor</option>
             <option value="admin">Admin</option>
           </select>
-          <button type="submit" className="bg-primary text-white rounded-lg px-6 py-3 font-semibold shadow-soft hover:bg-primaryHover transition-all">Invite</button>
+          <button type="submit" className="bg-primary text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 font-semibold shadow-soft hover:bg-primaryHover transition-all text-sm sm:text-base w-full sm:w-auto">Invite</button>
         </form>
-        <div className="mb-8">
-          <h2 className="text-xl font-serif font-bold text-primary mb-4 tracking-elegant">Event Types</h2>
-          <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center p-2 bg-surface/80 rounded-lg shadow-soft">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="admin-header text-lg sm:text-xl font-serif font-bold text-primary mb-2 sm:mb-4 tracking-elegant">Event Types</h2>
+          <form onSubmit={addEventType} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2 items-center p-2 bg-surface/80 rounded-lg shadow-soft">
             <input
               type="text"
               value={newEventType}
               onChange={e => setNewEventType(e.target.value)}
               placeholder="New event type"
-              className="p-2 border border-border rounded-lg bg-white/80 backdrop-blur-sm placeholder:text-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all"
+              className="p-2 border border-border rounded-lg bg-white/80 backdrop-blur-sm placeholder:text-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all text-sm sm:text-base w-full sm:w-auto"
             />
             <input
               type="color"
@@ -172,39 +172,39 @@ export default function TenantAdminDashboard() {
               className="w-8 h-8 border border-border rounded-lg shadow-subtle hover:shadow-soft transition-all cursor-pointer"
               title="Pick color"
             />
-            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg font-serif tracking-elegant shadow-soft hover:shadow-softHover hover:bg-primaryHover transition-all border border-primary">Add</button>
+            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg font-sans shadow-soft hover:shadow-softHover hover:bg-primaryHover transition-all border border-primary text-sm sm:text-base w-full sm:w-auto">Add</button>
           </form>
           <ul>
             {eventTypes.map(type => (
-              <li key={type.id} className="flex items-center justify-between p-2 hover:bg-secondary/20 rounded-lg transition-all">
+              <li key={type.id} className="flex items-center justify-between p-2 hover:bg-secondary/20 rounded-lg transition-all text-sm sm:text-base">
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded-md border border-border shadow-subtle" style={{ background: type.color || '#2196f3' }}></span>
                   <span className="text-textPrimary font-medium">{type.name}</span>
                 </span>
-                <button onClick={() => removeEventType(type.id)} className="text-error hover:text-error/80 font-serif tracking-elegant transition-all px-2 rounded-lg">Remove</button>
+                <button onClick={() => removeEventType(type.id)} className="text-error hover:text-error/80 font-serif tracking-elegant transition-all px-2 rounded-lg text-xs sm:text-base">Remove</button>
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <h2 className="text-xl font-serif font-bold text-primary mb-4 tracking-elegant">Current Users</h2>
+          <h2 className="admin-header text-lg sm:text-xl font-serif font-bold text-primary mb-2 sm:mb-4 tracking-elegant">Current Users</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-surface/80 rounded-lg shadow-card border border-border">
+            <table className="min-w-full bg-surface/80 rounded-lg shadow-card border border-border text-xs sm:text-sm md:text-base">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 border-b border-border text-left">Email</th>
-                  <th className="px-6 py-3 border-b border-border text-left">Role</th>
-                  <th className="px-6 py-3 border-b border-border text-left">Actions</th>
+                  <th className="px-2 sm:px-6 py-2 sm:py-3 border-b border-border text-left">Email</th>
+                  <th className="px-2 sm:px-6 py-2 sm:py-3 border-b border-border text-left">Role</th>
+                  <th className="px-2 sm:px-6 py-2 sm:py-3 border-b border-border text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map(user => (
                   <tr key={user.id} className="hover:bg-secondary/10 transition-all">
-                    <td className="px-4 py-2 text-textPrimary text-sm">{user.email || user.user_id}</td>
-                    <td className="px-6 py-4 border-b border-border">{user.role}</td>
-                    <td className="px-6 py-4 border-b border-border">
+                    <td className="px-2 sm:px-4 py-2 text-textPrimary text-xs sm:text-sm">{user.email || user.user_id}</td>
+                    <td className="px-2 sm:px-6 py-2 sm:py-4 border-b border-border">{user.role}</td>
+                    <td className="px-2 sm:px-6 py-2 sm:py-4 border-b border-border">
                       <button
-                        className="px-3 py-1 rounded-lg bg-error text-black font-medium shadow-card hover:bg-error/90 transition-all border border-error text-xs"
+                        className="px-2 sm:px-3 py-1 rounded-lg bg-error text-black font-medium shadow-card hover:bg-error/90 transition-all border border-error text-xs sm:text-xs md:text-sm"
                         onClick={() => handleDeleteUser(user.user_id)}
                       >
                         Delete
@@ -218,28 +218,28 @@ export default function TenantAdminDashboard() {
         </div>
         {/* Delete confirmation modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-overlay bg-opacity-50 z-50">
-            <div className="bg-surface p-6 rounded-md shadow-glass max-w-sm w-full">
-              <h2 className="text-lg font-bold mb-4">Confirm User Deletion</h2>
-              <p className="mb-2">To delete this user permanently, type <span className="font-mono font-bold">delete</span> below and press confirm.</p>
+          <div className="fixed inset-0 flex items-center justify-center bg-overlay bg-opacity-50 z-50 p-2">
+            <div className="bg-surface p-4 sm:p-6 rounded-md shadow-glass max-w-xs sm:max-w-sm w-full">
+              <h2 className="text-base sm:text-lg font-bold mb-2 sm:mb-4">Confirm User Deletion</h2>
+              <p className="mb-2 text-xs sm:text-base">To delete this user permanently, type <span className="font-mono font-bold">delete</span> below and press confirm.</p>
               <input
                 type="text"
                 value={deleteInput}
                 onChange={e => setDeleteInput(e.target.value)}
-                className="w-full border border-metal p-2 rounded-md mb-4"
+                className="w-full border border-metal p-2 rounded-md mb-2 sm:mb-4 text-xs sm:text-base"
                 placeholder="Type 'delete' to confirm"
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-col sm:flex-row justify-end gap-2">
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 bg-gray-200 rounded-lg"
+                  className="px-4 py-2 bg-gray-200 rounded-lg text-xs sm:text-base"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDeleteUser}
                   disabled={deleteInput !== 'delete'}
-                  className={`px-4 py-2 rounded-lg ${deleteInput === 'delete' ? 'bg-error text-black hover:bg-error/90' : 'bg-gray-400 text-white cursor-not-allowed'}`}
+                  className={`px-4 py-2 rounded-lg ${deleteInput === 'delete' ? 'bg-error text-black hover:bg-error/90' : 'bg-gray-400 text-white cursor-not-allowed'} text-xs sm:text-base`}
                 >
                   Confirm Delete
                 </button>

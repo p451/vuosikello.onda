@@ -1,15 +1,23 @@
 /* aikumo-teema.css */
 
 /* Jätetään vain mahdolliset layout/reset-tyylit, joita ei voi toteuttaa Tailwindilla. */
-body {
-  font-family: 'Noto Serif', serif;
+body, .font-sans, button, input, select, textarea, .color-legend, .legend-item, .event-row, .calendar-header, .day-header, .calendar-container, .logout-btn, .modal-btn, .admin-header, .remove-btn, .add-event-btn {
+  font-family: 'IBM Plex Sans', 'sans-serif' !important;
 }
+
 h1, h2, h3, h4, h5, h6, .heading, .card-title {
-  font-family: 'Noto Serif', serif;
+  font-family: 'Noto Serif', serif !important;
 }
-button, .btn, .primary-btn, .secondary-btn {
-  font-family: 'Noto Serif', serif;
+
+.delete-event-btn {
+  color: #111 !important;
+  background: #F4C6A6 !important;
+  border: 1px solid #E57373 !important;
+  font-family: 'IBM Plex Sans', 'sans-serif' !important;
 }
-input, select, textarea {
-  font-family: 'Noto Serif', serif;
+
+.admin-header, .modal-header, .modal-title {
+  font-family: 'IBM Plex Sans', 'sans-serif' !important;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
