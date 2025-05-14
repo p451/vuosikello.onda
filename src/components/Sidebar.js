@@ -160,31 +160,29 @@ const Sidebar = () => {
     return () => window.removeEventListener('sidebar-set-viewmode', handler);
   }, []);
 
+  // Sidebar closed state: hide sidebar fully, show open icon at bottom left with animation
   if (!open) {
     return (
-      <div
-        className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-surface shadow-card transition-all duration-200 ease-in-out w-14 group cursor-pointer border-r border-accent"
-        onClick={() => setOpen(true)}
-        aria-label="Avaa sivupalkki"
-      >
-        <div className="flex-1 flex flex-col justify-center items-center w-full">
-          <span className="block text-textPrimary text-xs rotate-90 group-hover:scale-110 transition-all select-none font-sans font-medium">Avaa</span>
-        </div>
-        <div className="mb-4">
+      <div className="fixed bottom-8 left-4 z-50">
+        <button
+          className="rounded-full bg-surface shadow-card border border-accent p-3 flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-110"
+          onClick={() => setOpen(true)}
+          aria-label="Avaa sivupalkki"
+        >
           {/* ChatGPT-style hamburger icon */}
-          <svg width="24" height="24" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="4" y="7" width="16" height="2" rx="1"/>
-            <rect x="4" y="15" width="16" height="2" rx="1"/>
+          <svg width="28" height="28" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="6" y="10" width="16" height="2" rx="1"/>
+            <rect x="6" y="16" width="16" height="2" rx="1"/>
           </svg>
-        </div>
+        </button>
       </div>
     );
   }
 
   return (
-    <aside className="h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-card z-40 font-sans transition-all duration-200 ease-in-out border-r border-accent rounded-lg">
+    <aside className="h-full w-64 bg-surface/95 text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-card z-40 font-sans transition-all duration-500 ease-in-out border-r border-accent rounded-lg animate-sidebar-open">
       <div>
-        <div className="flex items-center justify-between p-4 text-xl font-semibold border-b border-accent bg-surface rounded-t-lg">
+        <div className="flex items-center justify-between p-4 text-xl font-semibold border-b border-accent bg-surface/95 rounded-t-lg">
           <span className="font-sans font-semibold text-[18px]">{tenantName || ""}</span>
           <button
             className="ml-2 p-2 rounded-lg hover:bg-primary/20 transition-all duration-150 flex items-center"
@@ -230,7 +228,7 @@ const Sidebar = () => {
           <button onClick={handleLogout} className="py-2 px-4 rounded-lg bg-error text-black font-sans font-medium text-[14px] hover:bg-error/90 shadow-card transition-all text-left mt-4 border border-error">Logout</button>
         </nav>
       </div>
-      <div className="p-4 border-t border-accent bg-surface rounded-b-lg">
+      <div className="p-4 border-t border-accent bg-surface/95 rounded-b-lg">
         <button className="w-full py-2 px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[14px] border border-primary hover:bg-highlight shadow-card transition-all text-left">Oma profiili</button>
       </div>
     </aside>

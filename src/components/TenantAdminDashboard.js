@@ -17,6 +17,23 @@ export default function TenantAdminDashboard() {
   const [deleteInput, setDeleteInput] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
 
+  // Move fetchUsers to top-level so it's defined before useEffect and can be called anywhere
+  const fetchUsers = async () => {
+    if (!tenantId) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('*, profiles: user_id (email)')
+      .eq('tenant_id', tenantId);
+    if (!error && data) {
+      setUsers(data.map(u => ({
+        ...u,
+        email: u.profiles?.email || u.email || u.user_id // fallback to user_id if no email
+      })));
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (!userRole || !tenantId) {
       window.location.href = '/login';
@@ -29,23 +46,6 @@ export default function TenantAdminDashboard() {
     fetchUsers();
     fetchEventTypes();
   }, [tenantId, userRole]);
-
-  const fetchUsers = async () => {
-    try {
-      const { data: userData, error: userError } = await supabase
-        .from('user_roles')
-        .select('id,role,user_id,tenant_id,profiles(email)')
-        .eq('tenant_id', tenantId);
-
-      if (userError) throw userError;
-
-      setUsers(userData || []);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setLoading(false);
-    }
-  };
 
   const fetchEventTypes = async () => {
     if (!tenantId) return;
@@ -103,6 +103,13 @@ export default function TenantAdminDashboard() {
       setDeleteInput('');
       setLoading(false);
     }
+  };
+
+  // Add handleDeleteUser to open the delete modal and set user to delete
+  const handleDeleteUser = (userId) => {
+    setUserToDelete(userId);
+    setShowDeleteModal(true);
+    setDeleteInput('');
   };
 
   const addEventType = async (e) => {
@@ -193,10 +200,15 @@ export default function TenantAdminDashboard() {
               <tbody>
                 {users.map(user => (
                   <tr key={user.id} className="hover:bg-secondary/10 transition-all">
-                    <td className="px-6 py-4 border-b border-border">{user.profiles?.email}</td>
+                    <td className="px-4 py-2 text-textPrimary text-sm">{user.email || user.user_id}</td>
                     <td className="px-6 py-4 border-b border-border">{user.role}</td>
                     <td className="px-6 py-4 border-b border-border">
-                      <button onClick={() => { setUserToDelete(user); setShowDeleteModal(true); }} className="bg-error text-white rounded-full px-4 py-2 font-semibold shadow-soft hover:bg-error/90 transition-all">Remove</button>
+                      <button
+                        className="px-3 py-1 rounded-lg bg-error text-white font-medium shadow-card hover:bg-error/90 transition-all border border-error text-xs"
+                        onClick={() => handleDeleteUser(user.user_id)}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
