@@ -142,140 +142,129 @@ export default function SuperAdminDashboard() {
     openManageModal(selectedTenant);
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-600 font-bold">{error}</div>;
+  if (loading) return <div className="flex items-center justify-center min-h-screen bg-background text-xl text-primary font-serif">Loading...</div>;
+  if (error) return <div className="flex items-center justify-center min-h-screen bg-background text-xl text-error font-serif">{error}</div>;
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Superadmin Dashboard</h1>
-      <form onSubmit={addTenant} className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={newTenantName}
-          onChange={e => setNewTenantName(e.target.value)}
-          placeholder="New tenant name"
-          className="p-2 border rounded-md"
-        />
-        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md">Add Tenant</button>
-      </form>
-      <h2 className="text-xl font-semibold mb-4">Tenants</h2>
-      <table className="min-w-full bg-surface">
-        <thead>
-          <tr>
-            <th className="px-6 py-3 border-b border-metal text-left">Tenant Name</th>
-            <th className="px-6 py-3 border-b border-metal text-left">Created</th>
-            <th className="px-6 py-3 border-b border-metal text-left">ID</th>
-            <th className="px-6 py-3 border-b border-metal text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="w-full min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto bg-surface/90 rounded-lg shadow-glass border border-border p-8 backdrop-blur-sm">
+        <h1 className="text-3xl font-serif font-bold text-primary mb-6 tracking-elegant">SuperAdmin Dashboard</h1>
+        <form onSubmit={addTenant} className="flex gap-2 mb-6">
+          <input
+            type="text"
+            value={newTenantName}
+            onChange={e => setNewTenantName(e.target.value)}
+            placeholder="New tenant name"
+            className="flex-1 px-4 py-3 rounded-lg border border-border bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all"
+          />
+          <button type="submit" className="bg-primary text-white rounded-full px-6 py-3 font-semibold shadow-soft hover:bg-primaryHover transition-all">Add Tenant</button>
+        </form>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {tenants.map(tenant => (
-            <tr key={tenant.id}>
-              <td className="px-6 py-4 border-b border-metal">{tenant.name}</td>
-              <td className="px-6 py-4 border-b border-metal">{tenant.created_at}</td>
-              <td className="px-6 py-4 border-b border-metal">{tenant.id}</td>
-              <td className="px-6 py-4 border-b border-metal flex gap-2">
-                <button onClick={() => openManageModal(tenant)} className="px-2 py-1 bg-blue-500 text-white rounded-md">Manage</button>
-                <button onClick={() => deleteTenant(tenant.id)} className="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>
-              </td>
-            </tr>
+            <div key={tenant.id} className="bg-surface rounded-lg shadow-card border border-border p-6 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-serif font-bold text-primary">{tenant.name}</span>
+                <button onClick={() => deleteTenant(tenant.id)} className="bg-error text-white rounded-full px-4 py-2 font-semibold shadow-soft hover:bg-error/90 transition-all">Delete</button>
+              </div>
+              <button onClick={() => { setSelectedTenant(tenant); setShowManageModal(true); }} className="bg-secondary text-textPrimary rounded-full px-4 py-2 font-semibold shadow-soft hover:bg-accent transition-all">Manage</button>
+            </div>
           ))}
-        </tbody>
-      </table>
-      {/* Manage Tenant Modal */}
-      {showManageModal && selectedTenant && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-surface p-6 rounded-md w-full max-w-2xl relative shadow-soft">
-            <button className="absolute top-2 right-2 text-xl" onClick={() => setShowManageModal(false)}>&times;</button>
-            <h2 className="text-xl font-bold mb-4">Manage Tenant: {selectedTenant.name}</h2>
-            <div className="mb-4 flex items-center gap-2">
-              <input
-                type="text"
-                value={editTenantName === '' ? selectedTenant.name : editTenantName}
-                onChange={e => setEditTenantName(e.target.value)}
-                className="p-2 border rounded-md"
-              />
-              <button onClick={saveTenantName} className="px-3 py-1 bg-blue-500 text-white rounded-md">Save</button>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Invite/Create User</h3>
-              <form onSubmit={inviteUser} className="flex gap-2 items-center mb-2">
-                <input
-                  type="email"
-                  value={userInviteEmail}
-                  onChange={e => setUserInviteEmail(e.target.value)}
-                  placeholder="User email"
-                  className="p-2 border rounded-md"
-                  required
-                />
-                <select
-                  value={userInviteRole}
-                  onChange={e => setUserInviteRole(e.target.value)}
-                  className="p-2 border rounded-md"
-                >
-                  <option value="viewer">Viewer</option>
-                  <option value="editor">Editor</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded-md">Invite</button>
-              </form>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Users</h3>
-              <ul>
-                {manageUsers.map(user => (
-                  <li key={user.user_id} className="flex items-center justify-between mb-1">
-                    <span>{user.profiles?.email || user.user_id}</span>
-                    <span className="flex items-center gap-2">
-                      <select
-                        value={user.role}
-                        onChange={e => changeUserRole(user.user_id, e.target.value)}
-                        className="p-1 border rounded-md"
-                      >
-                        <option value="viewer">Viewer</option>
-                        <option value="editor">Editor</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                      <button onClick={() => removeUser(user.user_id)} className="text-red-500 ml-2">Remove</button>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Event Types</h3>
-              <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center">
+        </div>
+        {/* Manage Tenant Modal */}
+        {showManageModal && selectedTenant && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-surface/90 p-6 rounded-lg w-full max-w-2xl relative shadow-glass border border-border backdrop-blur-sm">
+              <button className="absolute top-2 right-2 text-xl" onClick={() => setShowManageModal(false)}>&times;</button>
+              <h2 className="text-xl font-bold mb-4">Manage Tenant: {selectedTenant.name}</h2>
+              <div className="mb-4 flex items-center gap-2">
                 <input
                   type="text"
-                  value={newEventType}
-                  onChange={e => setNewEventType(e.target.value)}
-                  placeholder="New event type"
+                  value={editTenantName === '' ? selectedTenant.name : editTenantName}
+                  onChange={e => setEditTenantName(e.target.value)}
                   className="p-2 border rounded-md"
                 />
-                <input
-                  type="color"
-                  value={newEventTypeColor}
-                  onChange={e => setNewEventTypeColor(e.target.value)}
-                  className="w-8 h-8 border rounded-md"
-                  title="Pick color"
-                />
-                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md">Add</button>
-              </form>
-              <ul>
-                {manageEventTypes.map(type => (
-                  <li key={type.id} className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <span style={{ background: type.color || '#2196f3', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
-                      {type.name}
-                    </span>
-                    <button onClick={() => removeEventType(type.id)} className="text-red-500">Remove</button>
-                  </li>
-                ))}
-              </ul>
+                <button onClick={saveTenantName} className="px-3 py-1 bg-blue-500 text-white rounded-md">Save</button>
+              </div>
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2">Invite/Create User</h3>
+                <form onSubmit={inviteUser} className="flex gap-2 items-center mb-2">
+                  <input
+                    type="email"
+                    value={userInviteEmail}
+                    onChange={e => setUserInviteEmail(e.target.value)}
+                    placeholder="User email"
+                    className="p-2 border rounded-md"
+                    required
+                  />
+                  <select
+                    value={userInviteRole}
+                    onChange={e => setUserInviteRole(e.target.value)}
+                    className="p-2 border rounded-md"
+                  >
+                    <option value="viewer">Viewer</option>
+                    <option value="editor">Editor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded-md">Invite</button>
+                </form>
+              </div>
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2">Users</h3>
+                <ul>
+                  {manageUsers.map(user => (
+                    <li key={user.user_id} className="flex items-center justify-between mb-1">
+                      <span>{user.profiles?.email || user.user_id}</span>
+                      <span className="flex items-center gap-2">
+                        <select
+                          value={user.role}
+                          onChange={e => changeUserRole(user.user_id, e.target.value)}
+                          className="p-1 border rounded-md"
+                        >
+                          <option value="viewer">Viewer</option>
+                          <option value="editor">Editor</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        <button onClick={() => removeUser(user.user_id)} className="text-red-500 ml-2">Remove</button>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mb-6">
+                <h3 className="font-semibold mb-2">Event Types</h3>
+                <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center">
+                  <input
+                    type="text"
+                    value={newEventType}
+                    onChange={e => setNewEventType(e.target.value)}
+                    placeholder="New event type"
+                    className="p-2 border rounded-md"
+                  />
+                  <input
+                    type="color"
+                    value={newEventTypeColor}
+                    onChange={e => setNewEventTypeColor(e.target.value)}
+                    className="w-8 h-8 border rounded-md"
+                    title="Pick color"
+                  />
+                  <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md">Add</button>
+                </form>
+                <ul>
+                  {manageEventTypes.map(type => (
+                    <li key={type.id} className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <span style={{ background: type.color || '#2196f3', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
+                        {type.name}
+                      </span>
+                      <button onClick={() => removeEventType(type.id)} className="text-red-500">Remove</button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

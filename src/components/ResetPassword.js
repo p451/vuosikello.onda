@@ -40,8 +40,8 @@ export default function ResetPassword() {
   };
 
   return (
-    <form onSubmit={handleReset} className="max-w-md mx-auto mt-10 p-6 bg-surface rounded-md shadow-soft">
-      <h2 className="text-xl font-bold mb-4">Set a new password</h2>
+    <form onSubmit={handleReset} className="max-w-md mx-auto mt-10 p-6 bg-surface rounded-lg shadow-card border border-border font-sans">
+      <h2 className="text-h1 font-semibold mb-4 font-sans">Set a new password</h2>
       {/* Hidden email field for accessibility and autofill */}
       <input
         type="email"
@@ -58,12 +58,12 @@ export default function ResetPassword() {
         placeholder="New password"
         value={password}
         onChange={e => setPassword(e.target.value)}
-        className="w-full border rounded-md p-2 mb-4"
+        className="w-full border border-border rounded-lg p-2 mb-4 bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all font-sans"
         required
         autoComplete="new-password"
       />
-      <button type="submit" className="w-full bg-accentPink text-white py-2 rounded-md">Set new password</button>
-      {message && <div className="mt-4 text-accentPink/80">{message}</div>}
+      <button type="submit" className="w-full rounded-full bg-primary text-white font-medium shadow-soft hover:bg-primaryHover transition-all border border-primary py-3 text-button font-sans">Set new password</button>
+      {message && <div className="mt-4 text-accent font-medium">{message}</div>}
     </form>
   );
 }

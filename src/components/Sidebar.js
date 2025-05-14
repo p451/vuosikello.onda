@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { useRole } from "../contexts/RoleContext";
 import { useState, useEffect } from "react";
@@ -14,6 +14,7 @@ const Sidebar = () => {
   const [open, setOpen] = useState(true);
   const [tenantName, setTenantName] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const getUser = async () => {
@@ -145,52 +146,92 @@ const Sidebar = () => {
     printWindow.print();
   };
 
+  // Helper for nav highlighting
+  const isActive = (path) => location.pathname === path;
+  // Helper for view mode highlighting
+  const [viewMode, setViewMode] = useState('month');
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail === 'day' || e.detail === 'week' || e.detail === 'month') {
+        setViewMode(e.detail);
+      }
+    };
+    window.addEventListener('sidebar-set-viewmode', handler);
+    return () => window.removeEventListener('sidebar-set-viewmode', handler);
+  }, []);
+
   if (!open) {
-    return (      <div className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-primary/80 hover:bg-primary shadow-glass hover:shadow-softHover transition-all duration-300 w-4 group cursor-pointer border-r border-metal"
+    return (
+      <div
+        className="fixed top-0 left-0 h-full z-50 flex flex-col items-center justify-between bg-surface shadow-card transition-all duration-200 ease-in-out w-14 group cursor-pointer border-r border-accent"
         onClick={() => setOpen(true)}
         aria-label="Avaa sivupalkki"
-        style={{ minWidth: '1rem', maxWidth: '1.5rem' }}
       >
         <div className="flex-1 flex flex-col justify-center items-center w-full">
-          <span className="block text-white text-xs rotate-90 group-hover:scale-110 transition-all select-none font-serif tracking-elegant">Avaa sidebar</span>
+          <span className="block text-textPrimary text-xs rotate-90 group-hover:scale-110 transition-all select-none font-sans font-medium">Avaa</span>
         </div>
         <div className="mb-4">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+          {/* ChatGPT-style hamburger icon */}
+          <svg width="24" height="24" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="4" y="7" width="16" height="2" rx="1"/>
+            <rect x="4" y="15" width="16" height="2" rx="1"/>
+          </svg>
         </div>
       </div>
     );
   }
 
   return (
-    <aside className={`h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-soft z-40 font-sans transition-transform duration-300`}>
+    <aside className="h-full w-64 bg-surface text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-card z-40 font-sans transition-all duration-200 ease-in-out border-r border-accent rounded-lg">
       <div>
-        <div className="flex items-center justify-between p-6 text-2xl font-bold border-b border-metal bg-surface">
-          <span className="font-serif tracking-elegant" style={{fontVariant: 'small-caps'}}>{tenantName || ""}</span>
+        <div className="flex items-center justify-between p-4 text-xl font-semibold border-b border-accent bg-surface rounded-t-lg">
+          <span className="font-sans font-semibold text-[18px]">{tenantName || ""}</span>
           <button
-            className="ml-2 px-3 py-1 rounded-md bg-secondary text-textPrimary font-serif font-semibold hover:bg-primary hover:text-white transition flex items-center gap-2 border border-metal"
-            aria-label="Siirrä sidebar sivuun"
+            className="ml-2 p-2 rounded-lg hover:bg-primary/20 transition-all duration-150 flex items-center"
+            aria-label="Sulje sivupalkki"
             onClick={() => setOpen(false)}
           >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#23211A"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" /></svg>
-            <span className="text-sm font-serif font-medium">Siirrä sivuun</span>
+            {/* ChatGPT-style close icon */}
+            <svg width="24" height="24" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 6L18 18M6 18L18 6" />
+            </svg>
           </button>
         </div>
         <nav className="flex flex-col gap-2 p-4">
           {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-            <Link to="/admin" className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition">Admin dashboard</Link>
+            <Link to="/admin"
+              className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+                ${isActive('/admin') ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
+            >Admin dashboard</Link>
           )}
-          <Link to="/" className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition">Calendar</Link>
-          <div className="mt-4 mb-2 text-xs text-placeholder uppercase tracking-wider">Näkymä</div>          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handleViewChange('day')}>Päivä</button>
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handleViewChange('week')}>Viikko</button>
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handleViewChange('month')}>Kuukausi</button>
+          <Link to="/"
+            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+              ${isActive('/') ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
+          >Calendar</Link>
+          <div className="mt-4 mb-2 text-xs text-textSecondary uppercase tracking-wide">Näkymä</div>
+          <button
+            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+              ${viewMode === 'day' ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
+            onClick={() => handleViewChange('day')}
+          >Päivä</button>
+          <button
+            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+              ${viewMode === 'week' ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
+            onClick={() => handleViewChange('week')}
+          >Viikko</button>
+          <button
+            className={`py-2 px-4 rounded-lg font-sans font-medium text-[14px] border transition-all text-left shadow-card
+              ${viewMode === 'month' ? 'bg-primary text-textPrimary border-primary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight'}`}
+            onClick={() => handleViewChange('month')}
+          >Kuukausi</button>
           <div className="mt-4" />
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handlePrintAgenda()}>Print Agenda</button>
-          <button className="py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant border border-primary" onClick={() => handlePrint('calendar')}>Print Calendar</button>
-          <button onClick={handleLogout} className="py-2 px-4 rounded-md bg-error text-white font-serif font-semibold hover:bg-error/90 shadow-soft hover:shadow-softHover transition-all text-left tracking-elegant mt-4 border border-error">Logout</button>
+          <button className="py-2 px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[14px] border border-secondary hover:bg-highlight shadow-card transition-all text-left" onClick={handlePrintAgenda}>Print Agenda</button>
+          <button className="py-2 px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[14px] border border-accent hover:bg-highlight shadow-card transition-all text-left" onClick={() => handlePrint('calendar')}>Print Calendar</button>
+          <button onClick={handleLogout} className="py-2 px-4 rounded-lg bg-error text-black font-sans font-medium text-[14px] hover:bg-error/90 shadow-card transition-all text-left mt-4 border border-error">Logout</button>
         </nav>
       </div>
-      <div className="p-4 border-t border-metal">
-        <button className="w-full py-2 px-4 rounded-md bg-primary text-white font-serif font-semibold hover:bg-primaryHover transition text-left">Oma profiili</button>
+      <div className="p-4 border-t border-accent bg-surface rounded-b-lg">
+        <button className="w-full py-2 px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[14px] border border-primary hover:bg-highlight shadow-card transition-all text-left">Oma profiili</button>
       </div>
     </aside>
   );

@@ -28,6 +28,16 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Aikumo</title>
+    <!-- Add fade-in animation to loader for extra polish -->
+    <style>
+      #aikumo-loader {
+        animation: fadeIn 0.7s cubic-bezier(0.4,0,0.2,1);
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

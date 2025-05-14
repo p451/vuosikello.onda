@@ -15,16 +15,17 @@ export default function Auth() {
     if (error) setError(error.message);
   };
 
-  return (    <div className="flex min-h-screen items-center justify-center bg-sakura bg-opacity-40">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-surface p-8 shadow-glass backdrop-blur-sm">
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-surface/90 p-8 shadow-modal border border-border backdrop-blur-sm">
         <div>
-          <h2 className="text-center text-3xl font-serif tracking-elegant text-textPrimary">
+          <h2 className="text-center text-h1 font-semibold text-primary mb-2 font-sans">
             Sign in to your account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           {error && (
-            <div className="rounded-md bg-error/10 p-4 border border-error/20">
+            <div className="rounded-lg bg-error/10 p-4 border border-error/20">
               <div className="text-sm text-error font-medium">{error}</div>
             </div>
           )}
@@ -38,7 +39,8 @@ export default function Auth() {
               type="email"
               autoComplete="email"
               required
-              className="relative block w-full appearance-none rounded-md border border-metal px-3 py-2 text-textPrimary placeholder-placeholder bg-white/80 backdrop-blur-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all sm:text-sm"              placeholder="Email address"
+              className="relative block w-full appearance-none rounded-lg border border-border px-4 py-3 text-textPrimary placeholder-placeholder bg-white/80 backdrop-blur-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all sm:text-base font-sans"
+              placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -53,7 +55,7 @@ export default function Auth() {
               type="password"
               autoComplete="current-password"
               required
-              className="relative block w-full appearance-none rounded-md border border-metal px-3 py-2 text-textPrimary placeholder-placeholder bg-white/80 backdrop-blur-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all sm:text-sm"
+              className="relative block w-full appearance-none rounded-lg border border-border px-4 py-3 text-textPrimary placeholder-placeholder bg-white/80 backdrop-blur-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all sm:text-base font-sans"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -62,19 +64,19 @@ export default function Auth() {
           <div>
             <button
               type="submit"
-              className="group relative flex w-full justify-center rounded-md border border-primary bg-primary py-2 px-4 text-sm font-serif tracking-elegant text-white hover:bg-primaryHover transition-all shadow-soft hover:shadow-softHover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="w-full rounded-full bg-primary text-white font-medium py-3 px-6 shadow-soft hover:bg-primaryHover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-all text-button font-sans"
             >
               Sign in
             </button>
           </div>
         </form>
-        
-        <div className="text-center text-sm font-sans">
+        <div className="text-center text-base font-sans mt-6">
           <span className="text-textSecondary">Don't have an account? </span>
-          <Link to="/signup" className="font-medium text-primary hover:text-primaryHover transition-all">
+          <Link to="/signup" className="font-medium text-primary hover:text-primaryHover transition-all text-button font-sans">
             Sign up here
           </Link>
-        </div>        <div className="text-center text-sm mt-8 pt-6 border-t border-metal">
+        </div>
+        <div className="text-center text-sm mt-8 pt-6 border-t border-border">
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -90,19 +92,14 @@ export default function Auth() {
           >
             <input
               type="email"
-              className="mt-2 w-full border border-metal rounded-md px-3 py-2 text-textPrimary placeholder-placeholder bg-white/80 backdrop-blur-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+              className="mt-2 w-full border border-border rounded-lg px-4 py-3 text-textPrimary placeholder-placeholder bg-white/80 backdrop-blur-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all font-sans"
               placeholder="Enter your email for reset"
               value={resetEmail}
               onChange={e => setResetEmail(e.target.value)}
               required
             />
-            <button
-              type="submit"
-              className="mt-4 w-full bg-secondary text-textPrimary font-serif tracking-elegant py-2 rounded-md shadow-soft hover:shadow-softHover hover:bg-primary hover:text-white transition-all border border-metal"
-            >
-              Send reset link
-            </button>
-            {resetMessage && <div className="text-primary font-medium mt-2">{resetMessage}</div>}
+            <button type="submit" className="w-full mt-2 rounded-full bg-secondary text-white font-medium py-2 px-6 shadow-soft hover:bg-primaryHover focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50 transition-all text-button font-sans">Send reset link</button>
+            {resetMessage && <div className="mt-2 text-accent font-medium">{resetMessage}</div>}
           </form>
         </div>
       </div>

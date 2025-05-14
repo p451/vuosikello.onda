@@ -363,8 +363,8 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
   };
   // Removed unused navigate function as its functionality is handled elsewhere
 
+  // Helper for event type color (only backgroundColor is allowed inline)
   const getEventTypeColor = (type) => {
-    // Use tenant_event_types color if available
     if (eventTypeMap[type]) return { backgroundColor: eventTypeMap[type] };
     return { backgroundColor: '#e2e8f0' };
   };
@@ -478,8 +478,8 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
   // Update the EventItem component to handle small holiday indicators
   const EventItem = ({ event, onClick, scale = 1 }) => (    <div 
       onClick={onClick}
-      className={`event-row rounded-md cursor-pointer hover:opacity-80 hover:shadow-subtle transition-all p-1 text-xs sm:text-sm text-textPrimary`}
-      style={{ ...getEventTypeColor(event.type), fontSize: `${scale * 0.75}rem`, minHeight: `${scale * 1.25}rem` }}
+      className={`event-row rounded-lg cursor-pointer hover:opacity-80 hover:shadow-card transition-all duration-200 ease-in-out p-1 text-xs sm:text-sm text-textPrimary font-medium`}
+      style={getEventTypeColor(event.type)}
     >
       <span className="truncate block font-medium">{event.name}</span>
     </div>
@@ -490,10 +490,10 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     <div className="color-legend my-4 flex gap-4 justify-center border-t pt-4">
       {eventTypes.map(type => (          <button
             key={type.id}
-            className={`legend-item flex items-center gap-1 px-2 py-1 rounded-md transition-all cursor-pointer hover:shadow-soft
+            className={`legend-item flex items-center gap-1 px-2 py-1 rounded-lg transition-all duration-200 ease-in-out cursor-pointer hover:shadow-card
               ${visibleEventTypes.includes(type.name) 
-                ? 'bg-accentPink/30 border-accentPink/30 border shadow-glass' 
-                : 'bg-sakura border-metal border opacity-50 hover:opacity-80'}`}
+                ? 'bg-accent/30 border-accent/30 border shadow-modal' 
+                : 'bg-surface border-metal border opacity-50 hover:opacity-80'}`}
             onClick={() => {
             setVisibleEventTypes(prev =>
               prev.includes(type.name)
@@ -502,8 +502,8 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
             );
           }}
         >
-          <div className="legend-color w-4 h-4 rounded-md" style={{ backgroundColor: type.color }}></div>
-          <span>{type.name}</span>
+          <div className="legend-color w-4 h-4 rounded-lg" style={{ backgroundColor: type.color }}></div>
+          <span className="font-medium text-xs">{type.name}</span>
         </button>
       ))}
     </div>
@@ -660,11 +660,11 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     setShowAddModal(true);
   };
 
-  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen">
+  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans">
       <style>
         {`
           @media print {
-            .no-print {
+            .no-print, .sidebar, aside, nav, .Navigation, .Sidebar {
               display: none !important;
             }
             .calendar-container {
@@ -681,7 +681,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
             }
             .day-cell {
               min-height: auto !important;
-              height: calc((29.7cm - 3cm) / 7) !important; /* A4 height minus margins and header/footer */
+              height: calc((29.7cm - 3cm) / 7) !important;
               padding: 0.2rem !important;
               font-size: 0.6rem !important;
             }
@@ -720,7 +720,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       {/* <div className="mb-4 space-y-2 sm:space-y-4 no-print"> ... </div> */}
       {/* POISTETAAN: vanha edellinen/seuraava ja kuukauden nimi */}
       {/* <div className="flex items-center gap-2 sm:gap-4 mb-4 no-print"> ... </div> */}
-      <div className="border rounded-lg shadow-glass bg-surface p-2 sm:p-4 calendar-container overflow-x-auto relative">
+      <div className="border rounded-lg shadow-modal bg-surface p-2 sm:p-4 calendar-container overflow-x-auto relative">
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4 calendar-header">
           <button
             onClick={() => {
@@ -728,12 +728,12 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
               prev.setMonth(currentDate.getMonth() - 1);
               setCurrentDate(prev);
             }}
-            className="px-2 py-1 rounded-md bg-primary text-white font-serif font-bold hover:bg-primaryHover transition-all border border-metal"
+            className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal"
             aria-label="Edellinen kuukausi"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
-          <h2 className="text-center text-lg sm:text-2xl font-serif font-bold m-0 p-0 select-none">
+          <h2 className="text-center text-h1 font-semibold font-sans uppercase tracking-wide m-0 p-0 select-none">
             {currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })}
           </h2>
           <button
@@ -742,7 +742,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
               next.setMonth(currentDate.getMonth() + 1);
               setCurrentDate(next);
             }}
-            className="px-2 py-1 rounded-md bg-primary text-white font-serif font-bold hover:bg-primaryHover transition-all border border-metal"
+            className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal"
             aria-label="Seuraava kuukausi"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -754,20 +754,19 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
         {can('create') && (
           <button
             onClick={() => openAddEventModal()}
-            className="fixed bottom-8 right-8 z-50 bg-primary text-white font-serif rounded-lg shadow-glass px-6 py-4 text-lg font-bold hover:bg-primaryHover transition-all border-2 border-metal no-print"
-            style={{ boxShadow: '0 4px 16px rgba(208,76,42,0.15)' }}
+            className="fixed bottom-8 right-8 z-50 bg-primary text-white font-medium rounded-lg shadow-card px-6 py-4 text-lg hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary no-print"
             aria-label="Lisää tapahtuma"
           >
-            + Lisää tapahtuma
+            Lisää tapahtuma
           </button>
         )}
       </div>
 
       {/* Add Detail Modal */}
       {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface p-6 rounded-lg w-full max-w-2xl shadow-glass border border-metal">
-            <div className="p-4 rounded-t-lg shadow-subtle" style={getEventTypeColor(selectedEvent.type)}>
-              <h3 className="text-xl font-serif font-bold tracking-elegant">{selectedEvent.name}</h3>
+          <div className="bg-surface/90 p-6 rounded-lg w-full max-w-2xl shadow-modal border border-border backdrop-blur-sm">
+            <div className="p-4 rounded-lg shadow-card" style={getEventTypeColor(selectedEvent.type)}>
+              <h3 className="text-xl font-semibold tracking-wide">{selectedEvent.name}</h3>
               <p className="text-sm mt-2 text-textSecondary">
                 {new Date(selectedEvent.startDate).toLocaleDateString('fi-FI')} - {new Date(selectedEvent.endDate).toLocaleDateString('fi-FI')}
               </p>
@@ -775,7 +774,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                 Tyyppi: {getEventTypeName(selectedEvent.type)}
               </p>
               {selectedEvent.info && (
-                <div className="mt-2 p-2 bg-surface border rounded-md text-sm">
+                <div className="mt-2 p-2 bg-surface border rounded-lg text-sm">
                   <span className="font-semibold">Lisätiedot:</span> {selectedEvent.info}
                 </div>
               )}
@@ -813,18 +812,18 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                 <input
                   ref={commentInputRef}
                   type="text"
-                  className="flex-1 border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   placeholder={replyTo ? 'Vastaa kommenttiin...' : 'Lisää kommentti...'}
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                 />
                 {replyTo && <button type="button" className="text-xs text-lowlightText" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
-                <button type="submit" className="px-3 py-1 bg-accentPink text-white rounded-md">Lähetä</button>
+                <button type="submit" className="px-3 py-1 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary">Lähetä</button>
               </form>
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
-                className="px-4 py-2 bg-metal/20 rounded-md"
+                className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary"
                 onClick={() => {
                   setShowDetailModal(false);
                   setSelectedEvent(null);
@@ -834,7 +833,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
               </button>
               {can('update') && (
                 <button
-                  className="px-4 py-2 bg-accentPink text-white rounded-md"
+                  className="px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
                   onClick={handleEditClick}
                 >
                   Muokkaa
@@ -848,49 +847,49 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       {/* Lisää info ja repeat eventin luontimodaliin */}
       {showAddModal && (
         <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
-          <div className="bg-surface p-4 sm:p-6 rounded-lg w-full max-w-md">
-            <h3 className="text-lg font-bold mb-4">Lisää uusi tapahtuma</h3>
+          <div className="bg-surface/90 p-6 rounded-lg w-full max-w-md shadow-modal border border-border backdrop-blur-sm">
+            <h3 className="text-lg font-semibold mb-4">Lisää uusi tapahtuma</h3>
             <div className="space-y-4">
               <div>
-                <label className="block mb-1">Nimi</label>
+                <label className="block mb-1 font-medium">Nimi</label>
                 <input
                   type="text"
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={newEvent.name}
                   onChange={e => setNewEvent({...newEvent, name: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1">Lisätiedot</label>
+                <label className="block mb-1 font-medium">Lisätiedot</label>
                 <textarea
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={newEvent.info}
                   onChange={e => setNewEvent({...newEvent, info: e.target.value})}
                   rows={2}
                 />
               </div>
               <div>
-                <label className="block mb-1">Alkamispäivä</label>
+                <label className="block mb-1 font-medium">Alkamispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={newEvent.startDate}
                   onChange={e => setNewEvent({...newEvent, startDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1">Päättymispäivä</label>
+                <label className="block mb-1 font-medium">Päättymispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={newEvent.endDate}
                   onChange={e => setNewEvent({...newEvent, endDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1">Tyyppi</label>
+                <label className="block mb-1 font-medium">Tyyppi</label>
                 <select
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={newEvent.type}
                   onChange={e => setNewEvent({...newEvent, type: e.target.value})}
                 >
@@ -904,21 +903,21 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                 </select>
               </div>
               <div>
-                <label className="block mb-1">Toistuva tapahtuma?</label>
+                <label className="block mb-1 font-medium">Toistuva tapahtuma?</label>
                 <input
                   type="checkbox"
                   checked={repeat.enabled}
                   onChange={e => setRepeat(r => ({ ...r, enabled: e.target.checked, frequency: e.target.checked ? 'daily' : 'none' }))}
                   className="mr-2"
                 />
-                <span>Kyllä</span>
+                <span className="font-medium">Kyllä</span>
               </div>
               {repeat.enabled && (
                 <div className="space-y-2">
                   <div>
-                    <label className="block mb-1">Toistuvuus</label>
+                    <label className="block mb-1 font-medium">Toistuvuus</label>
                     <select
-                      className="w-full border p-2 rounded-md"
+                      className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                       value={repeat.frequency}
                       onChange={e => setRepeat(r => ({ ...r, frequency: e.target.value }))}
                     >
@@ -928,36 +927,36 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                     </select>
                   </div>
                   <div>
-                    <label className="block mb-1">Toistojen määrä</label>
+                    <label className="block mb-1 font-medium">Toistojen määrä</label>
                     <input
                       type="number"
                       min={1}
-                      className="w-full border p-2 rounded-md"
+                      className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                       value={repeat.count}
                       onChange={e => setRepeat(r => ({ ...r, count: Number(e.target.value) }))}
                     />
                     <span className="text-xs text-lowlightText ml-2">tai loppumispäivä</span>
                     <input
                       type="date"
-                      className="border p-2 rounded-md ml-2"
+                      className="border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out ml-2"
                       value={repeat.until}
                       onChange={e => setRepeat(r => ({ ...r, until: e.target.value }))}
                     />
                   </div>
                 </div>
               )}
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 mt-4">
                 <button
-                  className="px-4 py-2 bg-metal/20 rounded-md"
+                  className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary"
                   onClick={() => setShowAddModal(false)}
                 >
                   Peruuta
                 </button>
                 <button
-                  className="px-4 py-2 bg-accentPink text-white rounded-md"
+                  className="px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
                   onClick={addEvent}
                 >
-                  Lisää
+                  Lisää tapahtuma
                 </button>
               </div>
             </div>
@@ -968,49 +967,49 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       {/* Lisää info eventin muokkausmodaaliin */}
       {showEditModal && editEvent && can('update') && (
         <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center">
-          <div className="bg-surface p-6 rounded-lg max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Muokkaa tapahtumaa</h3>
+          <div className="bg-surface/90 p-6 rounded-lg max-w-md w-full shadow-modal border border-border backdrop-blur-sm">
+            <h3 className="text-lg font-semibold mb-4">Muokkaa tapahtumaa</h3>
             <div className="space-y-4">
               <div>
-                <label className="block mb-1">Nimi</label>
+                <label className="block mb-1 font-medium">Nimi</label>
                 <input
                   type="text"
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={editEvent.name}
                   onChange={e => setEditEvent({...editEvent, name: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1">Lisätiedot</label>
+                <label className="block mb-1 font-medium">Lisätiedot</label>
                 <textarea
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={editEvent.info || ''}
                   onChange={e => setEditEvent({...editEvent, info: e.target.value})}
                   rows={2}
                 />
               </div>
               <div>
-                <label className="block mb-1">Alkamispäivä</label>
+                <label className="block mb-1 font-medium">Alkamispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={editEvent.startDate}
                   onChange={e => setEditEvent({...editEvent, startDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1">Päättymispäivä</label>
+                <label className="block mb-1 font-medium">Päättymispäivä</label>
                 <input
                   type="date"
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={editEvent.endDate}
                   onChange={e => setEditEvent({...editEvent, endDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1">Tyyppi</label>
+                <label className="block mb-1 font-medium">Tyyppi</label>
                 <select
-                  className="w-full border p-2 rounded-md"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
                   value={editEvent.type}
                   onChange={e => setEditEvent({...editEvent, type: e.target.value})}
                 >
@@ -1025,7 +1024,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
               </div>              <div className="flex justify-between">
                 {can('delete') && (
                   <button
-                    className="px-4 py-2 bg-error text-white rounded-md font-serif hover:bg-error/90 shadow-soft hover:shadow-softHover transition-all"
+                    className="px-4 py-2 rounded-lg bg-error text-white font-medium shadow-card hover:bg-error/90 transition-all duration-200 ease-in-out border border-error"
                     onClick={() => {
                       deleteEvent(editEvent);
                       setShowEditModal(false);
@@ -1036,7 +1035,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                 )}
                 <div className="flex gap-2">
                   <button
-                    className="px-4 py-2 bg-secondary rounded-md font-serif text-textPrimary hover:bg-secondary/80 shadow-soft hover:shadow-softHover transition-all border border-metal"
+                    className="px-4 py-2 rounded-lg bg-secondary text-textPrimary font-medium shadow-card hover:bg-accent transition-all duration-200 ease-in-out border border-secondary"
                     onClick={() => {
                       setShowEditModal(false);
                       setEditEvent(null);
@@ -1045,7 +1044,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                     Peruuta
                   </button>
                   <button
-                    className="px-4 py-2 bg-primary text-white rounded-md font-serif hover:bg-primaryHover shadow-soft hover:shadow-softHover transition-all"
+                    className="px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
                     onClick={updateEvent}
                   >
                     Tallenna
@@ -1059,11 +1058,11 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
 
       {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed right-8 top-20 w-full max-w-md bg-surface shadow-glass z-50 overflow-y-auto p-4 no-print rounded-lg border border-metal" style={{height: 'auto', maxHeight: '80vh'}}>
-          <button className="absolute top-2 right-2 text-xl" onClick={() => setShowDayPanel(false)}>&times;</button>
-          <h2 className="text-xl font-bold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
+        <div className="fixed right-8 top-20 w-full max-w-md bg-surface shadow-modal z-50 overflow-y-auto p-4 no-print rounded-lg border border-metal" style={{height: 'auto', maxHeight: '80vh'}}>
+          <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out" onClick={() => setShowDayPanel(false)}>&times;</button>
+          <h2 className="text-xl font-semibold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
           <button
-            className="mb-4 px-4 py-2 bg-accentPink text-white rounded-md"
+            className="mb-4 px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
             onClick={() => openAddEventModal(selectedDay)}
           >
             Lisää tapahtuma tälle päivälle
@@ -1072,9 +1071,9 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
           <ul>
             {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
             {dayPanelEvents.map(event => (
-              <li key={event.id} className="mb-2 p-2 border rounded-md cursor-pointer flex items-center gap-2 event-list-item" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
-                <span style={{ background: eventTypeMap[event.type] || '#e2e8f0', width: 16, height: 16, display: 'inline-block', borderRadius: 4, border: '1px solid #ccc' }}></span>
-                <span className="font-bold">{event.name}</span> <span className="text-xs">({event.type})</span>
+              <li key={event.id} className="mb-2 p-2 border rounded-lg cursor-pointer flex items-center gap-2 event-list-item hover:bg-accent/10 transition-all duration-200 ease-in-out" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
+                <span className="w-4 h-4 rounded-lg border border-border" style={{ backgroundColor: eventTypeMap[event.type] || '#e2e8f0' }}></span>
+                <span className="font-semibold">{event.name}</span> <span className="text-xs">({event.type})</span>
               </li>
             ))}
           </ul>

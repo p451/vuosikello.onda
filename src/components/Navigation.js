@@ -41,50 +41,51 @@ export default function Navigation() {
   }, [tenantId, user]);
 
   return (
-    <nav className="bg-sakura text-textPrimary p-4 border-b border-metal" style={{ fontFamily: 'IBM Plex Sans, sans-serif', lineHeight: '1.6em' }}>
+    <nav className="bg-background text-textPrimary p-4 border-b border-metal font-sans" >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Näytä tenantin nimi vain jos käyttäjä on kirjautunut */}
+        {/* Show tenant name only if user is logged in */}
         <div className="flex items-center gap-2">
-          <Link to="/" className="text-xl font-bold font-spectral-sc uppercase tracking-[0.5px]" style={{ fontFamily: 'Spectral SC, serif', fontVariant: 'small-caps', lineHeight: '1.3em', letterSpacing: '0.5px' }}>
+          <Link to="/" className="text-h1 font-semibold uppercase tracking-wide select-none transition-all duration-200 ease-in-out">
             Aikumo
           </Link>
           {user && tenantName && (
-            <span className="ml-2 text-base font-semibold text-primary bg-surface px-2 py-1 rounded-md border border-primary" style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}>{tenantName}</span>
+            <span className="ml-2 text-base font-medium text-primary bg-surface px-2 py-1 rounded-lg border border-primary transition-all duration-200 ease-in-out">{tenantName}</span>
           )}
         </div>
         <div className="sm:hidden">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="focus:outline-none"
+            className="focus:outline-none text-primary transition-all duration-200 ease-in-out"
             aria-label="Open menu"
-            style={{ color: '#4A4A4A' }}
           >
-            <svg className="w-7 h-7" fill="none" stroke="#4A4A4A" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
-        {/* Näytä valikkolinkit vain jos käyttäjä on kirjautunut */}
-        <div className="hidden sm:flex space-x-4 items-center">          {user && (
+        {/* Show menu links only if user is logged in */}
+        <div className="hidden sm:flex space-x-4 items-center">
+          {user && (
             <>
-              <Link to="/" className="hover:text-primary font-serif tracking-elegant px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5">
+              <Link to="/" className="hover:text-primary font-medium px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5 text-button">
                 Calendar
               </Link>
               {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-                <Link to="/admin" className="hover:text-primary font-serif tracking-elegant px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5">
+                <Link to="/admin" className="hover:text-primary font-medium px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5 text-button">
                   Admin Dashboard
                 </Link>
               )}
               {user && SUPERADMINS.includes(user.email) && (
-                <Link to="/superadmin" className="hover:text-primary font-serif tracking-elegant px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5">
+                <Link to="/superadmin" className="hover:text-primary font-medium px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5 text-button">
                   Superadmin Dashboard
                 </Link>
               )}
               <button
-                onClick={async () => {                  await supabase.auth.signOut();
+                onClick={async () => {
+                  await supabase.auth.signOut();
                   window.location.href = '/login';
                 }}
-                className="ml-4 px-3 py-1 rounded-md bg-error text-white font-serif font-semibold tracking-elegant shadow-soft hover:shadow-softHover transition-all border border-error hover:bg-error/90"
+                className="ml-4 px-3 py-1 rounded-lg bg-error text-black font-medium shadow-card hover:shadow-modal transition-all duration-200 ease-in-out border border-error text-button"
               >
                 Logout
               </button>
@@ -94,19 +95,19 @@ export default function Navigation() {
       </div>
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="sm:hidden mt-2 bg-surface rounded-md shadow-soft p-2 flex flex-col gap-2 border border-metal">
+        <div className="sm:hidden mt-2 bg-surface rounded-lg shadow-card p-2 flex flex-col gap-2 border border-metal transition-all duration-200 ease-in-out">
           {user && (
             <>
-              <Link to="/" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary" onClick={() => setMenuOpen(false)}>
+              <Link to="/" className="hover:text-primary px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary text-button" onClick={() => setMenuOpen(false)}>
                 Calendar
               </Link>
               {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
-                <Link to="/admin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary" onClick={() => setMenuOpen(false)}>
+                <Link to="/admin" className="hover:text-primary px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary text-button" onClick={() => setMenuOpen(false)}>
                   Admin Dashboard
                 </Link>
               )}
               {user && SUPERADMINS.includes(user.email) && (
-                <Link to="/superadmin" className="hover:text-primary px-3 py-1 rounded-md transition-all border-b-2 border-transparent hover:border-primary focus:border-primary" onClick={() => setMenuOpen(false)}>
+                <Link to="/superadmin" className="hover:text-primary px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary text-button" onClick={() => setMenuOpen(false)}>
                   Superadmin Dashboard
                 </Link>
               )}
@@ -115,8 +116,7 @@ export default function Navigation() {
                   await supabase.auth.signOut();
                   window.location.href = '/login';
                 }}
-                className="px-3 py-1 rounded-md bg-gradient-to-b from-primary to-primaryHover text-white font-semibold shadow-soft hover:shadow-glass transition-all border border-primary text-left"
-                style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}
+                className="px-3 py-1 rounded-lg bg-error text-white font-medium shadow-card hover:shadow-modal transition-all duration-200 ease-in-out border border-error text-button"
               >
                 Logout
               </button>

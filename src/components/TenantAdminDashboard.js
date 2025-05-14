@@ -10,7 +10,6 @@ export default function TenantAdminDashboard() {
   const { tenantId } = useTenant();
   const { userRole } = useRole();
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
   const [eventTypes, setEventTypes] = useState([]);
   const [newEventType, setNewEventType] = useState('');
   const [newEventTypeColor, setNewEventTypeColor] = useState('#2196f3');
@@ -44,7 +43,6 @@ export default function TenantAdminDashboard() {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error);
-      setMessage('Error loading users');
       setLoading(false);
     }
   };
@@ -61,7 +59,6 @@ export default function TenantAdminDashboard() {
   const addUserDirectly = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
     try {
       // Odota hetki, että profiili ehtii syntyä ennen user_roles-inserttiä
       await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -76,43 +73,19 @@ export default function TenantAdminDashboard() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error?.message || 'Käyttäjän luonti epäonnistui');
-      setMessage('Käyttäjä lisätty ja kutsu lähetetty!');
       setInviteEmail('');
       setSelectedRole('viewer');
       fetchUsers();
     } catch (error) {
-      setMessage(error.message);
+      console.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateUserRole = async (userId, newRole) => {
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .update({ role: newRole })
-        .eq('user_id', userId)
-        .eq('tenant_id', tenantId);
-
-      if (error) throw error;
-      await fetchUsers();
-      setMessage('Role updated successfully');
-    } catch (error) {
-      setMessage(error.message);
-    }
-  };
-
-  const removeUser = async (userId) => {
-    setUserToDelete(userId);
-    setDeleteInput('');
-    setShowDeleteModal(true);
-  };
-
   const confirmDeleteUser = async () => {
     if (deleteInput !== 'delete' || !userToDelete) return;
     setLoading(true);
-    setMessage('');
     try {
       const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/delete_user', {
         method: 'POST',
@@ -121,10 +94,9 @@ export default function TenantAdminDashboard() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error?.message || 'Käyttäjän poisto epäonnistui');
-      setMessage('Käyttäjä poistettu onnistuneesti!');
       setUsers(prev => prev.filter(user => user.user_id !== userToDelete));
     } catch (error) {
-      setMessage(error.message);
+      console.error(error.message);
     } finally {
       setShowDeleteModal(false);
       setUserToDelete(null);
@@ -151,157 +123,119 @@ export default function TenantAdminDashboard() {
     fetchEventTypes();
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (userRole !== 'admin') return null;
+  if (loading) return <div className="flex items-center justify-center min-h-screen bg-background text-xl text-primary font-serif">Loading...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Tenant Administration</h1>
-      
-      {message && (
-        <div className="mb-4 p-4 rounded-md bg-surface text-textPrimary">
-          {message}
-        </div>
-      )}
-
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Invite New User</h2>
-        <form onSubmit={addUserDirectly} className="space-y-4">
-          <div>
-            <label className="block mb-2">Email:</label>
-            <input
-              type="email"
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
-              className="w-full p-2 border border-metal rounded-md"
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-2">Role:</label>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full p-2 border border-metal rounded-md"
-            >
-              <option value="viewer">Viewer</option>
-              <option value="editor">Editor</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+    <div className="w-full min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto bg-surface/90 rounded-lg shadow-glass border border-border p-8 backdrop-blur-sm">
+        <h1 className="text-3xl font-serif font-bold text-primary mb-6 tracking-elegant">Tenant Admin Dashboard</h1>
+        <form onSubmit={addUserDirectly} className="flex gap-2 mb-6">
+          <input
+            type="email"
+            value={inviteEmail}
+            onChange={e => setInviteEmail(e.target.value)}
+            placeholder="Invite user by email"
+            className="flex-1 px-4 py-3 rounded-lg border border-border bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all"
+          />
+          <select
+            value={selectedRole}
+            onChange={e => setSelectedRole(e.target.value)}
+            className="px-4 py-3 rounded-lg border border-border bg-white/80 backdrop-blur-sm text-textPrimary focus:border-primary focus:ring-2 focus:ring-primary transition-all"
           >
-            Lisää käyttäjä
-          </button>
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button type="submit" className="bg-primary text-white rounded-full px-6 py-3 font-semibold shadow-soft hover:bg-primaryHover transition-all">Invite</button>
         </form>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Event Types</h2>        <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center p-2 bg-surface rounded-lg shadow-soft">
-          <input
-            type="text"
-            value={newEventType}
-            onChange={e => setNewEventType(e.target.value)}
-            placeholder="New event type"
-            className="p-2 border border-metal rounded-md bg-white/80 backdrop-blur-sm placeholder:text-placeholder focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-          />
-          <input
-            type="color"
-            value={newEventTypeColor}
-            onChange={e => setNewEventTypeColor(e.target.value)}
-            className="w-8 h-8 border border-metal rounded-md shadow-subtle hover:shadow-soft transition-all cursor-pointer"
-            title="Pick color"
-          />
-          <button type="submit" className="px-4 py-2 bg-primary text-white rounded-md font-serif tracking-elegant shadow-soft hover:shadow-softHover hover:bg-primaryHover transition-all border border-primary">Add</button>
-        </form>
-        <ul>
-          {eventTypes.map(type => (              <li key={type.id} className="flex items-center justify-between p-2 hover:bg-secondary/20 rounded-md transition-all">
+        <div className="mb-8">
+          <h2 className="text-xl font-serif font-bold text-primary mb-4 tracking-elegant">Event Types</h2>
+          <form onSubmit={addEventType} className="flex space-x-2 mb-2 items-center p-2 bg-surface/80 rounded-lg shadow-soft">
+            <input
+              type="text"
+              value={newEventType}
+              onChange={e => setNewEventType(e.target.value)}
+              placeholder="New event type"
+              className="p-2 border border-border rounded-lg bg-white/80 backdrop-blur-sm placeholder:text-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all"
+            />
+            <input
+              type="color"
+              value={newEventTypeColor}
+              onChange={e => setNewEventTypeColor(e.target.value)}
+              className="w-8 h-8 border border-border rounded-lg shadow-subtle hover:shadow-soft transition-all cursor-pointer"
+              title="Pick color"
+            />
+            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-full font-serif tracking-elegant shadow-soft hover:shadow-softHover hover:bg-primaryHover transition-all border border-primary">Add</button>
+          </form>
+          <ul>
+            {eventTypes.map(type => (
+              <li key={type.id} className="flex items-center justify-between p-2 hover:bg-secondary/20 rounded-lg transition-all">
                 <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-sm border border-metal shadow-subtle" style={{ background: type.color || '#2196f3' }}></span>
+                  <span className="w-4 h-4 rounded-md border border-border shadow-subtle" style={{ background: type.color || '#2196f3' }}></span>
                   <span className="text-textPrimary font-medium">{type.name}</span>
                 </span>
                 <button onClick={() => removeEventType(type.id)} className="text-error hover:text-error/80 font-serif tracking-elegant transition-all px-2">Remove</button>
               </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Current Users</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-surface">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 border-b border-metal text-left">Email</th>
-                <th className="px-6 py-3 border-b border-metal text-left">Role</th>
-                <th className="px-6 py-3 border-b border-metal text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.user_id}>
-                  <td className="px-6 py-4 border-b border-metal">
-                    {user.profiles?.email || user.user_id}
-                  </td>
-                  <td className="px-6 py-4 border-b border-metal">
-                    <select
-                      value={user.role}
-                      onChange={(e) => updateUserRole(user.user_id, e.target.value)}
-                      className="p-1 border border-metal rounded-md"
-                    >
-                      <option value="viewer">Viewer</option>
-                      <option value="editor">Editor</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </td>
-                  <td className="px-6 py-4 border-b border-metal">
-                    <button
-                      onClick={() => removeUser(user.user_id)}
-                      className="px-3 py-1 bg-danger text-white rounded-md hover:bg-danger-dark"
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))}
+          </ul>
         </div>
-      </div>
-      {/* Delete confirmation modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-overlay bg-opacity-50 z-50">
-          <div className="bg-surface p-6 rounded-md shadow-glass max-w-sm w-full">
-            <h2 className="text-lg font-bold mb-4">Confirm User Deletion</h2>
-            <p className="mb-2">To delete this user permanently, type <span className="font-mono font-bold">delete</span> below and press confirm.</p>
-            <input
-              type="text"
-              value={deleteInput}
-              onChange={e => setDeleteInput(e.target.value)}
-              className="w-full border border-metal p-2 rounded-md mb-4"
-              placeholder="Type 'delete' to confirm"
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDeleteUser}
-                disabled={deleteInput !== 'delete'}
-                className={`px-4 py-2 rounded-md text-white ${deleteInput === 'delete' ? 'bg-danger hover:bg-danger-dark' : 'bg-gray-400 cursor-not-allowed'}`}
-              >
-                Confirm Delete
-              </button>
-            </div>
+        <div>
+          <h2 className="text-xl font-serif font-bold text-primary mb-4 tracking-elegant">Current Users</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-surface/80 rounded-lg shadow-card border border-border">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 border-b border-border text-left">Email</th>
+                  <th className="px-6 py-3 border-b border-border text-left">Role</th>
+                  <th className="px-6 py-3 border-b border-border text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(user => (
+                  <tr key={user.id} className="hover:bg-secondary/10 transition-all">
+                    <td className="px-6 py-4 border-b border-border">{user.profiles?.email}</td>
+                    <td className="px-6 py-4 border-b border-border">{user.role}</td>
+                    <td className="px-6 py-4 border-b border-border">
+                      <button onClick={() => { setUserToDelete(user); setShowDeleteModal(true); }} className="bg-error text-white rounded-full px-4 py-2 font-semibold shadow-soft hover:bg-error/90 transition-all">Remove</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
+        {/* Delete confirmation modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-overlay bg-opacity-50 z-50">
+            <div className="bg-surface p-6 rounded-md shadow-glass max-w-sm w-full">
+              <h2 className="text-lg font-bold mb-4">Confirm User Deletion</h2>
+              <p className="mb-2">To delete this user permanently, type <span className="font-mono font-bold">delete</span> below and press confirm.</p>
+              <input
+                type="text"
+                value={deleteInput}
+                onChange={e => setDeleteInput(e.target.value)}
+                className="w-full border border-metal p-2 rounded-md mb-4"
+                placeholder="Type 'delete' to confirm"
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-4 py-2 bg-gray-200 rounded-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteUser}
+                  disabled={deleteInput !== 'delete'}
+                  className={`px-4 py-2 rounded-md text-white ${deleteInput === 'delete' ? 'bg-danger hover:bg-danger-dark' : 'bg-gray-400 cursor-not-allowed'}`}
+                >
+                  Confirm Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

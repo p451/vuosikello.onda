@@ -60,17 +60,17 @@ export default function SignUp() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-sakura">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-surface p-6 shadow-soft">
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-surface p-6 shadow-card border border-border font-sans">
         <div>
-          <h2 className="text-center text-3xl font-bold tracking-tight text-textPrimary">
+          <h2 className="text-center text-h1 font-semibold text-textPrimary font-sans">
             Create a new account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSignUp}>
-          <div className="space-y-4 rounded-md shadow-sm">
+          <div className="space-y-4 rounded-md">
             <div>
-              <label htmlFor="organization-name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="organization-name" className="block text-sm font-medium text-textSecondary font-sans">
                 Organization Name
               </label>
               <input
@@ -78,14 +78,14 @@ export default function SignUp() {
                 name="organization"
                 type="text"
                 required
-                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
+                className="mt-1 block w-full rounded-lg border border-border px-3 py-2 bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder shadow-card focus:border-primary focus:ring-2 focus:ring-primary transition-all font-sans"
                 value={tenantName}
                 onChange={(e) => setTenantName(e.target.value)}
               />
             </div>
             <div className="flex gap-2">
               <div className="w-1/2">
-                <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="first-name" className="block text-sm font-medium text-textSecondary font-sans">
                   First name
                 </label>
                 <input
@@ -93,13 +93,13 @@ export default function SignUp() {
                   name="first-name"
                   type="text"
                   required
-                  className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
+                  className="mt-1 block w-full rounded-lg border border-border px-3 py-2 bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder shadow-card focus:border-primary focus:ring-2 focus:ring-primary transition-all font-sans"
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                 />
               </div>
               <div className="w-1/2">
-                <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="last-name" className="block text-sm font-medium text-textSecondary font-sans">
                   Last name
                 </label>
                 <input
@@ -107,70 +107,64 @@ export default function SignUp() {
                   name="last-name"
                   type="text"
                   required
-                  className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
+                  className="mt-1 block w-full rounded-lg border border-border px-3 py-2 bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder shadow-card focus:border-primary focus:ring-2 focus:ring-primary transition-all font-sans"
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                 />
               </div>
             </div>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Phone number
+              <label htmlFor="email" className="block text-sm font-medium text-textSecondary font-sans">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="mt-1 block w-full rounded-lg border border-border px-3 py-2 bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder shadow-card focus:border-primary focus:ring-2 focus:ring-primary transition-all font-sans"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-textSecondary font-sans">
+                Phone
               </label>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
-                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
+                className="mt-1 block w-full rounded-lg border border-border px-3 py-2 bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder shadow-card focus:border-primary focus:ring-2 focus:ring-primary transition-all font-sans"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                required
-                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-textSecondary font-sans">
                 Password
               </label>
               <input
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="new-password"
                 required
-                className="mt-1 block w-full rounded-md border border-metal px-3 py-2 shadow-sm focus:border-accentPink focus:outline-none focus:ring-accentPink"
+                className="mt-1 block w-full rounded-lg border border-border px-3 py-2 bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder shadow-card focus:border-primary focus:ring-2 focus:ring-primary transition-all font-sans"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
               />
             </div>
           </div>
-
-          {message && (
-            <div className="rounded-md bg-blue-50 p-4">
-              <div className="text-sm text-blue-700">{message}</div>
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-accentPink px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-accentPink focus:ring-offset-2"
-            >
-              {loading ? 'Creating account...' : 'Sign up'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-full rounded-full bg-primary text-white font-medium py-3 px-6 shadow-soft hover:bg-primaryHover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-all text-button font-sans"
+            disabled={loading}
+          >
+            {loading ? 'Creating account...' : 'Sign up'}
+          </button>
+          {message && <div className="mt-4 text-accent font-medium">{message}</div>}
         </form>
       </div>
     </div>
