@@ -153,7 +153,7 @@ export default function TenantAdminDashboard() {
             <option value="editor">Editor</option>
             <option value="admin">Admin</option>
           </select>
-          <button type="submit" className="bg-primary text-white rounded-full px-6 py-3 font-semibold shadow-soft hover:bg-primaryHover transition-all">Invite</button>
+          <button type="submit" className="bg-primary text-white rounded-lg px-6 py-3 font-semibold shadow-soft hover:bg-primaryHover transition-all">Invite</button>
         </form>
         <div className="mb-8">
           <h2 className="text-xl font-serif font-bold text-primary mb-4 tracking-elegant">Event Types</h2>
@@ -172,7 +172,7 @@ export default function TenantAdminDashboard() {
               className="w-8 h-8 border border-border rounded-lg shadow-subtle hover:shadow-soft transition-all cursor-pointer"
               title="Pick color"
             />
-            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-full font-serif tracking-elegant shadow-soft hover:shadow-softHover hover:bg-primaryHover transition-all border border-primary">Add</button>
+            <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg font-serif tracking-elegant shadow-soft hover:shadow-softHover hover:bg-primaryHover transition-all border border-primary">Add</button>
           </form>
           <ul>
             {eventTypes.map(type => (
@@ -181,7 +181,7 @@ export default function TenantAdminDashboard() {
                   <span className="w-4 h-4 rounded-md border border-border shadow-subtle" style={{ background: type.color || '#2196f3' }}></span>
                   <span className="text-textPrimary font-medium">{type.name}</span>
                 </span>
-                <button onClick={() => removeEventType(type.id)} className="text-error hover:text-error/80 font-serif tracking-elegant transition-all px-2">Remove</button>
+                <button onClick={() => removeEventType(type.id)} className="text-error hover:text-error/80 font-serif tracking-elegant transition-all px-2 rounded-lg">Remove</button>
               </li>
             ))}
           </ul>
@@ -204,7 +204,7 @@ export default function TenantAdminDashboard() {
                     <td className="px-6 py-4 border-b border-border">{user.role}</td>
                     <td className="px-6 py-4 border-b border-border">
                       <button
-                        className="px-3 py-1 rounded-lg bg-error text-white font-medium shadow-card hover:bg-error/90 transition-all border border-error text-xs"
+                        className="px-3 py-1 rounded-lg bg-error text-black font-medium shadow-card hover:bg-error/90 transition-all border border-error text-xs"
                         onClick={() => handleDeleteUser(user.user_id)}
                       >
                         Delete
@@ -232,14 +232,14 @@ export default function TenantAdminDashboard() {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 bg-gray-200 rounded-md"
+                  className="px-4 py-2 bg-gray-200 rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDeleteUser}
                   disabled={deleteInput !== 'delete'}
-                  className={`px-4 py-2 rounded-md text-white ${deleteInput === 'delete' ? 'bg-danger hover:bg-danger-dark' : 'bg-gray-400 cursor-not-allowed'}`}
+                  className={`px-4 py-2 rounded-lg ${deleteInput === 'delete' ? 'bg-error text-black hover:bg-error/90' : 'bg-gray-400 text-white cursor-not-allowed'}`}
                 >
                   Confirm Delete
                 </button>
