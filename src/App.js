@@ -33,6 +33,13 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Redirect to calendar if logged in and on login/signup page
+  useEffect(() => {
+    if (session && (window.location.pathname === '/login' || window.location.pathname === '/signup')) {
+      window.location.replace('/');
+    }
+  }, [session]);
+
   return (
     <Router>
       <TenantProvider>

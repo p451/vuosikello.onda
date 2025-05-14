@@ -763,8 +763,8 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       </div>
 
       {/* Add Detail Modal */}
-      {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface/90 p-6 rounded-lg w-full max-w-2xl shadow-modal border border-border backdrop-blur-sm">
+      {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
+          <div className="bg-surface p-6 rounded-lg w-full max-w-2xl shadow-modal border border-border">
             <div className="p-4 rounded-lg shadow-card" style={getEventTypeColor(selectedEvent.type)}>
               <h3 className="text-xl font-semibold tracking-wide">{selectedEvent.name}</h3>
               <p className="text-sm mt-2 text-textSecondary">
@@ -1058,7 +1058,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
 
       {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed right-8 top-20 w-full max-w-md bg-surface shadow-modal z-50 overflow-y-auto p-4 no-print rounded-lg border border-metal" style={{height: 'auto', maxHeight: '80vh'}}>
+        <div className="fixed right-8 top-20 w-full max-w-md bg-surface shadow-modal z-50 overflow-y-auto p-4 no-print rounded-lg border border-metal">
           <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out" onClick={() => setShowDayPanel(false)}>&times;</button>
           <h2 className="text-xl font-semibold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
           <button
