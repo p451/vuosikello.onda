@@ -760,10 +760,19 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
         {can('create') && (
           <button
             onClick={() => openAddEventModal()}
-            className="fixed bottom-8 right-8 z-50 bg-primary text-white font-medium rounded-lg shadow-card px-6 py-4 text-lg hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary no-print"
+            className="fixed bottom-4 right-2 z-50 bg-primary text-white font-medium rounded-full shadow-card px-4 py-2 text-base hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary no-print
+              sm:bottom-8 sm:right-8 sm:rounded-lg sm:px-6 sm:py-4 sm:text-lg"
             aria-label="Lisää tapahtuma"
+            style={{ minWidth: 'auto', minHeight: 'auto' }}
           >
-            Lisää tapahtuma
+            <span className="block sm:hidden">
+              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+              </svg>
+            </span>
+            <span className="hidden sm:block">Lisää tapahtuma</span>
           </button>
         )}
       </div>
