@@ -726,16 +726,25 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       {/* <div className="mb-4 space-y-2 sm:space-y-4 no-print"> ... </div> */}
       {/* POISTETAAN: vanha edellinen/seuraava ja kuukauden nimi */}
       {/* <div className="flex items-center gap-2 sm:gap-4 mb-4 no-print"> ... </div> */}
-      <div className="border rounded-lg shadow-modal bg-surface p-2 sm:p-4 calendar-container overflow-x-auto relative">
+      <div
+        className="border rounded-lg shadow-modal bg-surface p-2 sm:p-4 calendar-container overflow-x-auto relative w-screen max-w-none -mx-4 sm:mx-0"
+        style={{ minWidth: 0 }}
+      >
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4 calendar-header">
           <button
             onClick={() => {
-              const prev = new Date(currentDate);
-              prev.setMonth(currentDate.getMonth() - 1);
+              let prev = new Date(currentDate);
+              if (viewMode === 'month') {
+                prev.setMonth(currentDate.getMonth() - 1);
+              } else if (viewMode === 'week') {
+                prev.setDate(currentDate.getDate() - 7);
+              } else if (viewMode === 'day') {
+                prev.setDate(currentDate.getDate() - 1);
+              }
               setCurrentDate(prev);
             }}
             className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal"
-            aria-label="Edellinen kuukausi"
+            aria-label="Edellinen jakso"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
@@ -744,12 +753,18 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
           </h2>
           <button
             onClick={() => {
-              const next = new Date(currentDate);
-              next.setMonth(currentDate.getMonth() + 1);
+              let next = new Date(currentDate);
+              if (viewMode === 'month') {
+                next.setMonth(currentDate.getMonth() + 1);
+              } else if (viewMode === 'week') {
+                next.setDate(currentDate.getDate() + 7);
+              } else if (viewMode === 'day') {
+                next.setDate(currentDate.getDate() + 1);
+              }
               setCurrentDate(next);
             }}
             className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal"
-            aria-label="Seuraava kuukausi"
+            aria-label="Seuraava jakso"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
           </button>
