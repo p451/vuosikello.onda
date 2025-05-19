@@ -7,11 +7,10 @@ import { useTenant } from "../contexts/TenantContext";
 
 const SUPERADMINS = ["antoni.duhov@gmail.com"];
 
-const Sidebar = () => {
+const Sidebar = ({ open, setOpen }) => {
   const { userRole } = useRole();
   const { tenantId } = useTenant();
   const [user, setUser] = useState(null);
-  const [open, setOpen] = useState(false); // Sidebar closed by default
   const [tenantName, setTenantName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -221,18 +220,19 @@ const Sidebar = () => {
         <div className="p-2 sm:p-4 border-t border-accent bg-surface/95 rounded-b-lg">
           <button className="w-full py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-primary hover:bg-highlight shadow-card transition-all text-left">Oma profiili</button>
         </div>
-      </aside>
-      {/* Sidebar toggle button, always visible at bottom left */}
+      </aside>      {/* Floating sidebar toggle button */}
       {!open && (
-        <div className="fixed bottom-4 left-2 z-50 sm:bottom-8 sm:left-4">
+        <div className="fixed top-4 left-2 z-50 sm:top-6 sm:left-4">
           <button
-            className="rounded-full bg-surface shadow-card border border-accent p-2 sm:p-3 flex items-center justify-center transition-all duration-[1200ms] ease-in-out hover:scale-110 shimmer-arrow"
+            className="rounded-full bg-surface shadow-modal border border-accent p-2 sm:p-3 flex items-center justify-center transition-all duration-200 ease-in-out hover:bg-secondary"
             onClick={() => setOpen(true)}
             aria-label="Avaa sivupalkki"
           >
-            {/* Arrow icon for opening sidebar */}
-            <svg width="24" height="24" stroke="#2E2E2E" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10 6l6 6-6 6" />
+            {/* Hamburger menu icon */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 12H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 6H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 18H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>

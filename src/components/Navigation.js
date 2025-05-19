@@ -3,15 +3,12 @@ import { Link } from 'react-router-dom';
 import { useRole } from '../contexts/RoleContext';
 import { supabase } from '../supabaseClient';
 import { useState, useEffect } from 'react';
-import { useTenant } from '../contexts/TenantContext';
 
 const SUPERADMINS = ['antoni.duhov@gmail.com']; // <-- replace with your email
 
 export default function Navigation() {
   const { userRole } = useRole();
-  const { tenantId } = useTenant();
   const [user, setUser] = useState(null);
-  const [tenantName, setTenantName] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -22,35 +19,14 @@ export default function Navigation() {
     getUser();
   }, []);
 
-  useEffect(() => {
-    const fetchTenantName = async () => {
-      if (!tenantId || !user) return;
-      try {
-        const { data, error, status } = await supabase
-          .from('tenants')
-          .select('name')
-          .eq('id', tenantId)
-          .single();
-        if (!error && data) setTenantName(data.name);
-        else if (status === 406) setTenantName(''); // Gracefully handle 406 (unauthenticated)
-      } catch (err) {
-        setTenantName(''); // Fallback: clear tenant name on error
-      }
-    };
-    fetchTenantName();
-  }, [tenantId, user]);
-
   return (
     <nav className="bg-background text-textPrimary p-2 sm:p-4 border-b border-metal font-sans">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
-        {/* Show tenant name only if user is logged in */}
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+        {/* Centered AIKUMO header */}
+        <div className="flex items-center gap-2 w-full justify-center">
           <Link to="/" className="text-xl sm:text-h1 font-semibold uppercase tracking-wide select-none transition-all duration-200 ease-in-out">
             Aikumo
           </Link>
-          {user && tenantName && (
-            <span className="ml-2 text-sm sm:text-base font-medium text-primary bg-surface px-2 py-1 rounded-lg border border-primary transition-all duration-200 ease-in-out">{tenantName}</span>
-          )}
           <div className="sm:hidden ml-auto">
             <button
               onClick={() => setMenuOpen(!menuOpen)}

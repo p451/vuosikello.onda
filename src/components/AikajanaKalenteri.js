@@ -3,7 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 
-const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('month');
+const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMode, setViewMode] = useState('month');
   // eslint-disable-next-line no-unused-vars
   const [selectedLayer, setSelectedLayer] = useState('all');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -273,13 +273,12 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     } catch (error) {
       console.error('Error updating event:', error);
     }
-  };
-  // Fetch comments for an event
+  };  // Fetch comments for an event
   const fetchComments = async (eventId) => {
     setCommentLoading(true);
     const { data, error } = await supabase
       .from('event_comments')
-      .select('*, profiles: user_id (email)')
+      .select('*, profiles: user_id (email, name, first_name, last_name)')
       .eq('event_id', eventId)
       .order('created_at', { ascending: true });
     if (error) {
@@ -494,20 +493,26 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
     printWindow.document.close();
     printWindow.print();
   };
-
-  // Update the EventItem component to use absolute positioning to fill the day cell in mobile
+  // Update the EventItem component to better handle scaling and spacing
   const EventItem = ({ event, onClick, scale = 1 }) => (
     <div 
       onClick={onClick}
-      className={`event-row rounded-md cursor-pointer hover:opacity-80 hover:shadow-card transition-all duration-200 ease-in-out flex items-center justify-center bg-primary text-white font-medium text-xs sm:text-sm overflow-hidden m-0 p-0`}
-      style={{ ...getEventTypeColor(event.type), fontSize: scale < 1 ? `${scale}em` : undefined, minHeight: '100%', minWidth: '100%', position: 'static' }}
+      className="event-row rounded-md cursor-pointer hover:opacity-80 hover:shadow-card transition-all duration-200 ease-in-out flex items-center justify-center bg-primary text-white font-medium text-xs sm:text-sm overflow-hidden m-0 p-0"
+      style={{ 
+        ...getEventTypeColor(event.type), 
+        fontSize: scale < 1 ? `${scale}em` : undefined, 
+        minHeight: '1.5em',
+        height: 'auto',
+        width: '100%',
+        position: 'relative'
+      }}
       title={event.name}
     >
-      <span className="truncate block w-full text-center leading-tight px-1">{event.name}</span>
+      <span className="truncate block w-full text-center leading-tight px-1 py-0.5">{event.name}</span>
     </div>
   );
 
-  // Update renderDayEvents to wrap EventItem in a relative container for mobile
+  // Update renderDayEvents to scale events properly based on count
   const renderDayEvents = (eventsForType, day, type) => {
     if (!visibleEventTypes.includes(type)) return null;
     const eventsArr = eventsForType || [];
@@ -520,9 +525,12 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
         (selectedLayer === 'all' || selectedLayer === type);
     });
     if (matchingEvents.length === 0) return null;
-    const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.2);
+    
+    // Calculate scale based on number of events - more aggressive scaling for many events
+    const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.15);
+    
     return (
-      <div className="relative w-full h-7 sm:h-auto">
+      <div className="relative w-full flex flex-col gap-1">
         {matchingEvents.map((event, idx) => (
           <EventItem 
             key={event.id}
@@ -552,7 +560,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       }
 
       return (
-        <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1 w-full mx-0 px-0">
           {['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'].map(day => (
             <div key={day} className="p-2 text-center font-bold bg-sakura day-header">
               {day}
@@ -590,15 +598,26 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       const weekDays = getWeekDays(currentDate);
       
       return (
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1 w-full mx-0 px-0">
+          {['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'].map(day => (
+            <div key={day} className="p-2 text-center font-bold bg-sakura day-header font-sans text-xs sm:text-base uppercase tracking-wide text-textPrimary">
+              {day}
+            </div>
+          ))}
           {weekDays.map((day, index) => (
-            <div key={index} className="border p-2 sm:p-4 min-h-[300px] sm:min-h-[400px]">
-              <div className="font-bold text-center mb-4 sm:mb-6 text-base sm:text-xl">
-                {day.toLocaleDateString('fi-FI', { weekday: 'short' })}<br />
-                {day.getDate()}.{day.getMonth() + 1}.
+            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell bg-surface/90 rounded-lg shadow-card text-xs sm:text-base font-sans text-textPrimary">
+              <div className="flex justify-between items-start">
+                <button
+                  className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary"
+                  style={{ lineHeight: 1.2 }}
+                  onClick={() => handleDayClick(day)}
+                  tabIndex={0}
+                  aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
+                >
+                  {day.getDate()}
+                </button>
               </div>
-              <div className="space-y-2">
-                {/* Other event types */}
+              <div className="space-y-1 flex flex-col mt-1">
                 {Object.keys(events).map(type => (
                   <div key={type} className="event-row min-h-[1.5rem]">
                     {renderDayEvents(events[type], day, type)}
@@ -611,8 +630,10 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
       );
     } else {
       return (
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold">{formatDate(currentDate)}</h2>
+        <div className="space-y-4 bg-surface/90 rounded-lg shadow-card p-4">
+          <h2 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary mb-2">
+            {formatDate(currentDate)}
+          </h2>
           <div className="space-y-2">
             {/* Other event types */}
             {Object.keys(events).map(type => (
@@ -664,9 +685,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
         </button>
       ))}
     </div>
-  );
-
-  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans">
+  );  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans">
       <style>
         {`
           @media print {
@@ -722,13 +741,13 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
           }
         `}
       </style>
-      {/* POISTETAAN: näkymän valinta, tapahtumatyypin valinta, print-napit, lisää tapahtuma */}
-      {/* <div className="mb-4 space-y-2 sm:space-y-4 no-print"> ... </div> */}
-      {/* POISTETAAN: vanha edellinen/seuraava ja kuukauden nimi */}
-      {/* <div className="flex items-center gap-2 sm:gap-4 mb-4 no-print"> ... </div> */}
-      <div
-        className="border rounded-lg shadow-modal bg-surface p-2 sm:p-4 calendar-container overflow-x-auto relative w-screen max-w-none -mx-4 sm:mx-0"
-        style={{ minWidth: 0 }}
+      
+      {/* Centered Aikumo Header, unified with calendar headers */}
+      <div className="text-center mb-6">
+        <h1 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary select-none">Aikumo</h1>
+      </div>
+      <div className="border rounded-lg shadow-modal bg-surface calendar-container overflow-x-auto relative w-full sm:max-w-5xl sm:mx-auto"
+        style={{ maxWidth: '100%' }}
       >
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4 calendar-header">
           <button
@@ -748,7 +767,7 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
-          <h2 className="text-center text-h1 font-semibold font-sans uppercase tracking-wide m-0 p-0 select-none">
+          <h2 className="text-center text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary m-0 p-0 select-none">
             {currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })}
           </h2>
           <button
@@ -771,27 +790,38 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
         </div>
         {renderContent()}
         <ColorLegend />
-        {/* UUSI: brändin mukainen kelluva nappi oikeaan alakulmaan */}
-        {can('create') && (
+        {/* Floating add event button, hidden when add modal is open */}
+        {can('create') && !showAddModal && (
           <button
             onClick={() => openAddEventModal()}
-            className="fixed bottom-4 right-2 z-50 bg-primary text-white font-medium rounded-full shadow-card px-4 py-2 text-base hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary no-print
-              sm:bottom-8 sm:right-8 sm:rounded-lg sm:px-6 sm:py-4 sm:text-lg"
+            className="fixed bottom-6 right-6 z-50 bg-primary text-white font-medium rounded-full shadow-modal p-4 text-base hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary no-print flex items-center justify-center hover:scale-110"
             aria-label="Lisää tapahtuma"
-            style={{ minWidth: 'auto', minHeight: 'auto' }}
           >
-            <span className="block sm:hidden">
-              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-              </svg>
-            </span>
-            <span className="hidden sm:block">Lisää tapahtuma</span>
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="16" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
           </button>
         )}
       </div>
-
+      {/* Hide sidebar toggle button when add modal is open */}
+      {!showAddModal && !sidebarOpen && (
+        <div className="fixed top-4 left-2 z-50 sm:top-6 sm:left-4">
+          <button
+            className="rounded-full bg-surface shadow-modal border border-accent p-2 sm:p-3 flex items-center justify-center transition-all duration-200 ease-in-out hover:bg-secondary"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Avaa sivupalkki"
+          >
+            {/* Hamburger menu icon */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 12H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 6H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 18H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      )}
       {/* Add Detail Modal */}
       {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
           <div className="bg-surface p-6 rounded-lg w-full max-w-2xl shadow-modal border border-border">
@@ -811,26 +841,35 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
             </div>
             {/* Comment Section */}
             <div className="mt-6">
-              <h4 className="font-semibold mb-2">Kommentit</h4>
-              {commentLoading ? <div>Ladataan...</div> : (
-                <ul className="mb-4">
-                  {comments.filter(c => !c.parent_comment_id).map(comment => (
-                    <li key={comment.id} className="mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold">{comment.profiles?.email || comment.user_id}</span>
-                        <span className="text-xs text-lowlightText">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
+              <h4 className="font-semibold mb-2 text-black font-sans tracking-elegant">Kommentit</h4>
+              {commentLoading ? <div className="text-center text-lowlightText font-sans">Ladataan...</div> : (
+                <ul className="mb-4 space-y-3">                  {comments.filter(c => !c.parent_comment_id).map(comment => (
+                    <li key={comment.id} className="mb-2 p-2 bg-surface/80 rounded-lg border border-border shadow-card">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-black font-sans">
+                          {comment.profiles?.name || 
+                           (comment.profiles?.first_name || comment.profiles?.last_name) ? 
+                             `${comment.profiles?.first_name || ''} ${comment.profiles?.last_name || ''}`.trim() : 
+                             comment.profiles?.email || comment.user_id}
+                        </span>
+                        <span className="text-xs text-lowlightText font-sans">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
                       </div>
-                      <div className="ml-2">{comment.content}</div>
-                      <button className="text-accentPink text-xs ml-2" onClick={() => { setReplyTo(comment.id); commentInputRef.current?.focus(); }}>Vastaa</button>
+                      <div className="ml-2 text-textPrimary font-sans">{comment.content}</div>
+                      <button className="text-accentPink text-xs ml-2 font-sans hover:underline" onClick={() => { setReplyTo(comment.id); commentInputRef.current?.focus(); }}>Vastaa</button>
                       {/* Replies */}
-                      <ul className="ml-6 mt-1">
+                      <ul className="ml-6 mt-1 space-y-2">
                         {comments.filter(c => c.parent_comment_id === comment.id).map(reply => (
-                          <li key={reply.id} className="mb-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold">{reply.profiles?.email || reply.user_id}</span>
-                              <span className="text-xs text-lowlightText">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
+                          <li key={reply.id} className="mb-1 p-2 bg-surface/60 rounded border border-border">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-bold text-black font-sans">
+                                {reply.profiles?.name || 
+                                 (reply.profiles?.first_name || reply.profiles?.last_name) ? 
+                                   `${reply.profiles?.first_name || ''} ${reply.profiles?.last_name || ''}`.trim() : 
+                                   reply.profiles?.email || reply.user_id}
+                              </span>
+                              <span className="text-xs text-lowlightText font-sans">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
                             </div>
-                            <div className="ml-2">{reply.content}</div>
+                            <div className="ml-2 text-textPrimary font-sans">{reply.content}</div>
                           </li>
                         ))}
                       </ul>
@@ -838,17 +877,17 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
                   ))}
                 </ul>
               )}
-              <form onSubmit={e => { e.preventDefault(); addComment(selectedEvent.id, newComment, replyTo); }} className="flex gap-2 items-center">
+              <form onSubmit={e => { e.preventDefault(); addComment(selectedEvent.id, newComment, replyTo); }} className="flex gap-2 items-center mt-2">
                 <input
                   ref={commentInputRef}
                   type="text"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out font-sans"
                   placeholder={replyTo ? 'Vastaa kommenttiin...' : 'Lisää kommentti...'}
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                 />
-                {replyTo && <button type="button" className="text-xs text-lowlightText" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
-                <button type="submit" className="px-3 py-1 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary">Lähetä</button>
+                {replyTo && <button type="button" className="text-xs text-lowlightText font-sans" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
+                <button type="submit" className="px-3 py-1 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary font-sans">Lähetä</button>
               </form>
             </div>
             <div className="mt-6 flex justify-end gap-2">
@@ -1084,12 +1123,10 @@ const AikajanaKalenteri = () => {  const [viewMode, setViewMode] = useState('mon
             </div>
           </div>
         </div>
-      )}
-
-      {/* Add Day Panel */}
+      )}      {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/40">
-          <div className="relative w-full max-w-xs sm:max-w-md bg-surface shadow-modal overflow-y-auto p-3 sm:p-4 no-print rounded-lg border border-metal max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-lowlightBg/80">
+          <div className="relative w-full max-w-xs sm:max-w-md bg-surface/90 backdrop-blur-sm shadow-modal overflow-y-auto p-3 sm:p-4 no-print rounded-lg border border-border max-h-[90vh]">
             <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out" onClick={() => setShowDayPanel(false)}>&times;</button>
             <h2 className="text-lg sm:text-xl font-semibold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
             <button

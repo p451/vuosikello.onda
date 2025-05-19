@@ -1,10 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import Auth from './components/Auth';
 import SignUp from './components/SignUp';
-import Navigation from './components/Navigation';
 import AikajanaKalenteri from './components/AikajanaKalenteri';
 import TenantAdminDashboard from './components/TenantAdminDashboard';
 import SuperAdminDashboard from './components/SuperAdminDashboard';
@@ -18,6 +16,8 @@ import './aikumo-teema.css';
 
 function App() {
   const [session, setSession] = useState(null);
+  // Sidebar open state lifted here
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,11 +45,10 @@ function App() {
       <TenantProvider>
         <RoleProvider>
           <div className="App min-h-screen bg-background font-sans text-textPrimary">
-            {session && <Sidebar />}
-            {session && <Navigation />}
-            <main className="pt-4 pb-8 px-2 sm:px-8">
+            {session && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />}
+            <main className={`pt-4 pb-8 ${session ? 'px-0 sm:px-8' : 'px-2 sm:px-8'} sm:max-w-7xl sm:mx-auto`}>
               <Routes>
-                <Route path="/" element={session ? <AikajanaKalenteri /> : <Navigate to="/login" />} />
+                <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> : <Navigate to="/login" />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/admin" element={<TenantAdminDashboard />} />

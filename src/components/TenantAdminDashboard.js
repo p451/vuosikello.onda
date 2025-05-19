@@ -13,8 +13,7 @@ export default function TenantAdminDashboard() {
   const [eventTypes, setEventTypes] = useState([]);
   const [newEventType, setNewEventType] = useState('');
   const [newEventTypeColor, setNewEventTypeColor] = useState('#2196f3');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteInput, setDeleteInput] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);  const [deleteInput, setDeleteInput] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
 
   // Move fetchUsers to top-level so it's defined before useEffect and can be called anywhere
@@ -23,12 +22,14 @@ export default function TenantAdminDashboard() {
     setLoading(true);
     const { data, error } = await supabase
       .from('user_roles')
-      .select('*, profiles: user_id (email)')
+      .select('*, profiles: user_id (email, name, last_name, first_name)')
       .eq('tenant_id', tenantId);
-    if (!error && data) {
-      setUsers(data.map(u => ({
+    if (!error && data) {      setUsers(data.map(u => ({
         ...u,
-        email: u.profiles?.email || u.email || u.user_id // fallback to user_id if no email
+        email: u.profiles?.email || u.email || u.user_id, // fallback to user_id if no email
+        name: u.profiles?.name || ((u.profiles?.first_name && u.profiles?.last_name) ? 
+          `${u.profiles.first_name} ${u.profiles.last_name}` : 
+          u.profiles?.first_name || u.profiles?.last_name || null)
       })));
     }
     setLoading(false);
@@ -186,21 +187,29 @@ export default function TenantAdminDashboard() {
             ))}
           </ul>
         </div>
-        <div>
-          <h2 className="admin-header text-lg sm:text-xl font-serif font-bold text-primary mb-2 sm:mb-4 tracking-elegant">Current Users</h2>
+        <div>          <h2 className="admin-header text-lg sm:text-xl font-serif font-bold text-primary mb-2 sm:mb-4 tracking-elegant">Current Users</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-surface/80 rounded-lg shadow-card border border-border text-xs sm:text-sm md:text-base">
               <thead>
                 <tr>
-                  <th className="px-2 sm:px-6 py-2 sm:py-3 border-b border-border text-left">Email</th>
+                  <th className="px-2 sm:px-6 py-2 sm:py-3 border-b border-border text-left">User</th>
                   <th className="px-2 sm:px-6 py-2 sm:py-3 border-b border-border text-left">Role</th>
                   <th className="px-2 sm:px-6 py-2 sm:py-3 border-b border-border text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map(user => (
-                  <tr key={user.id} className="hover:bg-secondary/10 transition-all">
-                    <td className="px-2 sm:px-4 py-2 text-textPrimary text-xs sm:text-sm">{user.email || user.user_id}</td>
+                  <tr key={user.user_id} className="hover:bg-secondary/10 transition-all">
+                    <td className="px-2 sm:px-4 py-2 text-textPrimary text-xs sm:text-sm">
+                      {user.name ? (
+                        <div>
+                          <div className="font-medium">{user.name}</div>
+                          <div className="text-textSecondary text-xs">{user.email || user.user_id}</div>
+                        </div>
+                      ) : (
+                        user.email || user.user_id
+                      )}
+                    </td>
                     <td className="px-2 sm:px-6 py-2 sm:py-4 border-b border-border">{user.role}</td>
                     <td className="px-2 sm:px-6 py-2 sm:py-4 border-b border-border">
                       <button
