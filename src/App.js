@@ -66,7 +66,7 @@ function App() {
             {session && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} />}
             <main className={`pt-4 pb-8 ${session ? 'px-0 sm:px-8' : 'px-2 sm:px-8'} sm:max-w-7xl sm:mx-auto`}>
               <Routes>
-                <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} /> : <Navigate to="/login" />} />
+                <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> : <Navigate to="/login" />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/admin" element={<TenantAdminDashboard darkMode={darkMode} setDarkMode={setDarkMode} />} />

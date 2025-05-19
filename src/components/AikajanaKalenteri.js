@@ -3,7 +3,18 @@ import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 
-const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode }) => {  const [viewMode, setViewMode] = useState('month');
+// Helper to format author name (prioritize profile fields)
+const getAuthorName = (profile, userId) => {
+  if (!profile) return userId;
+  if (profile.name) return profile.name;
+  if (profile.first_name || profile.last_name) {
+    return `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+  }
+  const metaName = profile.user_metadata?.name;
+  return metaName || profile.email || userId;
+};
+
+const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMode, setViewMode] = useState('month');
   // eslint-disable-next-line no-unused-vars
   const [selectedLayer, setSelectedLayer] = useState('all');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -276,36 +287,57 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode 
   };  // Fetch comments for an event
   const fetchComments = async (eventId) => {
     setCommentLoading(true);
-    const { data, error } = await supabase
-      .from('event_comments')
-      .select('*, profiles: user_id (email, name, first_name, last_name)')
-      .eq('event_id', eventId)
-      .order('created_at', { ascending: true });
-    if (error) {
-      console.error('Error fetching comments:', error);
-      return;
+    try {
+      // Fetch comments without join
+      const { data: commentsData, error: commentsError } = await supabase
+        .from('event_comments')
+        .select('id, content, created_at, parent_comment_id, user_id')
+        .eq('event_id', eventId)
+        .order('created_at', { ascending: true });
+      if (commentsError) throw commentsError;
+      const commentsList = commentsData || [];
+      // Fetch corresponding profiles
+      const userIds = Array.from(new Set(commentsList.map(c => c.user_id)));
+      let profiles = [];
+      if (userIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, name, first_name, last_name, email, user_metadata')
+          .in('id', userIds);
+        if (profilesError) throw profilesError;
+        profiles = profilesData;
+      }
+      // Attach profile to each comment
+      setComments(
+        commentsList.map(comment => ({
+          ...comment,
+          profile: profiles.find(p => p.id === comment.user_id) || null
+        }))
+      );
+    } catch (err) {
+      console.error('Error fetching comments:', err);
+    } finally {
+      setCommentLoading(false);
     }
-    setComments(data || []);
-    setCommentLoading(false);
   };
 
   // Add comment
   const addComment = async (eventId, content, parentId = null) => {
     setCommentLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from('event_comments').insert([
-      {
-        event_id: eventId,
-        user_id: user.id,
-        tenant_id: tenantId,
-        content,
-        parent_comment_id: parentId
-      }
-    ]);
-    setNewComment('');
-    setReplyTo(null);
-    await fetchComments(eventId);
-    setCommentLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('event_comments')
+        .insert([{ event_id: eventId, user_id: user.id, tenant_id: tenantId, content, parent_comment_id: parentId }]);
+      if (error) throw error;
+      setNewComment('');
+      setReplyTo(null);
+      await fetchComments(eventId);
+    } catch (err) {
+      console.error('Error adding comment:', err);
+    } finally {
+      setCommentLoading(false);
+    }
   };
 
   // Update handleEventClick to show detail view first
@@ -814,9 +846,9 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode 
             aria-label="Avaa sivupalkki"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 12H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 6H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 18H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 12H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 6H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
@@ -846,10 +878,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode 
                     <li key={comment.id} className="mb-2 p-2 bg-surface/80 rounded-lg border border-border shadow-card dark:bg-darkSurface/80 dark:border-darkBorder dark:text-darkTextPrimary">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-bold text-black font-sans dark:text-darkTextPrimary">
-                          {comment.profiles?.name || 
-                           (comment.profiles?.first_name || comment.profiles?.last_name) ? 
-                             `${comment.profiles?.first_name || ''} ${comment.profiles?.last_name || ''}`.trim() : 
-                             comment.profiles?.email || comment.user_id}
+                          {getAuthorName(comment.profile, comment.user_id)}
                         </span>
                         <span className="text-xs text-lowlightText font-sans dark:text-darkLowlightText">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
                       </div>
@@ -861,10 +890,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode 
                           <li key={reply.id} className="mb-1 p-2 bg-surface/60 rounded border border-border dark:bg-darkSurface/60 dark:border-darkBorder dark:text-darkTextPrimary">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-bold text-black font-sans dark:text-darkTextPrimary">
-                                {reply.profiles?.name || 
-                                 (reply.profiles?.first_name || reply.profiles?.last_name) ? 
-                                   `${reply.profiles?.first_name || ''} ${reply.profiles?.last_name || ''}`.trim() : 
-                                   reply.profiles?.email || reply.user_id}
+                                {getAuthorName(reply.profile, reply.user_id)}
                               </span>
                               <span className="text-xs text-lowlightText font-sans dark:text-darkLowlightText">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
                             </div>
