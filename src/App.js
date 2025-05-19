@@ -6,6 +6,7 @@ import SignUp from './components/SignUp';
 import AikajanaKalenteri from './components/AikajanaKalenteri';
 import TenantAdminDashboard from './components/TenantAdminDashboard';
 import SuperAdminDashboard from './components/SuperAdminDashboard';
+import Tasks from './components/Tasks';
 import ResetPassword from './components/ResetPassword';
 import ActivateAccount from './components/ActivateAccount';
 import Sidebar from './components/Sidebar';
@@ -73,6 +74,7 @@ function App() {
                 <Route path="/superadmin" element={<SuperAdminDashboard />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/activate" element={<ActivateAccount />} />
+                <Route path="/tasks" element={session ? <Tasks /> : <Navigate to="/login" />} />
               </Routes>
             </main>
           </div>

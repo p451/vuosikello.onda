@@ -198,8 +198,11 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
             )}
             <Link to="/"
               className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
-                ${isActive('/') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
-            >Calendar</Link>
+                ${isActive('/') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}            >Calendar</Link>
+            <Link to="/tasks"
+              className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
+                ${isActive('/tasks') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
+            >Tasks</Link>
             <div className="mt-2 sm:mt-4 mb-1 sm:mb-2 text-xs text-textSecondary uppercase tracking-wide dark:text-darkTextSecondary">Näkymä</div>
             <button
               className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
