@@ -4,8 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light mode styles (default) */
 .App {
   @apply min-h-screen bg-background font-sans text-textPrimary;
+}
+
+/* Dark mode styles */
+.dark .App {
+  @apply bg-darkBackground text-darkTextPrimary;
 }
 
 hr, .separator {
@@ -30,6 +36,20 @@ hr, .separator {
 
 .btn-accent {
   @apply inline-flex items-center justify-center bg-accent text-white font-semibold py-2 px-6 rounded-full shadow-soft hover:bg-highlight focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50 transition-all;
+}
+
+/* Dark mode for cards, buttons, etc. */
+.dark .card, .dark .glass {
+  @apply bg-darkSurface border-darkBorder text-darkTextPrimary;
+}
+.dark .btn-primary {
+  @apply bg-darkPrimary text-darkTextPrimary hover:bg-darkHighlight;
+}
+.dark .btn-secondary {
+  @apply bg-darkSecondary text-darkTextPrimary hover:bg-darkAccent;
+}
+.dark .btn-accent {
+  @apply bg-darkAccent text-darkTextPrimary hover:bg-darkHighlight;
 }
 
 .color-legend {

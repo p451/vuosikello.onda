@@ -16,8 +16,17 @@ import './aikumo-teema.css';
 
 function App() {
   const [session, setSession] = useState(null);
-  // Sidebar open state lifted here
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Dark mode state
+  const [darkMode, setDarkMode] = useState(() => {
+    // Try to load from localStorage or use prefers-color-scheme
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('aikumo-darkmode');
+      if (stored !== null) return stored === 'true';
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -33,6 +42,15 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('aikumo-darkmode', darkMode);
+  }, [darkMode]);
+
   // Redirect to calendar if logged in and on login/signup page
   useEffect(() => {
     if (session && (window.location.pathname === '/login' || window.location.pathname === '/signup')) {
@@ -44,14 +62,14 @@ function App() {
     <Router>
       <TenantProvider>
         <RoleProvider>
-          <div className="App min-h-screen bg-background font-sans text-textPrimary">
-            {session && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />}
+          <div className={`App min-h-screen font-sans text-textPrimary ${darkMode ? 'dark bg-darkBackground text-darkTextPrimary' : 'bg-background text-textPrimary'}`}>
+            {session && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} />}
             <main className={`pt-4 pb-8 ${session ? 'px-0 sm:px-8' : 'px-2 sm:px-8'} sm:max-w-7xl sm:mx-auto`}>
               <Routes>
-                <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> : <Navigate to="/login" />} />
+                <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} /> : <Navigate to="/login" />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/admin" element={<TenantAdminDashboard />} />
+                <Route path="/admin" element={<TenantAdminDashboard darkMode={darkMode} setDarkMode={setDarkMode} />} />
                 <Route path="/superadmin" element={<SuperAdminDashboard />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/activate" element={<ActivateAccount />} />

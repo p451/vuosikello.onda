@@ -1,20 +1,40 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class', // Enable Tailwind dark mode via class
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
+    "./public/index.html",
   ],
   theme: {
     extend: {
       colors: {
-        background: '#F7F7F7', // Off-white, soft background
-        surface: 'rgba(255,255,255,0.7)', // Glassmorphism surface
-        primary: '#F4C6A6', // Pantone 2025 Peach Fuzz
-        primaryHover: '#eebd98', // Add missing primaryHover for hover:bg-primaryHover
-        secondary: '#8AB9E2', // Hillitty vaaleansininen
-        accent: '#B3B3B3', // Vaalea harmaa der
-        highlight: '#F9E6D2', // Add highlight for hover:bg-highlight
-        textPrimary: '#2E2E2E', // Tummanharmaa
-        textSecondary: '#4A4A4A', // Keskitumma harmaa
+        background: '#F8F7F4',
+        surface: '#FFFFFF',
+        primary: '#F4C6A6',
+        secondary: '#8AB9E2',
+        accent: '#F4A6C6',
+        accentPink: '#F4A6C6',
+        error: '#E57373',
+        lowlightBg: '#F8F7F4',
+        lowlightText: '#B0B0B0',
+        textPrimary: '#2E2E2E',
+        textSecondary: '#6B7280',
+        // Dark mode colors
+        darkBackground: '#18181B',
+        darkSurface: '#23232A',
+        darkPrimary: '#F4C6A6',
+        darkSecondary: '#8AB9E2',
+        darkAccent: '#F4A6C6',
+        darkError: '#E57373',
+        darkLowlightBg: '#23232A',
+        darkLowlightText: '#888',
+        darkTextPrimary: '#F8F7F4',
+        darkTextSecondary: '#B0B0B0',
+        darkBorder: '#393950',
+        darkHighlight: '#2A2A3A',
+        // Add missing custom color for hover:bg-primaryHover and hover:bg-highlight
+        primaryHover: '#eebd97',
+        highlight: '#f7e6d6',
       },
       fontFamily: {
         sans: ['IBM Plex Sans', 'sans-serif'],
@@ -62,6 +82,5 @@ module.exports = {
       },
     },
   },
-  darkMode: 'class',
   plugins: [require('tailwindcss-filters')],
 }

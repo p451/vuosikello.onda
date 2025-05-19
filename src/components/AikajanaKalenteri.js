@@ -3,7 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 
-const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMode, setViewMode] = useState('month');
+const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode }) => {  const [viewMode, setViewMode] = useState('month');
   // eslint-disable-next-line no-unused-vars
   const [selectedLayer, setSelectedLayer] = useState('all');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -562,17 +562,17 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       return (
         <div className="grid grid-cols-7 gap-0.5 sm:gap-1 w-full mx-0 px-0">
           {['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'].map(day => (
-            <div key={day} className="p-2 text-center font-bold bg-sakura day-header">
+            <div key={day} className="p-2 text-center font-bold bg-sakura day-header font-sans text-xs sm:text-base uppercase tracking-wide text-textPrimary dark:bg-darkSurface dark:text-darkTextPrimary">
               {day}
             </div>
           ))}
           {days.map((day, index) => (
-            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base">
+            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base font-sans text-textPrimary bg-surface/90 rounded-lg shadow-card dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
               {day ? (
                 <>
                   <div className="flex justify-between items-start">
                     <button
-                      className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none"
+                      className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary dark:text-darkTextPrimary"
                       style={{ lineHeight: 1.2 }}
                       onClick={() => handleDayClick(day)}
                       tabIndex={0}
@@ -600,15 +600,15 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       return (
         <div className="grid grid-cols-7 gap-0.5 sm:gap-1 w-full mx-0 px-0">
           {['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'].map(day => (
-            <div key={day} className="p-2 text-center font-bold bg-sakura day-header font-sans text-xs sm:text-base uppercase tracking-wide text-textPrimary">
+            <div key={day} className="p-2 text-center font-bold bg-sakura day-header font-sans text-xs sm:text-base uppercase tracking-wide text-textPrimary dark:bg-darkSurface dark:text-darkTextPrimary">
               {day}
             </div>
           ))}
           {weekDays.map((day, index) => (
-            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell bg-surface/90 rounded-lg shadow-card text-xs sm:text-base font-sans text-textPrimary">
+            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell bg-surface/90 rounded-lg shadow-card text-xs sm:text-base font-sans text-textPrimary dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
               <div className="flex justify-between items-start">
                 <button
-                  className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary"
+                  className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary dark:text-darkTextPrimary"
                   style={{ lineHeight: 1.2 }}
                   onClick={() => handleDayClick(day)}
                   tabIndex={0}
@@ -630,14 +630,14 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       );
     } else {
       return (
-        <div className="space-y-4 bg-surface/90 rounded-lg shadow-card p-4">
-          <h2 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary mb-2">
+        <div className="space-y-4 bg-surface/90 rounded-lg shadow-card p-4 dark:bg-darkSurface dark:text-darkTextPrimary">
+          <h2 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary mb-2 dark:text-darkTextPrimary">
             {formatDate(currentDate)}
           </h2>
           <div className="space-y-2">
             {/* Other event types */}
             {Object.keys(events).map(type => (
-              <div key={type} className="event-row min-h-[1.5rem]">
+              <div key={type} className="event-row min-h-[1.5rem] dark:bg-darkSurface/90 dark:text-darkTextPrimary">
                 {renderDayEvents(events[type], currentDate, type)}
               </div>
             ))}
@@ -671,7 +671,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
           className={`legend-item flex items-center gap-1 px-2 py-1 rounded-lg transition-all duration-200 ease-in-out cursor-pointer hover:shadow-card
             ${visibleEventTypes.includes(type.name) 
               ? 'bg-accent/30 border-accent/30 border shadow-modal' 
-              : 'bg-surface border-metal border opacity-50 hover:opacity-80'}`}
+              : 'bg-surface border-metal border opacity-50 hover:opacity-80 dark:bg-darkSurface dark:border-darkBorder'}`}
           onClick={() => {
             setVisibleEventTypes(prev =>
               prev.includes(type.name)
@@ -681,11 +681,11 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
           }}
         >
           <div className="legend-color w-4 h-4 rounded-lg" style={{ backgroundColor: type.color }}></div>
-          <span className="font-medium text-xs">{type.name}</span>
+          <span className="font-medium text-xs dark:text-darkTextPrimary">{type.name}</span>
         </button>
       ))}
     </div>
-  );  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans">
+  );  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans dark:bg-darkBackground">
       <style>
         {`
           @media print {
@@ -744,9 +744,9 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       
       {/* Centered Aikumo Header, unified with calendar headers */}
       <div className="text-center mb-6">
-        <h1 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary select-none">Aikumo</h1>
+        <h1 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary select-none dark:text-darkTextPrimary">Aikumo</h1>
       </div>
-      <div className="border rounded-lg shadow-modal bg-surface calendar-container overflow-x-auto relative w-full sm:max-w-5xl sm:mx-auto"
+      <div className="border rounded-lg shadow-modal bg-surface calendar-container overflow-x-auto relative w-full sm:max-w-5xl sm:mx-auto dark:bg-darkSurface dark:border-darkBorder"
         style={{ maxWidth: '100%' }}
       >
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4 calendar-header">
@@ -762,12 +762,12 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
               }
               setCurrentDate(prev);
             }}
-            className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal"
+            className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal dark:border-darkBorder"
             aria-label="Edellinen jakso"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
-          <h2 className="text-center text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary m-0 p-0 select-none">
+          <h2 className="text-center text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary m-0 p-0 select-none dark:text-darkTextPrimary">
             {currentDate.toLocaleDateString('fi-FI', { month: 'long', year: 'numeric' })}
           </h2>
           <button
@@ -782,7 +782,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
               }
               setCurrentDate(next);
             }}
-            className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal"
+            className="px-2 py-1 rounded-lg bg-primary text-white font-medium hover:bg-primaryHover transition-all duration-200 ease-in-out border border-metal dark:border-darkBorder"
             aria-label="Seuraava jakso"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -794,7 +794,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
         {can('create') && !showAddModal && (
           <button
             onClick={() => openAddEventModal()}
-            className="fixed bottom-6 right-6 z-50 bg-primary text-white font-medium rounded-full shadow-modal p-4 text-base hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary no-print flex items-center justify-center hover:scale-110"
+            className="fixed bottom-6 right-6 z-50 bg-primary text-white font-medium rounded-full shadow-modal p-4 text-base hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary no-print flex items-center justify-center hover:scale-110 dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
             aria-label="Lisää tapahtuma"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -809,11 +809,10 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       {!showAddModal && !sidebarOpen && (
         <div className="fixed top-4 left-2 z-50 sm:top-6 sm:left-4">
           <button
-            className="rounded-full bg-surface shadow-modal border border-accent p-2 sm:p-3 flex items-center justify-center transition-all duration-200 ease-in-out hover:bg-secondary"
+            className="rounded-full bg-surface shadow-modal border border-accent p-2 sm:p-3 flex items-center justify-center transition-all duration-200 ease-in-out hover:bg-secondary dark:bg-darkSurface dark:border-darkAccent dark:hover:bg-darkHighlight"
             onClick={() => setSidebarOpen(true)}
             aria-label="Avaa sivupalkki"
           >
-            {/* Hamburger menu icon */}
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M3 12H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M3 6H21" stroke="#2E2E2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -823,53 +822,53 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
         </div>
       )}
       {/* Add Detail Modal */}
-      {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
-          <div className="bg-surface p-6 rounded-lg w-full max-w-2xl shadow-modal border border-border">
+      {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4 dark:bg-darkLowlightBg/80">
+          <div className="bg-surface p-6 rounded-lg w-full max-w-2xl shadow-modal border border-border dark:bg-darkSurface dark:border-darkBorder">
             <div className="p-4 rounded-lg shadow-card" style={getEventTypeColor(selectedEvent.type)}>
-              <h3 className="text-xl font-semibold tracking-wide">{selectedEvent.name}</h3>
-              <p className="text-sm mt-2 text-textSecondary">
+              <h3 className="text-xl font-semibold tracking-wide dark:text-darkTextPrimary">{selectedEvent.name}</h3>
+              <p className="text-sm mt-2 text-textSecondary dark:text-darkTextSecondary">
                 {new Date(selectedEvent.startDate).toLocaleDateString('fi-FI')} - {new Date(selectedEvent.endDate).toLocaleDateString('fi-FI')}
               </p>
-              <p className="text-sm mt-1 text-textSecondary">
+              <p className="text-sm mt-1 text-textSecondary dark:text-darkTextSecondary">
                 Tyyppi: {getEventTypeName(selectedEvent.type)}
               </p>
               {selectedEvent.info && (
-                <div className="mt-2 p-2 bg-surface border rounded-lg text-sm">
-                  <span className="font-semibold">Lisätiedot:</span> {selectedEvent.info}
+                <div className="mt-2 p-2 bg-surface border rounded-lg text-sm dark:bg-darkSurface dark:border-darkBorder dark:text-darkTextPrimary">
+                  <span className="font-semibold dark:text-darkTextPrimary">Lisätiedot:</span> {selectedEvent.info}
                 </div>
               )}
             </div>
             {/* Comment Section */}
             <div className="mt-6">
-              <h4 className="font-semibold mb-2 text-black font-sans tracking-elegant">Kommentit</h4>
-              {commentLoading ? <div className="text-center text-lowlightText font-sans">Ladataan...</div> : (
+              <h4 className="font-semibold mb-2 text-black font-sans tracking-elegant dark:text-darkTextPrimary">Kommentit</h4>
+              {commentLoading ? <div className="text-center text-lowlightText font-sans dark:text-darkLowlightText">Ladataan...</div> : (
                 <ul className="mb-4 space-y-3">                  {comments.filter(c => !c.parent_comment_id).map(comment => (
-                    <li key={comment.id} className="mb-2 p-2 bg-surface/80 rounded-lg border border-border shadow-card">
+                    <li key={comment.id} className="mb-2 p-2 bg-surface/80 rounded-lg border border-border shadow-card dark:bg-darkSurface/80 dark:border-darkBorder dark:text-darkTextPrimary">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-black font-sans">
+                        <span className="font-bold text-black font-sans dark:text-darkTextPrimary">
                           {comment.profiles?.name || 
                            (comment.profiles?.first_name || comment.profiles?.last_name) ? 
                              `${comment.profiles?.first_name || ''} ${comment.profiles?.last_name || ''}`.trim() : 
                              comment.profiles?.email || comment.user_id}
                         </span>
-                        <span className="text-xs text-lowlightText font-sans">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
+                        <span className="text-xs text-lowlightText font-sans dark:text-darkLowlightText">{new Date(comment.created_at).toLocaleString('fi-FI')}</span>
                       </div>
-                      <div className="ml-2 text-textPrimary font-sans">{comment.content}</div>
+                      <div className="ml-2 text-textPrimary font-sans dark:text-darkTextPrimary">{comment.content}</div>
                       <button className="text-accentPink text-xs ml-2 font-sans hover:underline" onClick={() => { setReplyTo(comment.id); commentInputRef.current?.focus(); }}>Vastaa</button>
                       {/* Replies */}
                       <ul className="ml-6 mt-1 space-y-2">
                         {comments.filter(c => c.parent_comment_id === comment.id).map(reply => (
-                          <li key={reply.id} className="mb-1 p-2 bg-surface/60 rounded border border-border">
+                          <li key={reply.id} className="mb-1 p-2 bg-surface/60 rounded border border-border dark:bg-darkSurface/60 dark:border-darkBorder dark:text-darkTextPrimary">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-bold text-black font-sans">
+                              <span className="font-bold text-black font-sans dark:text-darkTextPrimary">
                                 {reply.profiles?.name || 
                                  (reply.profiles?.first_name || reply.profiles?.last_name) ? 
                                    `${reply.profiles?.first_name || ''} ${reply.profiles?.last_name || ''}`.trim() : 
                                    reply.profiles?.email || reply.user_id}
                               </span>
-                              <span className="text-xs text-lowlightText font-sans">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
+                              <span className="text-xs text-lowlightText font-sans dark:text-darkLowlightText">{new Date(reply.created_at).toLocaleString('fi-FI')}</span>
                             </div>
-                            <div className="ml-2 text-textPrimary font-sans">{reply.content}</div>
+                            <div className="ml-2 text-textPrimary font-sans dark:text-darkTextPrimary">{reply.content}</div>
                           </li>
                         ))}
                       </ul>
@@ -881,18 +880,18 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
                 <input
                   ref={commentInputRef}
                   type="text"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out font-sans"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out font-sans dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   placeholder={replyTo ? 'Vastaa kommenttiin...' : 'Lisää kommentti...'}
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                 />
-                {replyTo && <button type="button" className="text-xs text-lowlightText font-sans" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
-                <button type="submit" className="px-3 py-1 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary font-sans">Lähetä</button>
+                {replyTo && <button type="button" className="text-xs text-lowlightText font-sans dark:text-darkLowlightText" onClick={() => setReplyTo(null)}>Peruuta vastaus</button>}
+                <button type="submit" className="px-3 py-1 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary font-sans dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight">Lähetä</button>
               </form>
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
-                className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary"
+                className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkHighlight"
                 onClick={() => {
                   setShowDetailModal(false);
                   setSelectedEvent(null);
@@ -902,7 +901,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
               </button>
               {can('update') && (
                 <button
-                  className="px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
+                  className="px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
                   onClick={handleEditClick}
                 >
                   Muokkaa
@@ -915,50 +914,50 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
 
       {/* Lisää info ja repeat eventin luontimodaliin */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4">
-          <div className="bg-surface/90 p-6 rounded-lg w-full max-w-md shadow-modal border border-border backdrop-blur-sm">
-            <h3 className="modal-header text-lg font-semibold mb-4">Lisää uusi tapahtuma</h3>
+        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4 dark:bg-darkLowlightBg/80">
+          <div className="bg-surface/90 p-6 rounded-lg w-full max-w-md shadow-modal border border-border backdrop-blur-sm dark:bg-darkSurface/90 dark:border-darkBorder">
+            <h3 className="modal-header text-lg font-semibold mb-4 dark:text-darkTextPrimary">Lisää uusi tapahtuma</h3>
             <div className="space-y-4">
               <div>
-                <label className="block mb-1 font-medium">Nimi</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Nimi</label>
                 <input
                   type="text"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={newEvent.name}
                   onChange={e => setNewEvent({...newEvent, name: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Lisätiedot</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Lisätiedot</label>
                 <textarea
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={newEvent.info}
                   onChange={e => setNewEvent({...newEvent, info: e.target.value})}
                   rows={2}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Alkamispäivä</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Alkamispäivä</label>
                 <input
                   type="date"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={newEvent.startDate}
                   onChange={e => setNewEvent({...newEvent, startDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Päättymispäivä</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Päättymispäivä</label>
                 <input
                   type="date"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={newEvent.endDate}
                   onChange={e => setNewEvent({...newEvent, endDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Tyyppi</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Tyyppi</label>
                 <select
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={newEvent.type}
                   onChange={e => setNewEvent({...newEvent, type: e.target.value})}
                 >
@@ -972,21 +971,21 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
                 </select>
               </div>
               <div>
-                <label className="block mb-1 font-medium">Toistuva tapahtuma?</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Toistuva tapahtuma?</label>
                 <input
                   type="checkbox"
                   checked={repeat.enabled}
                   onChange={e => setRepeat(r => ({ ...r, enabled: e.target.checked, frequency: e.target.checked ? 'daily' : 'none' }))}
                   className="mr-2"
                 />
-                <span className="font-medium">Kyllä</span>
+                <span className="font-medium dark:text-darkTextPrimary">Kyllä</span>
               </div>
               {repeat.enabled && (
                 <div className="space-y-2">
                   <div>
-                    <label className="block mb-1 font-medium">Toistuvuus</label>
+                    <label className="block mb-1 font-medium dark:text-darkTextPrimary">Toistuvuus</label>
                     <select
-                      className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                      className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                       value={repeat.frequency}
                       onChange={e => setRepeat(r => ({ ...r, frequency: e.target.value }))}
                     >
@@ -996,18 +995,18 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
                     </select>
                   </div>
                   <div>
-                    <label className="block mb-1 font-medium">Toistojen määrä</label>
+                    <label className="block mb-1 font-medium dark:text-darkTextPrimary">Toistojen määrä</label>
                     <input
                       type="number"
                       min={1}
-                      className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                      className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                       value={repeat.count}
                       onChange={e => setRepeat(r => ({ ...r, count: Number(e.target.value) }))}
                     />
-                    <span className="text-xs text-lowlightText ml-2">tai loppumispäivä</span>
+                    <span className="text-xs text-lowlightText ml-2 dark:text-darkLowlightText">tai loppumispäivä</span>
                     <input
                       type="date"
-                      className="border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out ml-2"
+                      className="border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out ml-2 dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                       value={repeat.until}
                       onChange={e => setRepeat(r => ({ ...r, until: e.target.value }))}
                     />
@@ -1016,13 +1015,13 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
               )}
               <div className="flex justify-end gap-2 mt-4">
                 <button
-                  className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-sans font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary"
+                  className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-sans font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkHighlight"
                   onClick={() => setShowAddModal(false)}
                 >
                   Peruuta
                 </button>
                 <button
-                  className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
+                  className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
                   onClick={addEvent}
                 >
                   Lisää tapahtuma
@@ -1035,50 +1034,50 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
 
       {/* Lisää info eventin muokkausmodaaliin */}
       {showEditModal && editEvent && can('update') && (
-        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center">
-          <div className="bg-surface/90 p-6 rounded-lg max-w-md w-full shadow-modal border border-border backdrop-blur-sm">
-            <h3 className="modal-header text-lg font-semibold mb-4">Muokkaa tapahtumaa</h3>
+        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center dark:bg-darkLowlightBg/80">
+          <div className="bg-surface/90 p-6 rounded-lg max-w-md w-full shadow-modal border border-border backdrop-blur-sm dark:bg-darkSurface/90 dark:border-darkBorder">
+            <h3 className="modal-header text-lg font-semibold mb-4 dark:text-darkTextPrimary">Muokkaa tapahtumaa</h3>
             <div className="space-y-4">
               <div>
-                <label className="block mb-1 font-medium">Nimi</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Nimi</label>
                 <input
                   type="text"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={editEvent.name}
                   onChange={e => setEditEvent({...editEvent, name: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Lisätiedot</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Lisätiedot</label>
                 <textarea
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={editEvent.info || ''}
                   onChange={e => setEditEvent({...editEvent, info: e.target.value})}
                   rows={2}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Alkamispäivä</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Alkamispäivä</label>
                 <input
                   type="date"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={editEvent.startDate}
                   onChange={e => setEditEvent({...editEvent, startDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Päättymispäivä</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Päättymispäivä</label>
                 <input
                   type="date"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={editEvent.endDate}
                   onChange={e => setEditEvent({...editEvent, endDate: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Tyyppi</label>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Tyyppi</label>
                 <select
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
                   value={editEvent.type}
                   onChange={e => setEditEvent({...editEvent, type: e.target.value})}
                 >
@@ -1093,7 +1092,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
               </div>              <div className="flex justify-between">
                 {can('delete') && (
                   <button
-                    className="delete-event-btn px-4 py-2 rounded-lg font-sans font-medium shadow-card hover:bg-error/90 transition-all duration-200 ease-in-out border"
+                    className="delete-event-btn px-4 py-2 rounded-lg font-sans font-medium shadow-card hover:bg-error/90 transition-all duration-200 ease-in-out border dark:bg-darkError dark:text-darkTextPrimary dark:border-darkBorder"
                     onClick={() => {
                       deleteEvent(editEvent);
                       setShowEditModal(false);
@@ -1104,7 +1103,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
                 )}
                 <div className="flex gap-2">
                   <button
-                    className="px-4 py-2 rounded-lg bg-secondary text-textPrimary font-sans font-medium shadow-card hover:bg-accent transition-all duration-200 ease-in-out border border-secondary"
+                    className="px-4 py-2 rounded-lg bg-secondary text-textPrimary font-sans font-medium shadow-card hover:bg-accent transition-all duration-200 ease-in-out border border-secondary dark:bg-darkSecondary dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkAccent"
                     onClick={() => {
                       setShowEditModal(false);
                       setEditEvent(null);
@@ -1113,7 +1112,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
                     Peruuta
                   </button>
                   <button
-                    className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary"
+                    className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
                     onClick={updateEvent}
                   >
                     Tallenna
@@ -1125,22 +1124,22 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
         </div>
       )}      {/* Add Day Panel */}
       {showDayPanel && selectedDay && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-lowlightBg/80">
-          <div className="relative w-full max-w-xs sm:max-w-md bg-surface/90 backdrop-blur-sm shadow-modal overflow-y-auto p-3 sm:p-4 no-print rounded-lg border border-border max-h-[90vh]">
-            <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out" onClick={() => setShowDayPanel(false)}>&times;</button>
-            <h2 className="text-lg sm:text-xl font-semibold mb-2">{selectedDay.toLocaleDateString('fi-FI')}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-lowlightBg/80 dark:bg-darkLowlightBg/80">
+          <div className="relative w-full max-w-xs sm:max-w-md bg-surface/90 backdrop-blur-sm shadow-modal overflow-y-auto p-3 sm:p-4 no-print rounded-lg border border-border max-h-[90vh] dark:bg-darkSurface/90 dark:border-darkBorder">
+            <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out dark:text-darkError dark:hover:text-darkError/80" onClick={() => setShowDayPanel(false)}>&times;</button>
+            <h2 className="text-lg sm:text-xl font-semibold mb-2 dark:text-darkTextPrimary">{selectedDay.toLocaleDateString('fi-FI')}</h2>
             <button
-              className="mb-4 px-3 sm:px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary w-full"
+              className="mb-4 px-3 sm:px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary w-full dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
               onClick={() => openAddEventModal(selectedDay)}
             >
               Lisää tapahtuma tälle päivälle
             </button>
-            <h3 className="font-semibold mb-2">Tapahtumat</h3>
+            <h3 className="font-semibold mb-2 dark:text-darkTextPrimary">Tapahtumat</h3>
             <ul>
-              {dayPanelEvents.length === 0 && <li>Ei tapahtumia tälle päivälle.</li>}
+              {dayPanelEvents.length === 0 && <li className="dark:text-darkTextSecondary">Ei tapahtumia tälle päivälle.</li>}
               {dayPanelEvents.map(event => (
-                <li key={event.id} className="mb-2 p-2 border rounded-lg cursor-pointer flex items-center gap-2 event-list-item hover:bg-accent/10 transition-all duration-200 ease-in-out" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
-                  <span className="w-4 h-4 rounded-lg border border-border" style={{ backgroundColor: eventTypeMap[event.type] || '#e2e8f0' }}></span>
+                <li key={event.id} className="mb-2 p-2 border rounded-lg cursor-pointer flex items-center gap-2 event-list-item hover:bg-accent/10 transition-all duration-200 ease-in-out dark:bg-darkSurface/80 dark:border-darkBorder dark:text-darkTextPrimary hover:dark:bg-darkAccent/10" onClick={e => { e.stopPropagation(); setShowDayPanel(false); handleEventClick(event); }}>
+                  <span className="w-4 h-4 rounded-lg border border-border dark:border-darkBorder" style={{ backgroundColor: eventTypeMap[event.type] || '#e2e8f0' }}></span>
                   <span className="font-semibold">{event.name}</span> <span className="text-xs">({event.type})</span>
                 </li>
               ))}
