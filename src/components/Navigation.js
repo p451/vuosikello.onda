@@ -4,10 +4,8 @@ import { useRole } from '../contexts/RoleContext';
 import { supabase } from '../supabaseClient';
 import { useState, useEffect } from 'react';
 
-const SUPERADMINS = ['antoni.duhov@gmail.com']; // <-- replace with your email
-
 export default function Navigation() {
-  const { userRole } = useRole();
+  const { userRole, isSuperadmin } = useRole();
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -47,12 +45,12 @@ export default function Navigation() {
               <Link to="/" className="hover:text-primary font-medium px-2 sm:px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5 text-xs sm:text-button">
                 Calendar
               </Link>
-              {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
+              {(userRole === 'admin' || isSuperadmin) && (
                 <Link to="/admin" className="hover:text-primary font-medium px-2 sm:px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5 text-xs sm:text-button">
                   Admin Dashboard
                 </Link>
               )}
-              {user && SUPERADMINS.includes(user.email) && (
+              {isSuperadmin && (
                 <Link to="/superadmin" className="hover:text-primary font-medium px-2 sm:px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary hover:bg-primary/5 text-xs sm:text-button">
                   Superadmin Dashboard
                 </Link>
@@ -78,12 +76,12 @@ export default function Navigation() {
               <Link to="/" className="hover:text-primary px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary text-xs" onClick={() => setMenuOpen(false)}>
                 Calendar
               </Link>
-              {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
+              {(userRole === 'admin' || isSuperadmin) && (
                 <Link to="/admin" className="hover:text-primary px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary text-xs" onClick={() => setMenuOpen(false)}>
                   Admin Dashboard
                 </Link>
               )}
-              {user && SUPERADMINS.includes(user.email) && (
+              {isSuperadmin && (
                 <Link to="/superadmin" className="hover:text-primary px-3 py-1 rounded-lg transition-all duration-200 ease-in-out border-b-2 border-transparent hover:border-primary focus:border-primary text-xs" onClick={() => setMenuOpen(false)}>
                   Superadmin Dashboard
                 </Link>

@@ -7,6 +7,7 @@ const RoleContext = createContext();
 export function RoleProvider({ children }) {
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSuperadmin, setIsSuperadmin] = useState(false);
   const { tenantId } = useTenant();
 
   useEffect(() => {
@@ -18,16 +19,23 @@ export function RoleProvider({ children }) {
 
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // Fetch tenant-specific role
         const { data: roleData, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .eq('tenant_id', tenantId)
           .single();
-
         if (!error && roleData) {
           setUserRole(roleData.role);
         }
+        // Fetch global superadmin role
+        const { data: superadminRows } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'superadmin');
+        setIsSuperadmin(Array.isArray(superadminRows) && superadminRows.length > 0);
       }
       setLoading(false);
     };
@@ -49,7 +57,7 @@ export function RoleProvider({ children }) {
   };
 
   return (
-    <RoleContext.Provider value={{ userRole, loading, can }}>
+    <RoleContext.Provider value={{ userRole, isSuperadmin, loading, can }}>
       {!loading && children}
     </RoleContext.Provider>
   );

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
-
-// Set your superadmin email(s) here
-const SUPERADMINS = ['antoni.duhov@gmail.com']; // <-- updated to your email
+import { useRole } from '../contexts/RoleContext';
 
 export default function SuperAdminDashboard() {
+  const { isSuperadmin } = useRole();
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,17 +19,14 @@ export default function SuperAdminDashboard() {
   const [userInviteRole, setUserInviteRole] = useState('viewer');
 
   useEffect(() => {
-    const checkSuperadmin = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user || !SUPERADMINS.includes(user.email)) {
-        setError('Access denied: You are not a superadmin.');
-        setLoading(false);
-        return;
-      }
-      fetchTenants();
-    };
-    checkSuperadmin();
-  }, []);
+    if (!isSuperadmin) {
+      setError('Access denied: You are not a superadmin.');
+      setLoading(false);
+      return;
+    }
+    fetchTenants();
+    // eslint-disable-next-line
+  }, [isSuperadmin]);
 
   const fetchTenants = async () => {
     const { data, error } = await supabase.from('tenants').select('*');

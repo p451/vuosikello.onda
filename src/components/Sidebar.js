@@ -5,12 +5,9 @@ import { useRole } from "../contexts/RoleContext";
 import { useState, useEffect } from "react";
 import { useTenant } from "../contexts/TenantContext";
 
-const SUPERADMINS = ["antoni.duhov@gmail.com"];
-
 const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
-  const { userRole } = useRole();
+  const { userRole, isSuperadmin } = useRole();
   const { tenantId } = useTenant();
-  const [user, setUser] = useState(null);
   const [tenantName, setTenantName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,8 +15,9 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
   useEffect(() => {
     const getUser = async () => {
       if (supabase && supabase.auth) {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        // Remove unused user fetch
+        // const { data: { user } } = await supabase.auth.getUser();
+        // setUser(user);
       }
     };
     getUser();
@@ -185,14 +183,14 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
             </button>
           </div>
           <nav className="flex flex-col gap-1 sm:gap-2 p-2 sm:p-4">
-            {(userRole === 'admin' || (user && SUPERADMINS.includes(user.email))) && (
+            {(userRole === 'admin' || isSuperadmin) && (
               <Link to="/admin"
                 className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
                   ${isActive('/admin') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
               >Admin dashboard</Link>
             )}
             {/* SuperAdmin dashboard link */}
-            {user && SUPERADMINS.includes(user.email) && (
+            {isSuperadmin && (
               <Link to="/superadmin"
                 className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
                   ${isActive('/superadmin') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
