@@ -191,6 +191,13 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
                   ${isActive('/admin') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
               >Admin dashboard</Link>
             )}
+            {/* SuperAdmin dashboard link */}
+            {user && SUPERADMINS.includes(user.email) && (
+              <Link to="/superadmin"
+                className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
+                  ${isActive('/superadmin') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
+              >SuperAdmin dashboard</Link>
+            )}
             <Link to="/"
               className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
                 ${isActive('/') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
