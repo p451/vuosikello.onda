@@ -8,30 +8,11 @@ export default function ResetPassword() {
 
   const handleReset = async (e) => {
     e.preventDefault();
-    let access_token = null;
-    let refresh_token = null;
-    // 1. Yritä hash-parametreista
-    const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
-    access_token = hashParams.get('access_token');
-    refresh_token = hashParams.get('refresh_token');
-    // 2. Jos ei löydy, kokeile query-parametreista
-    if (!access_token) {
-      const searchParams = new URLSearchParams(window.location.search);
-      access_token = searchParams.get('access_token');
-      refresh_token = searchParams.get('refresh_token');
-    }
-    if (!access_token) {
-      setMessage('Invalid or missing token');
-      return;
-    }
-    const { error } = await supabase.auth.updateUser(
-      { password },
-      refresh_token ? { accessToken: access_token, refreshToken: refresh_token } : { accessToken: access_token }
-    );
+    // Supabase auth client will detect session from URL hash
+    const { error } = await supabase.auth.updateUser({ password });
     if (error) setMessage(error.message);
     else {
       setMessage('Password updated! Please log in with your new password.');
-      // Kirjaa ulos ja ohjaa login-sivulle pienen viiveen jälkeen
       setTimeout(async () => {
         await supabase.auth.signOut();
         window.location.href = '/login';
