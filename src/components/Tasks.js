@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { TenantContext } from '../contexts/TenantContext';
-import { RoleContext } from '../contexts/RoleContext';
+import { useTenant } from '../contexts/TenantContext';
+import { useRole } from '../contexts/RoleContext';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -13,20 +13,19 @@ const Tasks = () => {
     category: '',
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { currentTenant } = useContext(TenantContext);
-  const { userRole } = useContext(RoleContext);
+  const [error, setError] = useState(null);  const { tenantId } = useTenant();
+  const { userRole } = useRole();
   const canManageTasks = ['admin', 'editor'].includes(userRole);
 
   useEffect(() => {
-    fetchTasks();
-  }, [currentTenant]);
+    fetchTasks();  }, [tenantId]);
 
   const fetchTasks = async () => {
     try {
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
+        .eq('tenant_id', tenantId)
         .order('deadline', { ascending: true });
 
       if (error) throw error;
@@ -51,12 +50,11 @@ const Tasks = () => {
     e.preventDefault();
     if (!canManageTasks) return;
 
-    try {
-      const { data, error } = await supabase
+    try {      const { data, error } = await supabase
         .from('tasks')
         .insert([{
           ...newTask,
-          tenant_id: currentTenant
+          tenant_id: tenantId
         }]);
 
       if (error) throw error;
