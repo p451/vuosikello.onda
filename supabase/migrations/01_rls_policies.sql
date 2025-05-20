@@ -1,0 +1,56 @@
+-- Enable Row Level Security on tenants
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+);  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.tenant_id = tenant_event_types.tenant_id and public.user_roles.role in ('admin','editor')  exists () with check (  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.tenant_id = tenant_event_types.tenant_id and public.user_roles.role in ('admin','editor')  exists (create policy tenant_admin_manage_event_types on public.tenant_event_types for all using (-- Allow tenant admins to manage event types for their tenant);  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.role = 'superadmin'  exists (create policy superadmin_select_event_types on public.tenant_event_types for select using (-- Allow superadmin to select all event types-- Enable Row Level Security on tenant_event_types
+alter table public.tenant_event_types enable row level security;);  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.role = 'superadmin'  exists (create policy superadmin_select_user_roles on public.user_roles for select using (-- Allow superadmin to select all user_roles);  user_id = auth.uid()create policy select_own_user_roles on public.user_roles for select using (-- Allow users to select their own roles-- Enable Row Level Security on user_roles
+alter table public.user_roles enable row level security;);  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.role = 'superadmin'  exists (create policy superadmin_delete_tenants on public.tenants for delete using ();  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.role = 'superadmin'  exists (create policy superadmin_update_tenants on public.tenants for update using ();  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.role = 'superadmin'  exists (create policy superadmin_insert_tenants on public.tenants for insert with check ();  )    select 1 from public.user_roles where public.user_roles.user_id = auth.uid() and public.user_roles.role = 'superadmin'  exists (create policy superadmin_select_tenants on public.tenants for select using (-- Allow superadmin to select, insert, update, delete tenantsalter table public.tenants enable row level security;
