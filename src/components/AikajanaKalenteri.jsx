@@ -582,6 +582,13 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
     printWindow.document.close();
     printWindow.print();
   };
+  // Helper to normalize a date to midnight (00:00:00)
+const normalizeDate = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
   // Update the EventItem component to better handle scaling and spacing
   const EventItem = ({ event, onClick, scale = 1 }) => (
     <div 
@@ -602,36 +609,37 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
   );
 
   // Update renderDayEvents to ensure all events are displayed properly
-  const renderDayEvents = (eventsForType, day, type) => {
-    if (!visibleEventTypes.includes(type)) return null;
-    const eventsArr = eventsForType || [];
-    if (selectedEventType !== 'all' && type !== selectedEventType) return null;
-  
-    // Filter events for the specific day
-    const matchingEvents = eventsArr.filter(event => {
-      const startDate = parseLocalDate(event.startDate);
-      const endDate = parseLocalDate(event.endDate);
-      return isSameDay(day, startDate) || (day >= startDate && day <= endDate);
-    });
-  
-    if (matchingEvents.length === 0) return null;
-  
-    // Adjust scaling for multiple events
-    const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.15);
-  
-    return (
-      <div className="relative w-full flex flex-col gap-1">
-        {matchingEvents.map((event, idx) => (
-          <EventItem 
-            key={event.id}
-            event={event}
-            onClick={() => handleEventClick(event)}
-            scale={scale}
-          />
-        ))}
-      </div>
-    );
-  };
+const renderDayEvents = (eventsForType, day, type) => {
+  if (!visibleEventTypes.includes(type)) return null;
+  const eventsArr = eventsForType || [];
+  if (selectedEventType !== 'all' && type !== selectedEventType) return null;
+
+  // Filter events for the specific day (normalize all dates to midnight)
+  const matchingEvents = eventsArr.filter(event => {
+    const startDate = normalizeDate(parseLocalDate(event.startDate));
+    const endDate = normalizeDate(parseLocalDate(event.endDate));
+    const thisDay = normalizeDate(day);
+    return isSameDay(thisDay, startDate) || (thisDay >= startDate && thisDay <= endDate);
+  });
+
+  if (matchingEvents.length === 0) return null;
+
+  // Adjust scaling for multiple events
+  const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.15);
+
+  return (
+    <div className="relative w-full flex flex-col gap-1">
+      {matchingEvents.map((event, idx) => (
+        <EventItem 
+          key={event.id}
+          event={event}
+          onClick={() => handleEventClick(event)}
+          scale={scale}
+        />
+      ))}
+    </div>
+  );
+};
   
   // Update the month view rendering in renderContent
   const renderContent = () => {
