@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
+import TaskModal from './TaskModal';
+import { useNavigate } from 'react-router-dom';
 
 // Helper to format author name (prioritize profile fields)
 const getAuthorName = (profile, userId) => {
@@ -70,7 +72,32 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
     deadline: '',
     priority: 'medium',
     category: '',
+    event_id: null, // Added for event relation
   });
+
+  const [calendarTasks, setCalendarTasks] = useState([]);
+
+  // Helper for task priority color
+  const getTaskPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return { backgroundColor: '#f87171', color: '#fff' }; // Red
+      case 'medium': return { backgroundColor: '#fbbf24', color: '#000' }; // Yellow
+      case 'low': return { backgroundColor: '#34d399', color: '#000' }; // Green
+      default: return { backgroundColor: '#e5e7eb', color: '#000' };
+    }
+  };
+
+  // Helper: does a day have active tasks?
+  function hasTasksForDay(date) {
+    // Use local date string (YYYY-MM-DD) for both
+    const ymd = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    return calendarTasks.some(task => task.deadline && task.deadline.slice(0, 10) === ymd);
+  }
+  // Helper: get tasks for a day
+  function getTasksForDay(date) {
+    const ymd = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    return calendarTasks.filter(task => task.deadline && task.deadline.slice(0, 10) === ymd && !task.completed);
+  }
 
   // Handler for adding a task from the day panel (define only once)
   const handleAddTask = async (e) => {
@@ -82,7 +109,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
         .insert([{ ...newTask, tenant_id: tenantId, deadline: newTask.deadline || (selectedDay ? getLocalDateString(selectedDay) : '') }]);
       if (error) throw error;
       setShowAddTaskModal(false);
-      setNewTask({ title: '', description: '', deadline: '', priority: 'medium', category: '' });
+      setNewTask({ title: '', description: '', deadline: '', priority: 'medium', category: '', event_id: null });
       // Refresh tasks for the day panel
       if (selectedDay) {
         const { data: tasksForDay, error: fetchError } = await supabase
@@ -97,6 +124,8 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
       console.error('Error adding task:', err);
     }
   };
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const init = async () => {
@@ -165,6 +194,20 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
     window.__vuosikello_events = events;
     window.__vuosikello_eventTypeMap = eventTypeMap;
   }, [viewMode, currentDate, events, eventTypeMap]);
+
+  // Fetch all tasks for the current month (for indicators)
+  useEffect(() => {
+    if (!tenantId) return;
+    const fetchCalendarTasks = async () => {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('completed', false);
+      if (!error && data) setCalendarTasks(data);
+    };
+    fetchCalendarTasks();
+  }, [tenantId, currentDate]);
 
   const fetchEvents = async () => {
     if (!tenantId) {
@@ -525,7 +568,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           <title>Vuosikello - ${viewTitle} agenda</title>
           <style>
             body { 
-              font-family: Arial, sans-serif;
+              font-family: 'IBM Plex Sans', 'sans-serif';
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
@@ -665,19 +708,31 @@ const renderDayEvents = (eventsForType, day, type) => {
             </div>
           ))}
           {days.map((day, index) => (
-            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base font-sans text-textPrimary bg-surface/90 rounded-lg shadow-card dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
+            <div key={index} className="relative p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell text-xs sm:text-base font-sans text-textPrimary bg-surface/90 rounded-lg shadow-card dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
               {day ? (
                 <>
                   <div className="flex justify-between items-start">
-                    <button
-                      className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary dark:text-darkTextPrimary"
-                      style={{ lineHeight: 1.2 }}
-                      onClick={() => handleDayClick(day)}
-                      tabIndex={0}
-                      aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
-                    >
-                      {day.getDate()}
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary dark:text-darkTextPrimary"
+                        style={{ lineHeight: 1.2 }}
+                        onClick={() => handleDayClick(day)}
+                        tabIndex={0}
+                        aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
+                      >
+                        {day.getDate()}
+                      </button>
+                      {hasTasksForDay(day) && (
+                        <span
+                          className="block w-4 h-4 rounded-full mt-1 mb-0.5 mx-auto shadow-glow animate-glow cursor-pointer flex items-center justify-center text-xs font-bold text-primary bg-transparent border border-primary"
+                          onClick={() => navigate('/tasks')}
+                          title="Tehtäviä tälle päivälle"
+                          style={{ boxShadow: '0 0 6px 2px #3b82f6', background: 'white' }}
+                        >
+                          T
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="space-y-1 flex flex-col mt-1">
                     {Object.keys(events).map(type => (
@@ -694,6 +749,8 @@ const renderDayEvents = (eventsForType, day, type) => {
       );
     } else if (viewMode === 'week') {
       const weekDays = getWeekDays(currentDate);
+      const weekStart = new Date(weekDays[0]); weekStart.setHours(0,0,0,0);
+      const weekEnd = new Date(weekDays[6]); weekEnd.setHours(23,59,59,999);
       
       return (
         <div className="grid grid-cols-7 gap-0.5 sm:gap-1 w-full mx-0 px-0">
@@ -702,31 +759,47 @@ const renderDayEvents = (eventsForType, day, type) => {
               {day}
             </div>
           ))}
-          {weekDays.map((day, index) => (
-            <div key={index} className="p-1 sm:p-2 border min-h-[6rem] sm:min-h-40 day-cell text-xs sm:text-base font-sans text-textPrimary bg-surface/90 rounded-lg shadow-card dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
-              <div className="flex justify-between items-start">
-                <button
-                  className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary dark:text-darkTextPrimary"
-                  style={{ lineHeight: 1.2 }}
-                  onClick={() => handleDayClick(day)}
-                  tabIndex={0}
-                  aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
-                >
-                  {day.getDate()}
-                </button>
-              </div>
-              <div className="space-y-1 flex flex-col mt-1">
-                {Object.keys(events).map(type => (
-                  <div key={type} className="event-row min-h-[1.5rem]">
-                    {renderDayEvents(events[type], day, type)}
+          {weekDays.map((day, index) => {
+            return (
+              <div key={index} className="relative p-1 sm:p-2 border min-h-[6rem] sm:min-h-40 day-cell text-xs sm:text-base font-sans text-textPrimary bg-surface/90 rounded-lg shadow-card dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-1">
+                    <button
+                      className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary dark:text-darkTextPrimary"
+                      style={{ lineHeight: 1.2 }}
+                      onClick={() => handleDayClick(day)}
+                      tabIndex={0}
+                      aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
+                    >
+                      {day.getDate()}
+                    </button>
+                    {hasTasksForDay(day) && (
+                      <span
+                        className="block w-4 h-4 rounded-full mt-1 mb-0.5 mx-auto shadow-glow animate-glow cursor-pointer flex items-center justify-center text-xs font-bold text-primary bg-transparent border border-primary"
+                        onClick={() => navigate('/tasks')}
+                        title="Tehtäviä tälle päivälle"
+                        style={{ boxShadow: '0 0 6px 2px #3b82f6', background: 'white' }}
+                      >
+                        T
+                      </span>
+                    )}
                   </div>
-                ))}
+                </div>
+                {/* No task list in week view, only the ball */}
+                <div className="space-y-1 flex flex-col mt-1">
+                  {Object.keys(events).map(type => (
+                    <div key={type} className="event-row min-h-[1.5rem]">
+                      {renderDayEvents(events[type], day, type)}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       );
     } else {
+      const dayTasks = getTasksForDay(currentDate);
       return (
         <div className="space-y-4 bg-surface/90 rounded-lg shadow-card p-4 dark:bg-darkSurface dark:text-darkTextPrimary">
           <h2 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary mb-2 dark:text-darkTextPrimary">
@@ -739,6 +812,40 @@ const renderDayEvents = (eventsForType, day, type) => {
                 {renderDayEvents(events[type], currentDate, type)}
               </div>
             ))}
+            <div className="mt-2">
+              <h3 className="font-semibold mb-1 text-primary dark:text-darkPrimary">Tehtävät</h3>
+              {dayTasks.length === 0 && <div className="text-gray-400 dark:text-darkTextSecondary">Ei tehtäviä tälle päivälle.</div>}
+              <ul className="space-y-1">
+                {dayTasks.map(task => (
+                  <li key={task.id} className={`px-2 py-1 border rounded flex items-center gap-2 text-xs font-sans ${
+                    task.priority === 'high' ? 'bg-red-100 text-red-800' :
+                    task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-green-100 text-green-800'
+                  }`}>
+                    <input type="checkbox" checked={task.completed} onChange={async () => {
+                      await supabase.from('tasks').update({ completed: !task.completed }).eq('id', task.id);
+                      // Optionally, refetch tasks or update state
+                      task.completed = !task.completed;
+                      // Remove from list if completed
+                      // setDayPanelTasks(dayPanelTasks => dayPanelTasks.filter(t => t.id !== task.id));
+                      // For now, just reload page or refetch
+                      window.location.reload();
+                    }} className="accent-primary w-4 h-4" />
+                    <span className={`inline-block w-2 h-2 rounded-full mr-1 ${task.priority === 'high' ? 'bg-red-500' : task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-500'}`}></span>
+                    <span className="font-semibold truncate">{task.title}</span>
+                    <span className="text-xs opacity-80">({task.priority})</span>
+                    {task.event_id && (
+                      <span className="ml-2 text-xs italic opacity-70">
+                        {(() => {
+                          const ev = Object.values(events).flat().find(e => e.id === task.event_id);
+                          return ev ? `→ ${ev.name}` : '';
+                        })()}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       );
@@ -1245,11 +1352,30 @@ const renderDayEvents = (eventsForType, day, type) => {
             </ul>
             <h3 className="font-semibold mb-2 dark:text-darkTextPrimary">Tehtävät</h3>
             <ul>
-              {dayPanelTasks.length === 0 && <li className="dark:text-darkTextSecondary">Ei tehtäviä tälle päivälle.</li>}
-              {dayPanelTasks.map(task => (
-                <li key={task.id} className="mb-2 p-2 border rounded-lg cursor-pointer flex items-center gap-2 task-list-item hover:bg-accent/10 transition-all duration-200 ease-in-out dark:bg-darkSurface/80 dark:border-darkBorder dark:text-darkTextPrimary hover:dark:bg-darkAccent/10">
-                  <span className="font-semibold">{task.title}</span>
-                  <span className="text-xs">({task.priority})</span>
+              {dayPanelTasks.filter(task => !task.completed).length === 0 && <li className="dark:text-darkTextSecondary">Ei tehtäviä tälle päivälle.</li>}
+              {dayPanelTasks.filter(task => !task.completed).map(task => (
+                <li
+                  key={task.id}
+                  className="mb-1 px-2 py-1 border rounded flex items-center gap-2 task-list-item cursor-pointer hover:bg-accent/10 transition-all duration-200 ease-in-out dark:bg-darkSurface/80 dark:border-darkBorder dark:text-darkTextPrimary hover:dark:bg-darkAccent/10"
+                  style={{
+                    ...getTaskPriorityColor(task.priority),
+                    minHeight: '1.5rem',
+                    fontSize: '0.85em',
+                    lineHeight: 1.1,
+                    padding: '0.2rem 0.5rem'
+                  }}
+                  onClick={() => navigate('/tasks')}
+                >
+                  <span className="font-semibold truncate">{task.title}</span>
+                  <span className="text-xs opacity-80">({task.priority})</span>
+                  {task.event_id && (
+                    <span className="ml-2 text-xs italic opacity-70">
+                      {(() => {
+                        const ev = Object.values(events).flat().find(e => e.id === task.event_id);
+                        return ev ? `→ ${ev.name}` : '';
+                      })()}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -1259,69 +1385,16 @@ const renderDayEvents = (eventsForType, day, type) => {
 
       {/* Add Task Modal for selected day */}
       {showAddTaskModal && (
-        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4 z-50 dark:bg-darkLowlightBg/80">
-          <div className="bg-surface/90 p-6 rounded-lg w-full max-w-md shadow-modal border border-border backdrop-blur-sm dark:bg-darkSurface/90 dark:border-darkBorder">
-            <h3 className="modal-header text-lg font-semibold mb-4 dark:text-darkTextPrimary">Lisää uusi tehtävä</h3>
-            <form onSubmit={handleAddTask} className="space-y-4">
-              <div>
-                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Nimi</label>
-                <input
-                  type="text"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
-                  value={newTask.title}
-                  onChange={e => setNewTask({ ...newTask, title: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Kuvaus</label>
-                <textarea
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
-                  value={newTask.description}
-                  onChange={e => setNewTask({ ...newTask, description: e.target.value })}
-                  rows={2}
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Deadline</label>
-                <input
-                  type="date"
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
-                  value={newTask.deadline}
-                  onChange={e => setNewTask({ ...newTask, deadline: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Prioriteetti</label>
-                <select
-                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
-                  value={newTask.priority}
-                  onChange={e => setNewTask({ ...newTask, priority: e.target.value })}
-                >
-                  <option value="low">Matala</option>
-                  <option value="medium">Keskitaso</option>
-                  <option value="high">Korkea</option>
-                </select>
-              </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-sans font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkHighlight"
-                  onClick={() => setShowAddTaskModal(false)}
-                >
-                  Peruuta
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
-                >
-                  Lisää tehtävä
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <TaskModal
+          open={showAddTaskModal}
+          onClose={() => setShowAddTaskModal(false)}
+          onSubmit={handleAddTask}
+          task={newTask}
+          setTask={setNewTask}
+          events={Object.values(events).flat()}
+          title="Lisää uusi tehtävä"
+          loading={false}
+        />
       )}
     </div>
   );

@@ -106,7 +106,7 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
         <head>
           <title>Vuosikello - ${viewTitle} agenda</title>
           <style>
-            body { font-family: Arial, sans-serif; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { font-family: 'IBM Plex Sans', 'sans-serif'; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .event-type { margin-top: 2em; }
             .event-list { margin-left: 2em; }
             .event-item { padding: 0.5em; margin: 0.5em 0; border-radius: 4px; color: black; }
@@ -224,11 +224,10 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
             <button className="py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-secondary hover:bg-highlight shadow-card transition-all text-left dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkHighlight" onClick={handlePrintAgenda}>Print Agenda</button>
             <button className="py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-accent hover:bg-highlight shadow-card transition-all text-left dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkAccent dark:hover:bg-darkHighlight" onClick={() => handlePrint('calendar')}>Print Calendar</button>
             <SidebarTaskBoard />
-            <button onClick={handleLogout} className="py-2 px-3 sm:px-4 rounded-lg bg-error text-black font-sans font-medium text-[13px] sm:text-[14px] hover:bg-error/90 shadow-card transition-all text-left mt-2 sm:mt-4 border border-error dark:bg-darkError dark:text-darkTextPrimary dark:border-darkError dark:hover:bg-darkHighlight">Logout</button>
           </nav>
         </div>
         <div className="p-2 sm:p-4 border-t border-accent bg-surface/95 rounded-b-lg flex flex-col gap-2 dark:bg-darkSurface dark:border-darkBorder">
-          <button className="w-full py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-primary hover:bg-highlight shadow-card transition-all text-left dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight">Oma profiili</button>
+          <button onClick={handleLogout} className="w-full py-2 px-3 sm:px-4 rounded-lg bg-error text-black font-sans font-medium text-[13px] sm:text-[14px] hover:bg-error/90 shadow-card transition-all text-left border border-error dark:bg-darkError dark:text-darkTextPrimary dark:border-darkError dark:hover:bg-darkHighlight">Logout</button>
           <button
             className={`w-full py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all ${darkMode ? 'bg-darkSurface text-darkTextPrimary border-darkBorder hover:bg-darkHighlight' : 'bg-surface text-textPrimary border-border hover:bg-highlight'}`}
             onClick={() => setDarkMode(dm => !dm)}
