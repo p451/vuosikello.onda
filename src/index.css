@@ -1,3 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .App {
+    @apply min-h-screen bg-background font-sans text-textPrimary;
+  }
+  .dark .App {
+    @apply bg-darkBackground text-darkTextPrimary;
+  }
+  header {
+    @apply hidden;
+  }
+  /* Migrate other @apply rules as needed */
+}
+
 /*
   Jätetään vain mahdolliset layout- ja reset-tyylit, joita ei voi toteuttaa Tailwindilla.
 */

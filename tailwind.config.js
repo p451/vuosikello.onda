@@ -2,6 +2,7 @@
 module.exports = {
   darkMode: 'class', // Enable Tailwind dark mode via class
   content: [
+    "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
     "./public/index.html",
   ],

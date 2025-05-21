@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
-import Auth from './components/Auth';
-import SignUp from './components/SignUp';
-import AikajanaKalenteri from './components/AikajanaKalenteri';
-import TenantAdminDashboard from './components/TenantAdminDashboard';
-import SuperAdminDashboard from './components/SuperAdminDashboard';
-import Tasks from './components/Tasks';
-import ResetPassword from './components/ResetPassword';
-import ActivateAccount from './components/ActivateAccount';
-import Sidebar from './components/Sidebar';
 import { TenantProvider } from './contexts/TenantContext';
 import { RoleProvider } from './contexts/RoleContext';
-import './App.css';
 import './aikumo-teema.css';
+// Lazy-loaded components for code splitting
+const Auth = lazy(() => import('./components/Auth'));
+const SignUp = lazy(() => import('./components/SignUp'));
+const AikajanaKalenteri = lazy(() => import('./components/AikajanaKalenteri'));
+const TenantAdminDashboard = lazy(() => import('./components/TenantAdminDashboard'));
+const SuperAdminDashboard = lazy(() => import('./components/SuperAdminDashboard'));
+const Tasks = lazy(() => import('./components/Tasks'));
+const ResetPassword = lazy(() => import('./components/ResetPassword'));
+const ActivateAccount = lazy(() => import('./components/ActivateAccount'));
+const Sidebar = lazy(() => import('./components/Sidebar'));
 
 function App() {
   const [session, setSession] = useState(null);
@@ -64,18 +64,24 @@ function App() {
       <TenantProvider>
         <RoleProvider>
           <div className={`App min-h-screen font-sans text-textPrimary ${darkMode ? 'dark bg-darkBackground text-darkTextPrimary' : 'bg-background text-textPrimary'}`}>
-            {session && <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} />}
+            {session && (
+              <Suspense fallback={<div>Loading sidebar...</div>}>
+                <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} />
+              </Suspense>
+            )}
             <main className={`pt-4 pb-8 ${session ? 'px-0 sm:px-8' : 'px-2 sm:px-8'} sm:max-w-7xl sm:mx-auto`}>
-              <Routes>
-                <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> : <Navigate to="/login" />} />
-                <Route path="/login" element={<Auth />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/admin" element={<TenantAdminDashboard darkMode={darkMode} setDarkMode={setDarkMode} />} />
-                <Route path="/superadmin" element={<SuperAdminDashboard />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/activate" element={<ActivateAccount />} />
-                <Route path="/tasks" element={session ? <Tasks /> : <Navigate to="/login" />} />
-              </Routes>
+              <Suspense fallback={<div>Loading page...</div>}>
+                <Routes>
+                  <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> : <Navigate to="/login" />} />
+                  <Route path="/login" element={<Auth />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/admin" element={<TenantAdminDashboard darkMode={darkMode} setDarkMode={setDarkMode} />} />
+                  <Route path="/superadmin" element={<SuperAdminDashboard />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/activate" element={<ActivateAccount />} />
+                  <Route path="/tasks" element={session ? <Tasks /> : <Navigate to="/login" />} />
+                </Routes>
+              </Suspense>
             </main>
           </div>
         </RoleProvider>
