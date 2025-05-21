@@ -4,6 +4,7 @@ import { supabase } from "../supabaseClient";
 import { useRole } from "../contexts/RoleContext";
 import { useState, useEffect } from "react";
 import { useTenant } from "../contexts/TenantContext";
+import SidebarTaskBoard from "./SidebarTaskBoard";
 
 const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
   const { userRole, isSuperadmin } = useRole();
@@ -222,6 +223,7 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
             <div className="mt-2 sm:mt-4" />
             <button className="py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-secondary hover:bg-highlight shadow-card transition-all text-left dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkHighlight" onClick={handlePrintAgenda}>Print Agenda</button>
             <button className="py-2 px-3 sm:px-4 rounded-lg bg-surface text-textPrimary font-sans font-medium text-[13px] sm:text-[14px] border border-accent hover:bg-highlight shadow-card transition-all text-left dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkAccent dark:hover:bg-darkHighlight" onClick={() => handlePrint('calendar')}>Print Calendar</button>
+            <SidebarTaskBoard />
             <button onClick={handleLogout} className="py-2 px-3 sm:px-4 rounded-lg bg-error text-black font-sans font-medium text-[13px] sm:text-[14px] hover:bg-error/90 shadow-card transition-all text-left mt-2 sm:mt-4 border border-error dark:bg-darkError dark:text-darkTextPrimary dark:border-darkError dark:hover:bg-darkHighlight">Logout</button>
           </nav>
         </div>

@@ -14,7 +14,9 @@ const getAuthorName = (profile, userId) => {
   return metaName || profile.email || userId;
 };
 
-const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMode, setViewMode] = useState('month');
+const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  
+  const [viewMode, setViewMode] = useState('month');
+
   // eslint-disable-next-line no-unused-vars
   const [selectedLayer, setSelectedLayer] = useState('all');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -58,6 +60,44 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
   // Lisää repeat state
   const [repeat, setRepeat] = useState({ enabled: false, frequency: 'none', count: 1, until: '' });
 
+  const [dayPanelTasks, setDayPanelTasks] = useState([]);
+
+  // State for add task modal (define only once at the top)
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    deadline: '',
+    priority: 'medium',
+    category: '',
+  });
+
+  // Handler for adding a task from the day panel (define only once)
+  const handleAddTask = async (e) => {
+    e.preventDefault();
+    if (!tenantId) return;
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .insert([{ ...newTask, tenant_id: tenantId, deadline: newTask.deadline || (selectedDay ? getLocalDateString(selectedDay) : '') }]);
+      if (error) throw error;
+      setShowAddTaskModal(false);
+      setNewTask({ title: '', description: '', deadline: '', priority: 'medium', category: '' });
+      // Refresh tasks for the day panel
+      if (selectedDay) {
+        const { data: tasksForDay, error: fetchError } = await supabase
+          .from('tasks')
+          .select('*')
+          .eq('tenant_id', tenantId)
+          .eq('deadline', getLocalDateString(selectedDay))
+          .eq('completed', false);
+        if (!fetchError) setDayPanelTasks(tasksForDay || []);
+      }
+    } catch (err) {
+      console.error('Error adding task:', err);
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       await fetchEvents();
@@ -71,6 +111,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.user_metadata?.tenant_id) {
         setNewEvent(prev => ({ ...prev, tenant_id: user.user_metadata.tenant_id }));
+        setNewTask(prev => ({ ...prev, tenant_id: user.user_metadata.tenant_id }));
       }
     };
     getTenantId();
@@ -354,9 +395,11 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
     setShowEditModal(true);
   };
 
-  const handleDayClick = (day) => {
+  // Update handleDayClick to include tasks
+  const handleDayClick = async (day) => {
     setSelectedDay(day);
     setShowDayPanel(true);
+  
     // Gather all events for this day
     const eventsForDay = Object.values(events).flat().filter(event => {
       const start = parseLocalDate(event.startDate);
@@ -364,6 +407,20 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       return day >= start && day <= end;
     });
     setDayPanelEvents(eventsForDay);
+  
+    // Fetch tasks for the selected day
+    try {
+      const { data: tasksForDay, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('deadline', getLocalDateString(day));
+  
+      if (error) throw error;
+      setDayPanelTasks(tasksForDay || []);
+    } catch (err) {
+      console.error('Error fetching tasks for the day:', err);
+    }
   };
 
   const getDaysInMonth = (date) => {
@@ -544,23 +601,24 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
     </div>
   );
 
-  // Update renderDayEvents to scale events properly based on count
+  // Update renderDayEvents to ensure all events are displayed properly
   const renderDayEvents = (eventsForType, day, type) => {
     if (!visibleEventTypes.includes(type)) return null;
     const eventsArr = eventsForType || [];
     if (selectedEventType !== 'all' && type !== selectedEventType) return null;
+  
+    // Filter events for the specific day
     const matchingEvents = eventsArr.filter(event => {
       const startDate = parseLocalDate(event.startDate);
       const endDate = parseLocalDate(event.endDate);
-      return (isSameDay(day, startDate) || 
-        (day >= startDate && day <= endDate)) &&
-        (selectedLayer === 'all' || selectedLayer === type);
+      return isSameDay(day, startDate) || (day >= startDate && day <= endDate);
     });
+  
     if (matchingEvents.length === 0) return null;
-    
-    // Calculate scale based on number of events - more aggressive scaling for many events
+  
+    // Adjust scaling for multiple events
     const scale = Math.max(0.6, 1 - (matchingEvents.length - 1) * 0.15);
-    
+  
     return (
       <div className="relative w-full flex flex-col gap-1">
         {matchingEvents.map((event, idx) => (
@@ -574,7 +632,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       </div>
     );
   };
-
+  
   // Update the month view rendering in renderContent
   const renderContent = () => {
     if (viewMode === 'month') {
@@ -637,7 +695,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
             </div>
           ))}
           {weekDays.map((day, index) => (
-            <div key={index} className="p-1 sm:p-2 border min-h-[4rem] sm:min-h-32 day-cell bg-surface/90 rounded-lg shadow-card text-xs sm:text-base font-sans text-textPrimary dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
+            <div key={index} className="p-1 sm:p-2 border min-h-[6rem] sm:min-h-40 day-cell text-xs sm:text-base font-sans text-textPrimary bg-surface/90 rounded-lg shadow-card dark:bg-darkSurface/90 dark:border-darkBorder dark:text-darkTextPrimary">
               <div className="flex justify-between items-start">
                 <button
                   className="font-bold hover:bg-accentPink/30 rounded-md px-1 focus:outline-none font-sans text-textPrimary dark:text-darkTextPrimary"
@@ -681,7 +739,8 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
 
   // When opening add event modal, always close the day panel first
   const openAddEventModal = (day = null) => {
-    setShowDayPanel(false); // Sulje päivämodaali ennen uuden avaamista
+    if (showAddModal) return; // Prevent multiple modals from opening
+    setShowDayPanel(false); // Close day panel before opening new modal
     const defaultType = eventTypes.length > 0 ? eventTypes[0].name : 'general';
     setNewEvent({
       name: '',
@@ -856,23 +915,23 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
       {/* Add Detail Modal */}
       {showDetailModal && selectedEvent && (      <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4 dark:bg-darkLowlightBg/80">
           <div className="bg-surface p-6 rounded-lg w-full max-w-2xl shadow-modal border border-border dark:bg-darkSurface dark:border-darkBorder">
-            <div className="p-4 rounded-lg shadow-card" style={getEventTypeColor(selectedEvent.type)}>
-              <h3 className="text-xl font-semibold tracking-wide dark:text-darkTextPrimary">{selectedEvent.name}</h3>
-              <p className="text-sm mt-2 text-textSecondary dark:text-darkTextSecondary">
+            <div className="p-4 rounded-lg shadow-card" style={{ ...getEventTypeColor(selectedEvent.type), color: '#000' }}>
+              <h3 className="text-xl font-semibold tracking-wide" style={{ color: '#000' }}>{selectedEvent.name}</h3>
+              <p className="text-sm mt-2" style={{ color: '#000' }}>
                 {new Date(selectedEvent.startDate).toLocaleDateString('fi-FI')} - {new Date(selectedEvent.endDate).toLocaleDateString('fi-FI')}
               </p>
-              <p className="text-sm mt-1 text-textSecondary dark:text-darkTextSecondary">
+              <p className="text-sm mt-1" style={{ color: '#000' }}>
                 Tyyppi: {getEventTypeName(selectedEvent.type)}
               </p>
               {selectedEvent.info && (
-                <div className="mt-2 p-2 bg-surface border rounded-lg text-sm dark:bg-darkSurface dark:border-darkBorder dark:text-darkTextPrimary">
-                  <span className="font-semibold dark:text-darkTextPrimary">Lisätiedot:</span> {selectedEvent.info}
+                <div className="mt-2 p-2 bg-surface border rounded-lg text-sm" style={{ color: '#000' }}>
+                  <span className="font-semibold" style={{ color: '#000' }}>Lisätiedot:</span> {selectedEvent.info}
                 </div>
               )}
             </div>
             {/* Comment Section */}
             <div className="mt-6">
-              <h4 className="font-semibold mb-2 text-black font-sans tracking-elegant dark:text-darkTextPrimary">Kommentit</h4>
+              <h4 className="font-semibold mb-2" style={{ color: '#000' }}>Kommentit</h4>
               {commentLoading ? <div className="text-center text-lowlightText font-sans dark:text-darkLowlightText">Ladataan...</div> : (
                 <ul className="mb-4 space-y-3">                  {comments.filter(c => !c.parent_comment_id).map(comment => (
                     <li key={comment.id} className="mb-2 p-2 bg-surface/80 rounded-lg border border-border shadow-card dark:bg-darkSurface/80 dark:border-darkBorder dark:text-darkTextPrimary">
@@ -1155,10 +1214,16 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
             <button className="absolute top-2 right-2 text-xl font-bold text-error hover:text-error/80 transition-all duration-200 ease-in-out dark:text-darkError dark:hover:text-darkError/80" onClick={() => setShowDayPanel(false)}>&times;</button>
             <h2 className="text-lg sm:text-xl font-semibold mb-2 dark:text-darkTextPrimary">{selectedDay.toLocaleDateString('fi-FI')}</h2>
             <button
-              className="mb-4 px-3 sm:px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary w-full dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
+              className="mb-2 px-3 sm:px-4 py-2 rounded-lg bg-primary text-white font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary w-full dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
               onClick={() => openAddEventModal(selectedDay)}
             >
               Lisää tapahtuma tälle päivälle
+            </button>
+            <button
+              className="mb-4 px-3 sm:px-4 py-2 rounded-lg bg-secondary text-white font-medium shadow-card hover:bg-secondaryHover transition-all duration-200 ease-in-out border border-secondary w-full dark:bg-darkSecondary dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkHighlight"
+              onClick={() => setShowAddTaskModal(true)}
+            >
+              Lisää tehtävä tälle päivälle
             </button>
             <h3 className="font-semibold mb-2 dark:text-darkTextPrimary">Tapahtumat</h3>
             <ul>
@@ -1170,6 +1235,83 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  const [viewMod
                 </li>
               ))}
             </ul>
+            <h3 className="font-semibold mb-2 dark:text-darkTextPrimary">Tehtävät</h3>
+            <ul>
+              {dayPanelTasks.length === 0 && <li className="dark:text-darkTextSecondary">Ei tehtäviä tälle päivälle.</li>}
+              {dayPanelTasks.map(task => (
+                <li key={task.id} className="mb-2 p-2 border rounded-lg cursor-pointer flex items-center gap-2 task-list-item hover:bg-accent/10 transition-all duration-200 ease-in-out dark:bg-darkSurface/80 dark:border-darkBorder dark:text-darkTextPrimary hover:dark:bg-darkAccent/10">
+                  <span className="font-semibold">{task.title}</span>
+                  <span className="text-xs">({task.priority})</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* Add Task Modal for selected day */}
+      {showAddTaskModal && (
+        <div className="fixed inset-0 bg-lowlightBg/80 flex items-center justify-center p-4 z-50 dark:bg-darkLowlightBg/80">
+          <div className="bg-surface/90 p-6 rounded-lg w-full max-w-md shadow-modal border border-border backdrop-blur-sm dark:bg-darkSurface/90 dark:border-darkBorder">
+            <h3 className="modal-header text-lg font-semibold mb-4 dark:text-darkTextPrimary">Lisää uusi tehtävä</h3>
+            <form onSubmit={handleAddTask} className="space-y-4">
+              <div>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Nimi</label>
+                <input
+                  type="text"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
+                  value={newTask.title}
+                  onChange={e => setNewTask({ ...newTask, title: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Kuvaus</label>
+                <textarea
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
+                  value={newTask.description}
+                  onChange={e => setNewTask({ ...newTask, description: e.target.value })}
+                  rows={2}
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Deadline</label>
+                <input
+                  type="date"
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
+                  value={newTask.deadline}
+                  onChange={e => setNewTask({ ...newTask, deadline: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium dark:text-darkTextPrimary">Prioriteetti</label>
+                <select
+                  className="w-full border border-border p-2 rounded-lg bg-white/80 backdrop-blur-sm text-textPrimary placeholder-placeholder focus:border-primary focus:ring-2 focus:ring-primary transition-all duration-200 ease-in-out dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder dark:placeholder-darkTextSecondary"
+                  value={newTask.priority}
+                  onChange={e => setNewTask({ ...newTask, priority: e.target.value })}
+                >
+                  <option value="low">Matala</option>
+                  <option value="medium">Keskitaso</option>
+                  <option value="high">Korkea</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-lg bg-surface text-textPrimary font-sans font-medium shadow-card hover:bg-highlight transition-all duration-200 ease-in-out border border-secondary dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkSecondary dark:hover:bg-darkHighlight"
+                  onClick={() => setShowAddTaskModal(false)}
+                >
+                  Peruuta
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg bg-primary text-white font-sans font-medium shadow-card hover:bg-primaryHover transition-all duration-200 ease-in-out border border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary dark:hover:bg-darkHighlight"
+                >
+                  Lisää tehtävä
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

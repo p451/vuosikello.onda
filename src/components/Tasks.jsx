@@ -4,7 +4,7 @@ import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState({ incomplete: [], completed: [] });
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -18,18 +18,30 @@ const Tasks = () => {
   const canManageTasks = ['admin', 'editor'].includes(userRole);
 
   useEffect(() => {
-    fetchTasks();  }, [tenantId]);
+    if (!tenantId) {
+      setError('Tenant ID is not available. Please ensure you are logged in and have the correct permissions.');
+      setLoading(false);
+      return;
+    }
+    fetchTasks();
+  }, [tenantId]);
 
   const fetchTasks = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: incomplete, error: error1 } = await supabase
         .from('tasks')
         .select('*')
         .eq('tenant_id', tenantId)
+        .eq('completed', false)
         .order('deadline', { ascending: true });
-
-      if (error) throw error;
-      setTasks(data);
+      const { data: completed, error: error2 } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('completed', true)
+        .order('deadline', { ascending: true });
+      if (error1 || error2) throw error1 || error2;
+      setTasks({ incomplete, completed });
     } catch (error) {
       setError('Error fetching tasks');
       console.error('Error:', error);
@@ -49,17 +61,16 @@ const Tasks = () => {
   const createTask = async (e) => {
     e.preventDefault();
     if (!canManageTasks) return;
-
-    try {      const { data, error } = await supabase
+    try {
+      const { data, error } = await supabase
         .from('tasks')
-        .insert([{
-          ...newTask,
-          tenant_id: tenantId
-        }]);
-
+        .insert([{ ...newTask, completed: false, tenant_id: tenantId }])
+        .select()
+        .single();
       if (error) throw error;
-
-      setTasks(prev => [...prev, data[0]]);
+      if (data) {
+        setTasks(prev => ({ ...prev, incomplete: [...(prev.incomplete || []), data] }));
+      }
       setNewTask({
         title: '',
         description: '',
@@ -74,8 +85,6 @@ const Tasks = () => {
   };
 
   const toggleTaskCompletion = async (taskId, currentStatus) => {
-    if (!canManageTasks) return;
-
     try {
       const { error } = await supabase
         .from('tasks')
@@ -84,14 +93,23 @@ const Tasks = () => {
 
       if (error) throw error;
 
-      setTasks(prev =>
-        prev.map(task =>
-          task.id === taskId ? { ...task, completed: !currentStatus } : task
-        )
-      );
-    } catch (error) {
-      setError('Error updating task');
-      console.error('Error:', error);
+      setTasks(prevTasks => {
+        const updatedTask = prevTasks.incomplete.find(task => task.id === taskId) || prevTasks.completed.find(task => task.id === taskId);
+        updatedTask.completed = !currentStatus;
+        if (currentStatus) {
+          return {
+            incomplete: [...prevTasks.incomplete, updatedTask],
+            completed: prevTasks.completed.filter(task => task.id !== taskId)
+          };
+        } else {
+          return {
+            incomplete: prevTasks.incomplete.filter(task => task.id !== taskId),
+            completed: [...prevTasks.completed, updatedTask]
+          };
+        }
+      });
+    } catch (err) {
+      console.error('Error toggling task completion:', err);
     }
   };
 
@@ -106,7 +124,10 @@ const Tasks = () => {
 
       if (error) throw error;
 
-      setTasks(prev => prev.filter(task => task.id !== taskId));
+      setTasks(prev => ({
+        incomplete: prev.incomplete.filter(task => task.id !== taskId),
+        completed: prev.completed.filter(task => task.id !== taskId)
+      }));
     } catch (error) {
       setError('Error deleting task');
       console.error('Error:', error);
@@ -185,29 +206,24 @@ const Tasks = () => {
       )}
 
       <div className="space-y-4">
-        {tasks.map(task => (
+        <h3 className="font-semibold mb-2">Aktiiviset tehtävät</h3>
+        {(tasks.incomplete || []).map(task => (
           <div
             key={task.id}
             className={`p-4 rounded-lg border ${
-              task.completed ? 'bg-gray-50' : 'bg-white'
+              task.completed ? 'bg-gray-50 line-through text-gray-500' : 'bg-white'
             }`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                {canManageTasks && (
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => toggleTaskCompletion(task.id, task.completed)}
-                    className="h-5 w-5"
-                  />
-                )}
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => toggleTaskCompletion(task.id, task.completed)}
+                  className="h-5 w-5"
+                />
                 <div>
-                  <h3 className={`text-lg font-semibold ${
-                    task.completed ? 'line-through text-gray-500' : ''
-                  }`}>
-                    {task.title}
-                  </h3>
+                  <h3 className="text-lg font-semibold">{task.title}</h3>
                   <p className="text-gray-600">{task.description}</p>
                 </div>
               </div>
@@ -236,6 +252,42 @@ const Tasks = () => {
                   >
                     Delete
                   </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="space-y-4 mt-8">
+        <h3 className="font-semibold mb-2">Valmiit tehtävät</h3>
+        {(tasks.completed || []).length === 0 && <div className="text-gray-400">Ei valmiita tehtäviä.</div>}
+        {(tasks.completed || []).map(task => (
+          <div key={task.id} className="p-4 rounded-lg border bg-gray-50 line-through text-gray-500">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <input type="checkbox" checked readOnly className="h-5 w-5" />
+                <div>
+                  <h3 className="text-lg font-semibold">{task.title}</h3>
+                  <p className="text-gray-600">{task.description}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className={`px-2 py-1 rounded text-sm ${
+                  task.priority === 'high' ? 'bg-red-100 text-red-800' :
+                  task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800'
+                }`}>
+                  {task.priority}
+                </span>
+                {task.category && (
+                  <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm">
+                    {task.category}
+                  </span>
+                )}
+                {task.deadline && (
+                  <span className="text-gray-500 text-sm">
+                    {new Date(task.deadline).toLocaleDateString()}
+                  </span>
                 )}
               </div>
             </div>
