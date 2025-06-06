@@ -161,18 +161,15 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
   // Sidebar is always rendered, animate with translate-x
   return (
     <>
-      {/* Sidebar panel */}
-      <aside
+      {/* Sidebar panel */}      <aside
         className={`h-full w-5/6 max-w-xs sm:w-64 bg-surface/95 text-textPrimary flex flex-col justify-between fixed left-0 top-0 shadow-card z-40 font-sans transition-transform duration-700 ease-in-out border-r border-accent rounded-lg
         ${open ? 'translate-x-0' : '-translate-x-full'}
         dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder`}
         style={{ willChange: 'transform' }}
-        aria-hidden={!open}
       >
         <div>
           <div className="flex items-center justify-between p-3 sm:p-4 text-lg sm:text-xl font-semibold border-b border-accent bg-surface/95 rounded-t-lg dark:bg-darkSurface dark:border-darkBorder">
-            <span className="font-sans font-semibold text-[16px] sm:text-[18px]">{tenantName || ""}</span>
-            <button
+            <span className="font-sans font-semibold text-[16px] sm:text-[18px]">{tenantName || ""}</span>            <button
               className="ml-2 p-2 rounded-lg hover:bg-primary/20 transition-all duration-150 flex items-center dark:hover:bg-darkHighlight text-gray-800 dark:text-darkTextPrimary"
               aria-label="Sulje sivupalkki"
               onClick={() => setOpen(false)}
@@ -184,8 +181,7 @@ const Sidebar = ({ open, setOpen, darkMode, setDarkMode }) => {
             </button>
           </div>
           <nav className="flex flex-col gap-1 sm:gap-2 p-2 sm:p-4">
-            {(userRole === 'admin' || isSuperadmin) && (
-              <Link to="/admin"
+            {(userRole === 'admin' || isSuperadmin) && (              <Link to="/admin"
                 className={`py-2 px-3 sm:px-4 rounded-lg font-sans font-medium text-[13px] sm:text-[14px] border transition-all text-left shadow-card
                   ${isActive('/admin') ? 'bg-primary text-textPrimary border-primary dark:bg-darkPrimary dark:text-darkTextPrimary dark:border-darkPrimary' : 'bg-surface text-textPrimary border-transparent hover:bg-highlight dark:bg-darkSurface dark:text-darkTextPrimary dark:hover:bg-darkHighlight'}`}
               >Admin dashboard</Link>
