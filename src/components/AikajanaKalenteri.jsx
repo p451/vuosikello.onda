@@ -891,7 +891,7 @@ const renderDayEvents = (eventsForType, day, type) => {
         </button>
       ))}
     </div>
-  );  return (    <div className="w-full mx-auto p-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans dark:bg-darkBackground">
+  );  return (    <div className="w-full mx-auto px-0 py-2 sm:p-4 max-w-full lg:max-w-7xl bg-background min-h-screen font-sans dark:bg-darkBackground">
       <style>
         {`
           @media print {
@@ -951,8 +951,7 @@ const renderDayEvents = (eventsForType, day, type) => {
       {/* Centered Aikumo Header, unified with calendar headers */}
       <div className="text-center mb-6">
         <h1 className="text-h1 font-sans font-semibold uppercase tracking-wide text-textPrimary select-none dark:text-darkTextPrimary">Aikumo</h1>
-      </div>
-      <div className="border rounded-lg shadow-modal bg-surface calendar-container overflow-x-auto relative w-full sm:max-w-5xl sm:mx-auto dark:bg-darkSurface dark:border-darkBorder"
+      </div>      <div className="border rounded-lg shadow-modal bg-surface calendar-container overflow-x-auto relative w-full mx-0 sm:mx-auto sm:max-w-5xl dark:bg-darkSurface dark:border-darkBorder"
         style={{ maxWidth: '100%' }}
       >
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4 calendar-header">
