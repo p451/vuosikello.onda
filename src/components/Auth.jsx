@@ -83,9 +83,8 @@ export default function Auth() {
               if (!resetEmail) {
                 setResetMessage('Enter your email to reset password.');
                 return;
-              }
-              const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-                redirectTo: 'https://ondacalendar.netlify.app/reset-password'
+              }              const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+                redirectTo: 'https://aikumo.netlify.app/reset-password'
               });
               setResetMessage(error ? error.message : 'Reset link sent! Check your email.');
             }}
