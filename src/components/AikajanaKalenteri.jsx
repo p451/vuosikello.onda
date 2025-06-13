@@ -721,10 +721,9 @@ const renderDayEvents = (eventsForType, day, type) => {
                         aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
                       >
                         {day.getDate()}
-                      </button>
-                      {hasTasksForDay(day) && (
+                      </button>                      {hasTasksForDay(day) && (
                         <span
-                          className="block w-4 h-4 rounded-full mt-1 mb-0.5 mx-auto shadow-glow animate-glow cursor-pointer flex items-center justify-center text-xs font-bold text-primary bg-transparent border border-primary"
+                          className="w-4 h-4 rounded-full mt-1 mb-0.5 mx-auto shadow-glow animate-glow cursor-pointer flex items-center justify-center text-xs font-bold text-primary bg-transparent border border-primary"
                           onClick={() => navigate('/tasks')}
                           title="Tehtäviä tälle päivälle"
                           style={{ boxShadow: '0 0 6px 2px #3b82f6', background: 'white' }}
@@ -772,10 +771,9 @@ const renderDayEvents = (eventsForType, day, type) => {
                       aria-label={`Näytä päivän ${day.getDate()}.${day.getMonth() + 1}. tapahtumat`}
                     >
                       {day.getDate()}
-                    </button>
-                    {hasTasksForDay(day) && (
+                    </button>                    {hasTasksForDay(day) && (
                       <span
-                        className="block w-4 h-4 rounded-full mt-1 mb-0.5 mx-auto shadow-glow animate-glow cursor-pointer flex items-center justify-center text-xs font-bold text-primary bg-transparent border border-primary"
+                        className="w-4 h-4 rounded-full mt-1 mb-0.5 mx-auto shadow-glow animate-glow cursor-pointer flex items-center justify-center text-xs font-bold text-primary bg-transparent border border-primary"
                         onClick={() => navigate('/tasks')}
                         title="Tehtäviä tälle päivälle"
                         style={{ boxShadow: '0 0 6px 2px #3b82f6', background: 'white' }}
