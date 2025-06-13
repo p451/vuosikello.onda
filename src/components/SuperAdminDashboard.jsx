@@ -106,15 +106,15 @@ export default function SuperAdminDashboard() {
   };
 
   // Invite/create user for tenant (TenantAdminDashboard-tyyli)
-  const inviteUser = async (e) => {
-    e.preventDefault();
+  const inviteUser = async (e) => {    e.preventDefault();
     if (!userInviteEmail) return;
     try {
-      // Odota hetki, että profiili ehtii syntyä ennen user_roles-inserttiä
-      await new Promise((resolve) => setTimeout(resolve, 1200));
       const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/create_user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3Z3FtaXdwcm51anFramlobGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3MDU1NTEsImV4cCI6MjA2MjI4MTU1MX0.plhNaMEg8jiiNBvkMNPPbtsevM43ArGEXVe_TbVJE54`
+        },
         body: JSON.stringify({
           email: userInviteEmail,
           role: userInviteRole,

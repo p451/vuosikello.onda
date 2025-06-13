@@ -56,16 +56,16 @@ export default function TenantAdminDashboard({ darkMode, setDarkMode }) {
       .eq('tenant_id', tenantId);
     if (!error) setEventTypes(data);
   };
-
   const addUserDirectly = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Odota hetki, että profiili ehtii syntyä ennen user_roles-inserttiä
-      await new Promise((resolve) => setTimeout(resolve, 1200));
       const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/create_user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3Z3FtaXdwcm51anFramlobGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3MDU1NTEsImV4cCI6MjA2MjI4MTU1MX0.plhNaMEg8jiiNBvkMNPPbtsevM43ArGEXVe_TbVJE54`
+        },
         body: JSON.stringify({
           email: inviteEmail,
           role: selectedRole,
@@ -87,10 +87,12 @@ export default function TenantAdminDashboard({ darkMode, setDarkMode }) {
   const confirmDeleteUser = async () => {
     if (deleteInput !== 'delete' || !userToDelete) return;
     setLoading(true);
-    try {
-      const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/delete_user', {
+    try {      const response = await fetch('https://kwgqmiwprnujqkjihllg.supabase.co/functions/v1/delete_user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3Z3FtaXdwcm51anFramlobGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3MDU1NTEsImV4cCI6MjA2MjI4MTU1MX0.plhNaMEg8jiiNBvkMNPPbtsevM43ArGEXVe_TbVJE54`
+        },
         body: JSON.stringify({ user_id: userToDelete })
       });
       const result = await response.json();
@@ -129,6 +131,23 @@ export default function TenantAdminDashboard({ darkMode, setDarkMode }) {
   const removeEventType = async (id) => {
     await supabase.from('tenant_event_types').delete().eq('id', id);
     fetchEventTypes();
+  };
+
+  // Change user role
+  const changeUserRole = async (userId, newRole) => {
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ role: newRole })
+        .eq('user_id', userId)
+        .eq('tenant_id', tenantId);
+      
+      if (error) throw error;
+      fetchUsers(); // Refresh the user list
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      alert('Failed to update user role');
+    }
   };
 
   if (loading) return <div className="flex items-center justify-center min-h-screen bg-background text-xl text-primary font-serif">Loading...</div>;
@@ -219,7 +238,17 @@ export default function TenantAdminDashboard({ darkMode, setDarkMode }) {
                         user.email || user.user_id
                       )}
                     </td>
-                    <td className="px-2 sm:px-6 py-2 sm:py-4 border-b border-border">{user.role}</td>
+                    <td className="px-2 sm:px-6 py-2 sm:py-4 border-b border-border">
+                      <select
+                        value={user.role}
+                        onChange={e => changeUserRole(user.user_id, e.target.value)}
+                        className="p-1 border border-border rounded-md text-xs sm:text-sm dark:bg-darkSurface dark:text-darkTextPrimary dark:border-darkBorder"
+                      >
+                        <option value="viewer">Viewer</option>
+                        <option value="editor">Editor</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </td>
                     <td className="px-2 sm:px-6 py-2 sm:py-4 border-b border-border">
                       <button
                         className="px-2 sm:px-3 py-1 rounded-lg bg-error text-black font-medium shadow-card hover:bg-error/90 transition-all border border-error text-xs sm:text-xs md:text-sm"
