@@ -18,9 +18,8 @@ const getAuthorName = (profile, userId) => {
 
 const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {  
   const [viewMode, setViewMode] = useState('month');
-
-  // eslint-disable-next-line no-unused-vars
-  const [selectedLayer, setSelectedLayer] = useState('all');
+  // Note: selectedLayer will be used for future layer filtering feature
+  const [selectedLayer] = useState('all');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -44,9 +43,8 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
   const { tenantId } = useTenant();
   const { can } = useRole();
   const [events, setEvents] = useState({});
-
-  // eslint-disable-next-line no-unused-vars
-  const [selectedEventType, setSelectedEventType] = useState('all');
+  // Note: selectedEventType will be used for future event type filtering feature
+  const [selectedEventType] = useState('all');
 
   const [showDayPanel, setShowDayPanel] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -122,6 +120,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
       }
     } catch (err) {
       console.error('Error adding task:', err);
+      // Could add toast notification here in the future
     }
   };
 
@@ -211,7 +210,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
 
   const fetchEvents = async () => {
     if (!tenantId) {
-      console.log('No tenant ID available');
+      // No tenant ID available, skip fetching
       return;
     }
 
@@ -228,7 +227,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
       }
 
       if (!data) {
-        console.log('No events found');
+        // No events found in database
         return;
       }
 
@@ -400,6 +399,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
       );
     } catch (err) {
       console.error('Error fetching comments:', err);
+      // Could add toast notification here in the future
     } finally {
       setCommentLoading(false);
     }
@@ -419,6 +419,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
       await fetchComments(eventId);
     } catch (err) {
       console.error('Error adding comment:', err);
+      // Could add toast notification here in the future
     } finally {
       setCommentLoading(false);
     }

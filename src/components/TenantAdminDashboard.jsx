@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
+import { useToast } from '../contexts/ToastContext';
 
 export default function TenantAdminDashboard({ darkMode, setDarkMode }) {
   const [users, setUsers] = useState([]);
@@ -9,6 +10,7 @@ export default function TenantAdminDashboard({ darkMode, setDarkMode }) {
   const [selectedRole, setSelectedRole] = useState('viewer');
   const { tenantId } = useTenant();
   const { userRole } = useRole();
+  const { success, error: showError } = useToast();
   const [loading, setLoading] = useState(true);
   const [eventTypes, setEventTypes] = useState([]);
   const [newEventType, setNewEventType] = useState('');
@@ -146,7 +148,7 @@ export default function TenantAdminDashboard({ darkMode, setDarkMode }) {
       fetchUsers(); // Refresh the user list
     } catch (error) {
       console.error('Error updating user role:', error);
-      alert('Failed to update user role');
+      showError('Käyttäjäroolin päivitys epäonnistui');
     }
   };
 

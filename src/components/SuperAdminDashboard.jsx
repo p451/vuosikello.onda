@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useRole } from '../contexts/RoleContext';
+import { useToast } from '../contexts/ToastContext';
 
 export default function SuperAdminDashboard() {
   const { isSuperadmin } = useRole();
+  const { success, error: showError } = useToast();
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -126,9 +128,9 @@ export default function SuperAdminDashboard() {
       setUserInviteEmail('');
       setUserInviteRole('viewer');
       openManageModal(selectedTenant);
-      alert('Käyttäjä lisätty ja kutsu lähetetty!');
+      success('Käyttäjä lisätty ja kutsu lähetetty!');
     } catch (error) {
-      alert(error.message);
+      showError(error.message);
     }
   };
 

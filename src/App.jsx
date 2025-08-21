@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import { supabase } from './supabaseClient';
 import { TenantProvider } from './contexts/TenantContext';
 import { RoleProvider } from './contexts/RoleContext';
+import { ToastProvider } from './contexts/ToastContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import './aikumo-teema.css';
 // Lazy-loaded components for code splitting
 const Auth = lazy(() => import('./components/Auth'));
@@ -60,33 +62,37 @@ function App() {
   }, [session]);
 
   return (
-    <Router>
-      <TenantProvider>
-        <RoleProvider>
-          <div className={`App min-h-screen font-sans text-textPrimary ${darkMode ? 'dark bg-darkBackground text-darkTextPrimary' : 'bg-background text-textPrimary'}`}>
-            {session && (
-              <Suspense fallback={<div>Loading sidebar...</div>}>
-                <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} />
-              </Suspense>
-            )}
-            <main className={`pt-4 pb-8 ${session ? 'px-0 sm:px-8' : 'px-2 sm:px-8'} sm:max-w-7xl sm:mx-auto`}>
-              <Suspense fallback={<div>Loading page...</div>}>
-                <Routes>
-                  <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> : <Navigate to="/login" />} />
-                  <Route path="/login" element={<Auth />} />
-                  <Route path="/signup" element={<SignUp />} />
-                  <Route path="/admin" element={<TenantAdminDashboard darkMode={darkMode} setDarkMode={setDarkMode} />} />
-                  <Route path="/superadmin" element={<SuperAdminDashboard />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/activate" element={<ActivateAccount />} />
-                  <Route path="/tasks" element={session ? <Tasks /> : <Navigate to="/login" />} />
-                </Routes>
-              </Suspense>
-            </main>
-          </div>
-        </RoleProvider>
-      </TenantProvider>
-    </Router>
+    <ErrorBoundary>
+      <ToastProvider>
+        <Router>
+          <TenantProvider>
+            <RoleProvider>
+              <div className={`App min-h-screen font-sans text-textPrimary ${darkMode ? 'dark bg-darkBackground text-darkTextPrimary' : 'bg-background text-textPrimary'}`}>
+                {session && (
+                  <Suspense fallback={<div>Loading sidebar...</div>}>
+                    <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} darkMode={darkMode} setDarkMode={setDarkMode} />
+                  </Suspense>
+                )}
+                <main className={`pt-4 pb-8 ${session ? 'px-0 sm:px-8' : 'px-2 sm:px-8'} sm:max-w-7xl sm:mx-auto`}>
+                  <Suspense fallback={<div>Loading page...</div>}>
+                    <Routes>
+                      <Route path="/" element={session ? <AikajanaKalenteri sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> : <Navigate to="/login" />} />
+                      <Route path="/login" element={<Auth />} />
+                      <Route path="/signup" element={<SignUp />} />
+                      <Route path="/admin" element={<TenantAdminDashboard darkMode={darkMode} setDarkMode={setDarkMode} />} />
+                      <Route path="/superadmin" element={<SuperAdminDashboard />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/activate" element={<ActivateAccount />} />
+                      <Route path="/tasks" element={session ? <Tasks /> : <Navigate to="/login" />} />
+                    </Routes>
+                  </Suspense>
+                </main>
+              </div>
+            </RoleProvider>
+          </TenantProvider>
+        </Router>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
 
