@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vuosikello - Environment Test</title>
+  </head>
+  <body>
+    <div id="test">
+      <h1>Environment Variables Test</h1>
+      <div id="results"></div>
+    </div>
+    <script type="module">
+      // Test if environment variables are available
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const hasUrl = !!supabaseUrl;
+      
+      const results = document.getElementById('results');
+      results.innerHTML = `
+        <p><strong>VITE_SUPABASE_URL:</strong> ${hasUrl ? 'Found' : 'Not found'}</p>
+        <p><strong>Value:</strong> ${supabaseUrl || 'undefined'}</p>
+        <p><strong>Mode:</strong> ${import.meta.env.MODE}</p>
+        <p><strong>Dev:</strong> ${import.meta.env.DEV}</p>
+        <p><strong>Prod:</strong> ${import.meta.env.PROD}</p>
+      `;
+    </script>
+  </body>
+</html>
