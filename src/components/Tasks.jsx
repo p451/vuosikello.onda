@@ -147,7 +147,7 @@ const Tasks = () => {
   if (loading) return <div>Loading tasks...</div>;
   if (error) return <div>Error: {error}</div>;
   return (
-    <div className="p-0 m-0 w-full font-sans text-textPrimary dark:text-darkTextPrimary pt-4 sm:pt-0">
+    <div className="px-4 py-0 m-0 w-full font-sans text-textPrimary dark:text-darkTextPrimary pt-4 sm:pt-0 sm:px-0">
       <h2 className="text-2xl font-bold mb-2 font-sans text-primary dark:text-darkPrimary">Tehtävät</h2>
       {canManageTasks && (
         <>
