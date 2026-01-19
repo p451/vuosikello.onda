@@ -6,9 +6,37 @@
 // Globaali toast-funktio (asetetaan App.jsx:ssä)
 let globalToastFn = null;
 let audioContext = null;
+let audioContextInitialized = false;
 
 export const setGlobalToastFunction = (toastFn) => {
   globalToastFn = toastFn;
+};
+
+// Alusta AudioContext käyttäjän ensimmäisestä interaktiosta
+const initializeAudioContext = () => {
+  if (audioContextInitialized) return;
+  
+  const handler = () => {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioContext.state === 'suspended') {
+      audioContext.resume().then(() => {
+        console.log('AudioContext initialized and resumed');
+        audioContextInitialized = true;
+      }).catch(err => {
+        console.error('Failed to initialize AudioContext:', err);
+      });
+    } else {
+      audioContextInitialized = true;
+    }
+    // Poista listener kun AudioContext on alustettu
+    document.removeEventListener('click', handler);
+    document.removeEventListener('touchstart', handler);
+  };
+  
+  document.addEventListener('click', handler, { once: true });
+  document.addEventListener('touchstart', handler, { once: true });
 };
 
 // Hae tai luo AudioContext
@@ -18,6 +46,11 @@ const getAudioContext = () => {
   }
   return audioContext;
 };
+
+// Alusta AudioContext app käynnistyessä
+if (typeof window !== 'undefined') {
+  initializeAudioContext();
+}
 
 // Tarkista selaimen notifikaatio-tuki
 export const requestNotificationPermission = async () => {
