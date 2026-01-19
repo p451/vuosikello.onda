@@ -159,6 +159,28 @@ export const sendNotification = async (title, options = {}) => {
     // Soita ääni joka tapauksessa
     console.log('Playing notification sound');
     playNotificationSound();
+    
+    // Yritä lähettää push notifikaatio Service Workerin kautta (background-notifikaatiot)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        console.log('Service Worker ready, sending push notification');
+        // Voimme lähettää custom viestin Service Workerille
+        if (registration.active) {
+          registration.active.postMessage({
+            type: 'SHOW_NOTIFICATION',
+            title: title,
+            options: {
+              body: options.body || title,
+              icon: '/manifest.json',
+              badge: '/robots.txt',
+              tag: options.tag || 'notification-' + Date.now(),
+              vibrate: [200, 100, 200],
+              ...options
+            }
+          });
+        }
+      }).catch(err => console.error('Service Worker not ready:', err));
+    }
   } catch (error) {
     console.error('Virhe ilmoitusta lähettäessä:', error);
     // Yritä ainakin soittaa ääni vaikka ilmoitus epäonnistuisi

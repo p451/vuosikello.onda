@@ -79,6 +79,19 @@ function App() {
     }
   }, [session]);
 
+  // Rekisteröi Service Worker notifikaatioita varten
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+        .then((registration) => {
+          console.log('Service Worker registered successfully:', registration);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
+  }, []);
+
   return (
     <ErrorBoundary>
       <ToastProvider>
