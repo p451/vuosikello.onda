@@ -109,10 +109,6 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
         .select()
         .single();
       if (error) throw error;
-      // Lähetä notifikaatio uudesta tehtävästä
-      if (data) {
-        notifyTaskCreated(data.title);
-      }
       setShowAddTaskModal(false);
       setNewTask({ title: '', description: '', deadline: '', priority: 'medium', category: '', event_id: null });
       // Refresh tasks for the day panel
@@ -510,8 +506,6 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
             tenant_id: event.tenant_id,
             info: event.info
           });
-          // Lähetä notifikaatio jokaisesta luodusta tapahtumasta
-          notifyEventCreated(event.name);
         });
         setEvents(newEvents);
       }
@@ -541,8 +535,6 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
         .eq('tenant_id', tenantId);
 
       if (error) throw error;
-      // Lähetä notifikaatio tapahtuman päivityksestä
-      notifyEventUpdated(editEvent.name);
       await fetchEvents();
       setShowEditModal(false);
       setEditEvent(null);
