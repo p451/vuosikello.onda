@@ -3,6 +3,13 @@
  * Lähettää selainilmoituksen ja soittaa äänen kun uusia tapahtumia tai tehtäviä luodaan
  */
 
+// Globaali toast-funktio (asetetaan App.jsx:ssä)
+let globalToastFn = null;
+
+export const setGlobalToastFunction = (toastFn) => {
+  globalToastFn = toastFn;
+};
+
 // Tarkista selaimen notifikaatio-tuki
 const requestNotificationPermission = async () => {
   if (!('Notification' in window)) {
@@ -108,13 +115,19 @@ export const sendNotification = async (title, options = {}) => {
   try {
     console.log('sendNotification called with title:', title, 'options:', options);
     
+    // Näytä visuaalinen toast
+    if (globalToastFn) {
+      console.log('Showing toast notification');
+      globalToastFn(options.body || title, 'info', 5000);
+    }
+    
     // Pyydä lupa ensimmäisen kerran
     const hasPermission = await requestNotificationPermission();
     console.log('Has permission:', hasPermission);
 
-    // Näytä ilmoitus
+    // Näytä selain-ilmoitus
     if (hasPermission && Notification.permission === 'granted') {
-      console.log('Showing notification:', title);
+      console.log('Showing browser notification:', title);
       const notification = new Notification(title, {
         icon: '/manifest.json',
         badge: '/robots.txt',
@@ -129,9 +142,9 @@ export const sendNotification = async (title, options = {}) => {
         window.focus();
       };
       
-      console.log('Notification shown successfully');
+      console.log('Browser notification shown successfully');
     } else {
-      console.log('Cannot show notification - permission not granted');
+      console.log('Cannot show browser notification - permission not granted');
     }
 
     // Soita ääni joka tapauksessa
