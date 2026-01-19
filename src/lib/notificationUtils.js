@@ -5,9 +5,18 @@
 
 // Globaali toast-funktio (asetetaan App.jsx:ssä)
 let globalToastFn = null;
+let audioContext = null;
 
 export const setGlobalToastFunction = (toastFn) => {
   globalToastFn = toastFn;
+};
+
+// Hae tai luo AudioContext
+const getAudioContext = () => {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioContext;
 };
 
 // Tarkista selaimen notifikaatio-tuki
@@ -40,20 +49,20 @@ export const playNotificationSound = () => {
   try {
     console.log('Attempting to play notification sound');
     
-    // Käytä Web Audio API -ääntä
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    // Käytä globaalia AudioContext:ia
+    const ctx = getAudioContext();
     
     // Varmista että AudioContext on käynnissä
-    if (audioContext.state === 'suspended') {
+    if (ctx.state === 'suspended') {
       console.log('AudioContext was suspended, resuming...');
-      audioContext.resume().then(() => {
+      ctx.resume().then(() => {
         console.log('AudioContext resumed successfully');
-        playSoundWithContext(audioContext);
+        playSoundWithContext(ctx);
       }).catch((err) => {
         console.error('Failed to resume AudioContext:', err);
       });
     } else {
-      playSoundWithContext(audioContext);
+      playSoundWithContext(ctx);
     }
   } catch (error) {
     console.error('Virhe äänen soittamisessa:', error);
