@@ -10,15 +10,21 @@ const requestNotificationPermission = async () => {
     return false;
   }
 
+  console.log('Notification permission current status:', Notification.permission);
+
   if (Notification.permission === 'granted') {
+    console.log('Notification permission already granted');
     return true;
   }
 
   if (Notification.permission !== 'denied') {
+    console.log('Requesting notification permission...');
     const permission = await Notification.requestPermission();
+    console.log('Notification permission result:', permission);
     return permission === 'granted';
   }
 
+  console.log('Notification permission was denied');
   return false;
 };
 
@@ -75,12 +81,16 @@ const playNotificationSound = () => {
 // Pääfunktio ilmoituksille
 export const sendNotification = async (title, options = {}) => {
   try {
+    console.log('sendNotification called with title:', title, 'options:', options);
+    
     // Pyydä lupa ensimmäisen kerran
     const hasPermission = await requestNotificationPermission();
+    console.log('Has permission:', hasPermission);
 
     // Näytä ilmoitus
     if (hasPermission && Notification.permission === 'granted') {
-      new Notification(title, {
+      console.log('Showing notification:', title);
+      const notification = new Notification(title, {
         icon: '/manifest.json',
         badge: '/robots.txt',
         tag: 'notification-' + Date.now(), // Unique tag estää duplikaatteja
@@ -88,14 +98,25 @@ export const sendNotification = async (title, options = {}) => {
         vibrate: [200, 100, 200], // Värinä (jos laite tukee)
         ...options
       });
+      
+      notification.onclick = () => {
+        console.log('Notification clicked');
+        window.focus();
+      };
+      
+      console.log('Notification shown successfully');
+    } else {
+      console.log('Cannot show notification - permission not granted');
     }
 
     // Soita ääni joka tapauksessa
+    console.log('Playing notification sound');
     playNotificationSound();
   } catch (error) {
     console.error('Virhe ilmoitusta lähettäessä:', error);
     // Yritä ainakin soittaa ääni vaikka ilmoitus epäonnistuisi
     try {
+      console.log('Trying to play sound despite notification error');
       playNotificationSound();
     } catch (soundError) {
       console.error('Virhe äänen soittamisessa:', soundError);
@@ -105,6 +126,7 @@ export const sendNotification = async (title, options = {}) => {
 
 // Tapahtuman ilmoitus
 export const notifyEventCreated = (eventName) => {
+  console.log('notifyEventCreated called:', eventName);
   sendNotification('🎯 Uusi tapahtuma', {
     body: `"${eventName}" on luotu`,
     tag: 'event-created',
@@ -114,6 +136,7 @@ export const notifyEventCreated = (eventName) => {
 
 // Tehtävän ilmoitus
 export const notifyTaskCreated = (taskTitle) => {
+  console.log('notifyTaskCreated called:', taskTitle);
   sendNotification('✓ Uusi tehtävä', {
     body: `"${taskTitle}" on luotu`,
     tag: 'task-created',
@@ -123,6 +146,7 @@ export const notifyTaskCreated = (taskTitle) => {
 
 // Tapahtuman muokkaus ilmoitus
 export const notifyEventUpdated = (eventName) => {
+  console.log('notifyEventUpdated called:', eventName);
   sendNotification('📝 Tapahtuma päivitetty', {
     body: `"${eventName}" on päivitetty`,
     tag: 'event-updated',
