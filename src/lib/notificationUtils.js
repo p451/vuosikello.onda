@@ -31,8 +31,31 @@ const requestNotificationPermission = async () => {
 // Soita kellonsoitto-mainen ilmoitusääni
 const playNotificationSound = () => {
   try {
+    console.log('Attempting to play notification sound');
+    
     // Käytä Web Audio API -ääntä
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Varmista että AudioContext on käynnissä
+    if (audioContext.state === 'suspended') {
+      console.log('AudioContext was suspended, resuming...');
+      audioContext.resume().then(() => {
+        console.log('AudioContext resumed successfully');
+        playSoundWithContext(audioContext);
+      }).catch((err) => {
+        console.error('Failed to resume AudioContext:', err);
+      });
+    } else {
+      playSoundWithContext(audioContext);
+    }
+  } catch (error) {
+    console.error('Virhe äänen soittamisessa:', error);
+  }
+};
+
+// Apufunktio äänen soittamiseen
+const playSoundWithContext = (audioContext) => {
+  try {
     const now = audioContext.currentTime;
     
     // Luo perusoskillaattori
@@ -73,8 +96,10 @@ const playNotificationSound = () => {
 
     oscillator.start(now);
     oscillator.stop(now + 0.85);
+    
+    console.log('Sound played successfully');
   } catch (error) {
-    console.error('Virhe äänen soittamisessa:', error);
+    console.error('Virhe äänen soittamisessa playSoundWithContext:', error);
   }
 };
 
