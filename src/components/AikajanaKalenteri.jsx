@@ -5,7 +5,7 @@ import { useRole } from '../contexts/RoleContext';
 import { useToast } from '../contexts/ToastContext';
 import TaskModal from './TaskModal';
 import { useNavigate } from 'react-router-dom';
-import { notifyEventCreated, notifyEventUpdated, notifyTaskCreated, playNotificationSound, requestNotificationPermission } from '../lib/notificationUtils';
+import { notifyEventCreated, notifyEventUpdated, notifyTaskCreated, notifyTaskCompleted, playNotificationSound } from '../lib/notificationUtils';
 
 // Helper to format author name (prioritize profile fields)
 const getAuthorName = (profile, userId) => {
@@ -175,20 +175,12 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
             });
             return updated;
           });
-          // Lähetä notifikaatio ja toast
+          // Lähetä toast ja ääni + OS-tason notifikaatio
           if (toast) {
             toast.success(`🎯 Uusi tapahtuma: "${newEvent.name}"`);
           }
           playNotificationSound();
-          requestNotificationPermission().then(granted => {
-            if (granted) {
-              new Notification('🎯 Uusi tapahtuma', {
-                body: `"${newEvent.name}" on luotu`,
-                icon: '/manifest.json',
-                tag: 'event-created'
-              });
-            }
-          });
+          notifyEventCreated(newEvent.name);
         }
       )
       .on(
@@ -225,15 +217,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
             toast.info(`📝 Tapahtuma päivitetty: "${updatedEvent.name}"`);
           }
           playNotificationSound();
-          requestNotificationPermission().then(granted => {
-            if (granted) {
-              new Notification('📝 Tapahtuma päivitetty', {
-                body: `"${updatedEvent.name}" on päivitetty`,
-                icon: '/manifest.json',
-                tag: 'event-updated'
-              });
-            }
-          });
+          notifyEventUpdated(updatedEvent.name);
         }
       )
       .on(
@@ -361,20 +345,12 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           const newTask = payload.new;
           if (!newTask.completed) {
             setCalendarTasks(prev => [...prev, newTask]);
-            // Lähetä notifikaatio ja toast
+            // Lähetä toast ja ääni + OS-tason notifikaatio
             if (toast) {
               toast.success(`✓ Uusi tehtävä: "${newTask.title}"`);
             }
             playNotificationSound();
-            requestNotificationPermission().then(granted => {
-              if (granted) {
-                new Notification('✓ Uusi tehtävä', {
-                  body: `"${newTask.title}" on luotu`,
-                  icon: '/manifest.json',
-                  tag: 'task-created'
-                });
-              }
-            });
+            notifyTaskCreated(newTask.title);
           }
         }
       )
@@ -391,20 +367,12 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           const updatedTask = payload.new;
           setCalendarTasks(prev => {
             if (updatedTask.completed) {
-              // Lähetä notifikaatio ja toast kun tehtävä valmistuu
+              // Lähetä toast ja ääni + OS-tason notifikaatio kun tehtävä valmistuu
               if (toast) {
                 toast.success(`✅ Tehtävä valmistunut: "${updatedTask.title}"`);
               }
               playNotificationSound();
-              requestNotificationPermission().then(granted => {
-                if (granted) {
-                  new Notification('✅ Tehtävä valmistunut', {
-                    body: `"${updatedTask.title}" on merkitty valmiiksi`,
-                    icon: '/manifest.json',
-                    tag: 'task-completed'
-                  });
-                }
-              });
+              notifyTaskCompleted(updatedTask.title);
               return prev.filter(t => t.id !== updatedTask.id);
             } else {
               return prev.map(t => t.id === updatedTask.id ? updatedTask : t);

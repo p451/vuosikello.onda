@@ -4,7 +4,7 @@ import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 import { useToast } from '../contexts/ToastContext';
 import TaskModal from './TaskModal';
-import { notifyTaskCreated, notifyTaskCompleted, playNotificationSound, requestNotificationPermission } from '../lib/notificationUtils';
+import { notifyTaskCreated, notifyTaskCompleted, playNotificationSound } from '../lib/notificationUtils';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState({ incomplete: [], completed: [] });
@@ -57,20 +57,12 @@ const Tasks = () => {
             ...prev,
             incomplete: [...(prev.incomplete || []), newTask]
           }));
-          // Lähetä notifikaatio ja toast
+          // Lähetä toast ja ääni + OS-tason notifikaatio
           if (toast) {
             toast.success(`✓ Uusi tehtävä: "${newTask.title}"`);
           }
           playNotificationSound();
-          requestNotificationPermission().then(granted => {
-            if (granted) {
-              new Notification('✓ Uusi tehtävä', {
-                body: `"${newTask.title}" on luotu`,
-                icon: '/manifest.json',
-                tag: 'task-created'
-              });
-            }
-          });
+          notifyTaskCreated(newTask.title);
         }
       )
       .on(
@@ -95,15 +87,7 @@ const Tasks = () => {
               toast.success(`✅ Tehtävä valmistunut: "${updatedTask.title}"`);
             }
             playNotificationSound();
-            requestNotificationPermission().then(granted => {
-              if (granted) {
-                new Notification('✅ Tehtävä valmistunut', {
-                  body: `"${updatedTask.title}" on merkitty valmiiksi`,
-                  icon: '/manifest.json',
-                  tag: 'task-completed'
-                });
-              }
-            });
+            notifyTaskCompleted(updatedTask.title);
           } else {
             setTasks(prev => ({
               ...prev,

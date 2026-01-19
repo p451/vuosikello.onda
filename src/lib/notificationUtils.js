@@ -157,8 +157,8 @@ export const sendNotification = async (title, options = {}) => {
   try {
     console.log('sendNotification called with title:', title, 'options:', options);
     
-    // Näytä visuaalinen toast
-    if (globalToastFn) {
+    // Näytä visuaalinen toast (ellei suppressToast)
+    if (globalToastFn && options.suppressToast !== true) {
       console.log('Showing toast notification');
       globalToastFn(options.body || title, 'info', 5000);
     }
@@ -171,8 +171,8 @@ export const sendNotification = async (title, options = {}) => {
     if (hasPermission && Notification.permission === 'granted') {
       console.log('Showing browser notification:', title);
       const notification = new Notification(title, {
-        icon: '/manifest.json',
-        badge: '/robots.txt',
+        icon: '/logo192.png',
+        badge: '/logo192.png',
         tag: 'notification-' + Date.now(), // Unique tag estää duplikaatteja
         requireInteraction: false, // Ei vaadi käyttäjän toimintoa, mutta näkyy silti
         vibrate: [200, 100, 200], // Värinä (jos laite tukee)
@@ -193,26 +193,41 @@ export const sendNotification = async (title, options = {}) => {
     console.log('Playing notification sound');
     playNotificationSound();
     
-    // Yritä lähettää push notifikaatio Service Workerin kautta (background-notifikaatiot)
+    // Yritä näyttää notifikaatio Service Worker -rekisteröinnin kautta (taustalla)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(registration => {
-        console.log('Service Worker ready, sending push notification');
-        // Voimme lähettää custom viestin Service Workerille
-        if (registration.active) {
-          registration.active.postMessage({
-            type: 'SHOW_NOTIFICATION',
-            title: title,
-            options: {
-              body: options.body || title,
-              icon: '/manifest.json',
-              badge: '/robots.txt',
-              tag: options.tag || 'notification-' + Date.now(),
-              vibrate: [200, 100, 200],
-              ...options
-            }
-          });
-        }
-      }).catch(err => console.error('Service Worker not ready:', err));
+      navigator.serviceWorker.ready
+        .then(registration => {
+          console.log('Service Worker ready');
+          const swOptions = {
+            body: options.body || title,
+            icon: '/logo192.png',
+            badge: '/logo192.png',
+            tag: options.tag || 'notification-' + Date.now(),
+            vibrate: [200, 100, 200],
+            ...options
+          };
+
+          if (typeof registration.showNotification === 'function') {
+            console.log('Using registration.showNotification');
+            return registration.showNotification(title, swOptions);
+          }
+
+          // Fallback: lähetä viesti aktiiviselle SW:lle tai controllerille
+          const payload = { type: 'SHOW_NOTIFICATION', title, options: swOptions };
+          if (registration.active) {
+            console.log('Posting message to registration.active');
+            registration.active.postMessage(payload);
+            return Promise.resolve();
+          }
+          if (navigator.serviceWorker.controller) {
+            console.log('Posting message via navigator.serviceWorker.controller');
+            navigator.serviceWorker.controller.postMessage(payload);
+            return Promise.resolve();
+          }
+          console.warn('No active service worker to post message to');
+          return Promise.resolve();
+        })
+        .catch(err => console.error('Service Worker not ready:', err));
     }
   } catch (error) {
     console.error('Virhe ilmoitusta lähettäessä:', error);
@@ -232,7 +247,8 @@ export const notifyEventCreated = (eventName) => {
   sendNotification('🎯 Uusi tapahtuma', {
     body: `"${eventName}" on luotu`,
     tag: 'event-created',
-    silent: false
+    silent: false,
+    suppressToast: true
   });
 };
 
@@ -242,7 +258,8 @@ export const notifyTaskCreated = (taskTitle) => {
   sendNotification('✓ Uusi tehtävä', {
     body: `"${taskTitle}" on luotu`,
     tag: 'task-created',
-    silent: false
+    silent: false,
+    suppressToast: true
   });
 };
 
@@ -252,7 +269,8 @@ export const notifyEventUpdated = (eventName) => {
   sendNotification('📝 Tapahtuma päivitetty', {
     body: `"${eventName}" on päivitetty`,
     tag: 'event-updated',
-    silent: false
+    silent: false,
+    suppressToast: true
   });
 };
 
@@ -261,6 +279,7 @@ export const notifyTaskCompleted = (taskTitle) => {
   sendNotification('✅ Tehtävä valmistunut', {
     body: `"${taskTitle}" on merkitty valmiiksi`,
     tag: 'task-completed',
-    silent: false
+    silent: false,
+    suppressToast: true
   });
 };

@@ -30,8 +30,8 @@ self.addEventListener('push', (event) => {
 
     const options = {
       body: data.body || 'Uusi notifikaatio',
-      icon: '/manifest.json',
-      badge: '/robots.txt',
+      icon: '/logo192.png',
+      badge: '/logo192.png',
       tag: data.tag || 'notification',
       requireInteraction: false,
       vibrate: [200, 100, 200],
