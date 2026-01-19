@@ -142,8 +142,14 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
     // Setup Realtime subscription for events
     if (!tenantId) return;
     
+    console.log('Setting up events realtime subscription for tenant:', tenantId);
+    
     const eventsChannel = supabase
-      .channel(`events:tenant_id=eq.${tenantId}`)
+      .channel(`public:events:tenant_id=eq.${tenantId}`, {
+        config: {
+          broadcast: { self: true }
+        }
+      })
       .on(
         'postgres_changes',
         {
@@ -153,6 +159,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Events INSERT received:', payload);
           const newEvent = payload.new;
           // Lisää tapahtuma vastaavaan kategoriaan
           setEvents(prev => {
@@ -183,6 +190,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Events UPDATE received:', payload);
           const updatedEvent = payload.new;
           // Päivitä tapahtuma
           setEvents(prev => {
@@ -215,6 +223,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Events DELETE received:', payload);
           const deletedEvent = payload.old;
           const category = deletedEvent.type;
           // Poista tapahtuma
@@ -224,10 +233,13 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           }));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Events subscription status:', status);
+      });
 
     return () => {
-      supabase.removeChannel(eventsChannel);
+      console.log('Cleaning up events subscription');
+      eventsChannel.unsubscribe();
     };
   }, [tenantId]);
 
@@ -306,8 +318,14 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
     fetchCalendarTasks();
     
     // Setup Realtime subscription for calendar tasks
+    console.log('Setting up calendar tasks realtime subscription for tenant:', tenantId);
+    
     const tasksChannel = supabase
-      .channel(`tasks:tenant_id=eq.${tenantId}`)
+      .channel(`public:tasks:calendar:tenant_id=eq.${tenantId}`, {
+        config: {
+          broadcast: { self: true }
+        }
+      })
       .on(
         'postgres_changes',
         {
@@ -317,6 +335,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Calendar tasks INSERT received:', payload);
           const newTask = payload.new;
           if (!newTask.completed) {
             setCalendarTasks(prev => [...prev, newTask]);
@@ -332,6 +351,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Calendar tasks UPDATE received:', payload);
           const updatedTask = payload.new;
           setCalendarTasks(prev => {
             if (updatedTask.completed) {
@@ -351,14 +371,18 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Calendar tasks DELETE received:', payload);
           const deletedTaskId = payload.old.id;
           setCalendarTasks(prev => prev.filter(t => t.id !== deletedTaskId));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Calendar tasks subscription status:', status);
+      });
 
     return () => {
-      supabase.removeChannel(tasksChannel);
+      console.log('Cleaning up calendar tasks subscription');
+      tasksChannel.unsubscribe();
     };
   }, [tenantId, currentDate]);
 

@@ -31,8 +31,14 @@ const Tasks = () => {
     fetchTasks();
     
     // Setup Realtime subscription for tasks
+    console.log('Setting up tasks realtime subscription for tenant:', tenantId);
+    
     const channel = supabase
-      .channel(`tasks:tenant_id=eq.${tenantId}`)
+      .channel(`public:tasks:tenant_id=eq.${tenantId}`, {
+        config: {
+          broadcast: { self: true }
+        }
+      })
       .on(
         'postgres_changes',
         {
@@ -42,6 +48,7 @@ const Tasks = () => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Tasks INSERT received:', payload);
           const newTask = payload.new;
           // Lisää tehtävä listalle
           setTasks(prev => ({
@@ -61,6 +68,7 @@ const Tasks = () => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Tasks UPDATE received:', payload);
           const updatedTask = payload.new;
           // Päivitä tehtävä listalla
           if (updatedTask.completed) {
@@ -88,6 +96,7 @@ const Tasks = () => {
           filter: `tenant_id=eq.${tenantId}`
         },
         (payload) => {
+          console.log('Tasks DELETE received:', payload);
           const deletedTaskId = payload.old.id;
           setTasks(prev => ({
             incomplete: prev.incomplete.filter(t => t.id !== deletedTaskId),
@@ -95,10 +104,13 @@ const Tasks = () => {
           }));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Tasks subscription status:', status);
+      });
 
     return () => {
-      supabase.removeChannel(channel);
+      console.log('Cleaning up tasks subscription');
+      channel.unsubscribe();
     };
   }, [tenantId]);
 
