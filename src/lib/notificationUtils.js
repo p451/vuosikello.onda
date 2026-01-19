@@ -11,7 +11,7 @@ export const setGlobalToastFunction = (toastFn) => {
 };
 
 // Tarkista selaimen notifikaatio-tuki
-const requestNotificationPermission = async () => {
+export const requestNotificationPermission = async () => {
   if (!('Notification' in window)) {
     console.log('Selaimen notifikaatiot eivät ole tuettuja');
     return false;
@@ -36,7 +36,7 @@ const requestNotificationPermission = async () => {
 };
 
 // Soita kellonsoitto-mainen ilmoitusääni
-const playNotificationSound = () => {
+export const playNotificationSound = () => {
   try {
     console.log('Attempting to play notification sound');
     

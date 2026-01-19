@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
+import { useToast } from '../contexts/ToastContext';
 import TaskModal from './TaskModal';
 import { useNavigate } from 'react-router-dom';
-import { notifyEventCreated, notifyEventUpdated, notifyTaskCreated } from '../lib/notificationUtils';
+import { notifyEventCreated, notifyEventUpdated, notifyTaskCreated, playNotificationSound, requestNotificationPermission } from '../lib/notificationUtils';
 
 // Helper to format author name (prioritize profile fields)
 const getAuthorName = (profile, userId) => {
@@ -21,6 +22,7 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
   const [viewMode, setViewMode] = useState('month');
   // Note: selectedLayer will be used for future layer filtering feature
   const [selectedLayer] = useState('all');
+  const toast = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -173,8 +175,20 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
             });
             return updated;
           });
-          // Lähetä notifikaatio
-          notifyEventCreated(newEvent.name);
+          // Lähetä notifikaatio ja toast
+          if (toast) {
+            toast.success(`🎯 Uusi tapahtuma: "${newEvent.name}"`);
+          }
+          playNotificationSound();
+          requestNotificationPermission().then(granted => {
+            if (granted) {
+              new Notification('🎯 Uusi tapahtuma', {
+                body: `"${newEvent.name}" on luotu`,
+                icon: '/manifest.json',
+                tag: 'event-created'
+              });
+            }
+          });
         }
       )
       .on(
@@ -207,7 +221,19 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
             }
             return updated;
           });
-          notifyEventUpdated(updatedEvent.name);
+          if (toast) {
+            toast.info(`📝 Tapahtuma päivitetty: "${updatedEvent.name}"`);
+          }
+          playNotificationSound();
+          requestNotificationPermission().then(granted => {
+            if (granted) {
+              new Notification('📝 Tapahtuma päivitetty', {
+                body: `"${updatedEvent.name}" on päivitetty`,
+                icon: '/manifest.json',
+                tag: 'event-updated'
+              });
+            }
+          });
         }
       )
       .on(
@@ -335,8 +361,20 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           const newTask = payload.new;
           if (!newTask.completed) {
             setCalendarTasks(prev => [...prev, newTask]);
-            // Lähetä notifikaatio kaikille
-            notifyTaskCreated(newTask.title);
+            // Lähetä notifikaatio ja toast
+            if (toast) {
+              toast.success(`✓ Uusi tehtävä: "${newTask.title}"`);
+            }
+            playNotificationSound();
+            requestNotificationPermission().then(granted => {
+              if (granted) {
+                new Notification('✓ Uusi tehtävä', {
+                  body: `"${newTask.title}" on luotu`,
+                  icon: '/manifest.json',
+                  tag: 'task-created'
+                });
+              }
+            });
           }
         }
       )
@@ -353,8 +391,20 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           const updatedTask = payload.new;
           setCalendarTasks(prev => {
             if (updatedTask.completed) {
-              // Lähetä notifikaatio kun tehtävä valmistuu
-              notifyTaskCompleted(updatedTask.title);
+              // Lähetä notifikaatio ja toast kun tehtävä valmistuu
+              if (toast) {
+                toast.success(`✅ Tehtävä valmistunut: "${updatedTask.title}"`);
+              }
+              playNotificationSound();
+              requestNotificationPermission().then(granted => {
+                if (granted) {
+                  new Notification('✅ Tehtävä valmistunut', {
+                    body: `"${updatedTask.title}" on merkitty valmiiksi`,
+                    icon: '/manifest.json',
+                    tag: 'task-completed'
+                  });
+                }
+              });
               return prev.filter(t => t.id !== updatedTask.id);
             } else {
               return prev.map(t => t.id === updatedTask.id ? updatedTask : t);

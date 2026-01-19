@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
+import { useToast } from '../contexts/ToastContext';
 import TaskModal from './TaskModal';
-import { notifyTaskCreated, notifyTaskCompleted } from '../lib/notificationUtils';
+import { notifyTaskCreated, notifyTaskCompleted, playNotificationSound, requestNotificationPermission } from '../lib/notificationUtils';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState({ incomplete: [], completed: [] });
+  const toast = useToast();
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -55,8 +57,20 @@ const Tasks = () => {
             ...prev,
             incomplete: [...(prev.incomplete || []), newTask]
           }));
-          // Lähetä notifikaatio
-          notifyTaskCreated(newTask.title);
+          // Lähetä notifikaatio ja toast
+          if (toast) {
+            toast.success(`✓ Uusi tehtävä: "${newTask.title}"`);
+          }
+          playNotificationSound();
+          requestNotificationPermission().then(granted => {
+            if (granted) {
+              new Notification('✓ Uusi tehtävä', {
+                body: `"${newTask.title}" on luotu`,
+                icon: '/manifest.json',
+                tag: 'task-created'
+              });
+            }
+          });
         }
       )
       .on(
@@ -77,7 +91,19 @@ const Tasks = () => {
               incomplete: prev.incomplete.filter(t => t.id !== updatedTask.id),
               completed: [...prev.completed, updatedTask]
             }));
-            notifyTaskCompleted(updatedTask.title);
+            if (toast) {
+              toast.success(`✅ Tehtävä valmistunut: "${updatedTask.title}"`);
+            }
+            playNotificationSound();
+            requestNotificationPermission().then(granted => {
+              if (granted) {
+                new Notification('✅ Tehtävä valmistunut', {
+                  body: `"${updatedTask.title}" on merkitty valmiiksi`,
+                  icon: '/manifest.json',
+                  tag: 'task-completed'
+                });
+              }
+            });
           } else {
             setTasks(prev => ({
               ...prev,
