@@ -335,6 +335,8 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           const newTask = payload.new;
           if (!newTask.completed) {
             setCalendarTasks(prev => [...prev, newTask]);
+            // Lähetä notifikaatio kaikille
+            notifyTaskCreated(newTask.title);
           }
         }
       )
@@ -351,6 +353,8 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
           const updatedTask = payload.new;
           setCalendarTasks(prev => {
             if (updatedTask.completed) {
+              // Lähetä notifikaatio kun tehtävä valmistuu
+              notifyTaskCompleted(updatedTask.title);
               return prev.filter(t => t.id !== updatedTask.id);
             } else {
               return prev.map(t => t.id === updatedTask.id ? updatedTask : t);
