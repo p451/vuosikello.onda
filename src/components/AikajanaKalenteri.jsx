@@ -4,6 +4,7 @@ import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 import TaskModal from './TaskModal';
 import { useNavigate } from 'react-router-dom';
+import { notifyEventCreated, notifyEventUpdated, notifyTaskCreated } from '../lib/notificationUtils';
 
 // Helper to format author name (prioritize profile fields)
 const getAuthorName = (profile, userId) => {
@@ -102,10 +103,16 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
     e.preventDefault();
     if (!tenantId) return;
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('tasks')
-        .insert([{ ...newTask, tenant_id: tenantId, deadline: newTask.deadline || (selectedDay ? getLocalDateString(selectedDay) : '') }]);
+        .insert([{ ...newTask, tenant_id: tenantId, deadline: newTask.deadline || (selectedDay ? getLocalDateString(selectedDay) : '') }])
+        .select()
+        .single();
       if (error) throw error;
+      // Lähetä notifikaatio uudesta tehtävästä
+      if (data) {
+        notifyTaskCreated(data.title);
+      }
       setShowAddTaskModal(false);
       setNewTask({ title: '', description: '', deadline: '', priority: 'medium', category: '', event_id: null });
       // Refresh tasks for the day panel
@@ -332,6 +339,8 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
             tenant_id: event.tenant_id,
             info: event.info
           });
+          // Lähetä notifikaatio jokaisesta luodusta tapahtumasta
+          notifyEventCreated(event.name);
         });
         setEvents(newEvents);
       }
@@ -361,6 +370,8 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
         .eq('tenant_id', tenantId);
 
       if (error) throw error;
+      // Lähetä notifikaatio tapahtuman päivityksestä
+      notifyEventUpdated(editEvent.name);
       await fetchEvents();
       setShowEditModal(false);
       setEditEvent(null);

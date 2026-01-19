@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useTenant } from '../contexts/TenantContext';
 import { useRole } from '../contexts/RoleContext';
 import TaskModal from './TaskModal';
+import { notifyTaskCreated, notifyTaskCompleted } from '../lib/notificationUtils';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState({ incomplete: [], completed: [] });
@@ -79,6 +80,8 @@ const Tasks = () => {
       if (data) {
         setTasks(prev => ({ ...prev, incomplete: [...(prev.incomplete || []), data] }));
         setShowAddTaskModal(false); // Close modal after creation
+        // Lähetä notifikaatio uudesta tehtävästä
+        notifyTaskCreated(data.title);
       }
       setNewTask({
         title: '',
@@ -106,6 +109,12 @@ const Tasks = () => {
       setTasks(prevTasks => {
         const updatedTask = prevTasks.incomplete.find(task => task.id === taskId) || prevTasks.completed.find(task => task.id === taskId);
         updatedTask.completed = !currentStatus;
+        
+        // Lähetä notifikaatio kun tehtävä merkitään valmiiksi
+        if (!currentStatus) {
+          notifyTaskCompleted(updatedTask.title);
+        }
+        
         if (currentStatus) {
           return {
             incomplete: [...prevTasks.incomplete, updatedTask],
