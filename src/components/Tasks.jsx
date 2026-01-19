@@ -29,6 +29,77 @@ const Tasks = () => {
       return;
     }
     fetchTasks();
+    
+    // Setup Realtime subscription for tasks
+    const channel = supabase
+      .channel(`tasks:tenant_id=eq.${tenantId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const newTask = payload.new;
+          // Lisää tehtävä listalle
+          setTasks(prev => ({
+            ...prev,
+            incomplete: [...(prev.incomplete || []), newTask]
+          }));
+          // Lähetä notifikaatio
+          notifyTaskCreated(newTask.title);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const updatedTask = payload.new;
+          // Päivitä tehtävä listalla
+          if (updatedTask.completed) {
+            setTasks(prev => ({
+              ...prev,
+              incomplete: prev.incomplete.filter(t => t.id !== updatedTask.id),
+              completed: [...prev.completed, updatedTask]
+            }));
+            notifyTaskCompleted(updatedTask.title);
+          } else {
+            setTasks(prev => ({
+              ...prev,
+              incomplete: prev.incomplete.map(t => t.id === updatedTask.id ? updatedTask : t),
+              completed: prev.completed.filter(t => t.id !== updatedTask.id)
+            }));
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const deletedTaskId = payload.old.id;
+          setTasks(prev => ({
+            incomplete: prev.incomplete.filter(t => t.id !== deletedTaskId),
+            completed: prev.completed.filter(t => t.id !== deletedTaskId)
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [tenantId]);
 
   useEffect(() => {

@@ -22,14 +22,14 @@ const requestNotificationPermission = async () => {
   return false;
 };
 
-// Soita ilmoitusääni
+// Soita kellonsoitto-mainen ilmoitusääni
 const playNotificationSound = () => {
   try {
     // Käytä Web Audio API -ääntä
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const now = audioContext.currentTime;
     
-    // Luo kaksi oskillaattoria miellyttävän äänen luomiseen
+    // Luo perusoskillaattori
     const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
     const filter = audioContext.createBiquadFilter();
@@ -38,30 +38,35 @@ const playNotificationSound = () => {
     filter.connect(gain);
     gain.connect(audioContext.destination);
 
-    // Aseta ominaisuudet
+    // Aseta ominaisuudet kellonsoittomaista ääntä varten
     oscillator.type = 'sine';
     filter.type = 'lowpass';
-    filter.frequency.value = 3000;
+    filter.frequency.value = 4000;
 
-    // Luodaan kaksiosainen melodia
-    // Ensimmäinen sävel
-    oscillator.frequency.setValueAtTime(600, now);
-    oscillator.frequency.setValueAtTime(600, now + 0.1);
-    
-    // Toinen sävel korkeampi
-    oscillator.frequency.setValueAtTime(900, now + 0.15);
-    oscillator.frequency.setValueAtTime(900, now + 0.3);
-
-    // Gain envelope - lisää ja vähennä volyymiä
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.4, now + 0.05);
-    gain.gain.setValueAtTime(0.4, now + 0.1);
+    // Luodaan neljä kellonsoiton kaltaista säveliä
+    // Sävel 1 - korkea C
+    oscillator.frequency.setValueAtTime(1047, now);
+    oscillator.frequency.setValueAtTime(1047, now + 0.15);
+    gain.gain.linearRampToValueAtTime(0.5, now + 0.05);
     gain.gain.linearRampToValueAtTime(0, now + 0.15);
-    gain.gain.linearRampToValueAtTime(0.3, now + 0.16);
-    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+    
+    // Sävel 2 - matala C
+    oscillator.frequency.setValueAtTime(523.25, now + 0.2);
+    gain.gain.setValueAtTime(0.5, now + 0.2);
+    gain.gain.linearRampToValueAtTime(0, now + 0.35);
+    
+    // Sävel 3 - korkea E
+    oscillator.frequency.setValueAtTime(1318.51, now + 0.4);
+    gain.gain.setValueAtTime(0.5, now + 0.4);
+    gain.gain.linearRampToValueAtTime(0, now + 0.55);
+    
+    // Sävel 4 - matala E (loppuaksentti)
+    oscillator.frequency.setValueAtTime(659.25, now + 0.6);
+    gain.gain.setValueAtTime(0.6, now + 0.6);
+    gain.gain.linearRampToValueAtTime(0, now + 0.85);
 
     oscillator.start(now);
-    oscillator.stop(now + 0.3);
+    oscillator.stop(now + 0.85);
   } catch (error) {
     console.error('Virhe äänen soittamisessa:', error);
   }
@@ -79,7 +84,8 @@ export const sendNotification = async (title, options = {}) => {
         icon: '/manifest.json',
         badge: '/robots.txt',
         tag: 'notification-' + Date.now(), // Unique tag estää duplikaatteja
-        requireInteraction: false, // Ei vaadi käyttäjän toimintoa
+        requireInteraction: false, // Ei vaadi käyttäjän toimintoa, mutta näkyy silti
+        vibrate: [200, 100, 200], // Värinä (jos laite tukee)
         ...options
       });
     }
@@ -100,31 +106,35 @@ export const sendNotification = async (title, options = {}) => {
 // Tapahtuman ilmoitus
 export const notifyEventCreated = (eventName) => {
   sendNotification('🎯 Uusi tapahtuma', {
-    body: `Tapahtuma "${eventName}" on luotu`,
-    tag: 'event-created'
+    body: `"${eventName}" on luotu`,
+    tag: 'event-created',
+    silent: false
   });
 };
 
 // Tehtävän ilmoitus
 export const notifyTaskCreated = (taskTitle) => {
   sendNotification('✓ Uusi tehtävä', {
-    body: `Tehtävä "${taskTitle}" on luotu`,
-    tag: 'task-created'
+    body: `"${taskTitle}" on luotu`,
+    tag: 'task-created',
+    silent: false
   });
 };
 
 // Tapahtuman muokkaus ilmoitus
 export const notifyEventUpdated = (eventName) => {
   sendNotification('📝 Tapahtuma päivitetty', {
-    body: `Tapahtuma "${eventName}" on päivitetty`,
-    tag: 'event-updated'
+    body: `"${eventName}" on päivitetty`,
+    tag: 'event-updated',
+    silent: false
   });
 };
 
 // Tehtävän valmistumisen ilmoitus
 export const notifyTaskCompleted = (taskTitle) => {
   sendNotification('✅ Tehtävä valmistunut', {
-    body: `Tehtävä "${taskTitle}" on merkitty valmiiksi`,
-    tag: 'task-completed'
+    body: `"${taskTitle}" on merkitty valmiiksi`,
+    tag: 'task-completed',
+    silent: false
   });
 };

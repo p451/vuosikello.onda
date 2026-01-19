@@ -138,6 +138,97 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
       await fetchEvents();
     };
     init();
+    
+    // Setup Realtime subscription for events
+    if (!tenantId) return;
+    
+    const eventsChannel = supabase
+      .channel(`events:tenant_id=eq.${tenantId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'events',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const newEvent = payload.new;
+          // Lisää tapahtuma vastaavaan kategoriaan
+          setEvents(prev => {
+            const category = newEvent.type;
+            const updated = { ...prev };
+            if (!updated[category]) updated[category] = [];
+            updated[category].push({
+              id: newEvent.id,
+              name: newEvent.name,
+              startDate: newEvent.start_date,
+              endDate: newEvent.end_date,
+              type: newEvent.type,
+              tenant_id: newEvent.tenant_id,
+              info: newEvent.info
+            });
+            return updated;
+          });
+          // Lähetä notifikaatio
+          notifyEventCreated(newEvent.name);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'events',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const updatedEvent = payload.new;
+          // Päivitä tapahtuma
+          setEvents(prev => {
+            const category = updatedEvent.type;
+            const updated = { ...prev };
+            if (updated[category]) {
+              updated[category] = updated[category].map(e =>
+                e.id === updatedEvent.id ? {
+                  id: updatedEvent.id,
+                  name: updatedEvent.name,
+                  startDate: updatedEvent.start_date,
+                  endDate: updatedEvent.end_date,
+                  type: updatedEvent.type,
+                  tenant_id: updatedEvent.tenant_id,
+                  info: updatedEvent.info
+                } : e
+              );
+            }
+            return updated;
+          });
+          notifyEventUpdated(updatedEvent.name);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'events',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const deletedEvent = payload.old;
+          const category = deletedEvent.type;
+          // Poista tapahtuma
+          setEvents(prev => ({
+            ...prev,
+            [category]: prev[category]?.filter(e => e.id !== deletedEvent.id) || []
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(eventsChannel);
+    };
   }, [tenantId]);
 
   // Get tenant_id from user metadata on component mount
@@ -213,6 +304,62 @@ const AikajanaKalenteri = ({ sidebarOpen, setSidebarOpen }) => {
       if (!error && data) setCalendarTasks(data);
     };
     fetchCalendarTasks();
+    
+    // Setup Realtime subscription for calendar tasks
+    const tasksChannel = supabase
+      .channel(`tasks:tenant_id=eq.${tenantId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const newTask = payload.new;
+          if (!newTask.completed) {
+            setCalendarTasks(prev => [...prev, newTask]);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const updatedTask = payload.new;
+          setCalendarTasks(prev => {
+            if (updatedTask.completed) {
+              return prev.filter(t => t.id !== updatedTask.id);
+            } else {
+              return prev.map(t => t.id === updatedTask.id ? updatedTask : t);
+            }
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${tenantId}`
+        },
+        (payload) => {
+          const deletedTaskId = payload.old.id;
+          setCalendarTasks(prev => prev.filter(t => t.id !== deletedTaskId));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(tasksChannel);
+    };
   }, [tenantId, currentDate]);
 
   const fetchEvents = async () => {
